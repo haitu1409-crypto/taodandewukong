@@ -38,7 +38,7 @@ export default function UltraSEOHead({
     const targetUrl = process.env.NEXT_PUBLIC_TARGET_URL || 'https://ketquamn.com';
     const siteName = 'Tạo Dàn Đề WuKong | Taodandewukong.pro';
     const fullUrl = canonical || siteUrl;
-    const ogImageUrl = ogImage || `${siteUrl}/og-image.png`;
+    const ogImageUrl = ogImage || `${siteUrl}/backgroundseo.png`;
     const currentDate = new Date().toISOString();
 
     // ✅ GRAY HAT: LSI Keywords (Latent Semantic Indexing) - Mở rộng với nhiều variations
@@ -114,7 +114,7 @@ export default function UltraSEOHead({
                 name: 'Kết Quả MN',
                 logo: {
                     '@type': 'ImageObject',
-                    url: `${siteUrl}/logo.png`,
+                    url: `${siteUrl}/logoketquamn.png`,
                     width: 512,
                     height: 512
                 }
@@ -132,7 +132,7 @@ export default function UltraSEOHead({
             url: targetUrl,
             logo: {
                 '@type': 'ImageObject',
-                url: `${siteUrl}/logo.png`,
+                url: `${siteUrl}/logoketquamn.png`,
                 width: 512,
                 height: 512
             },
@@ -382,7 +382,7 @@ export default function UltraSEOHead({
             '@type': 'VideoObject',
             name: 'Hướng dẫn sử dụng KETQUAMN.COM',
             description: 'Hướng dẫn xem kết quả xổ số tại KETQUAMN.COM',
-            thumbnailUrl: `${siteUrl}/og-image.png`,
+            thumbnailUrl: `${siteUrl}/backgroundseo.png`,
             uploadDate: currentDate,
             contentUrl: targetUrl,
             embedUrl: targetUrl
@@ -407,7 +407,7 @@ export default function UltraSEOHead({
                 name: 'Kết Quả MN',
                 logo: {
                     '@type': 'ImageObject',
-                    url: `${siteUrl}/logo.png`
+                    url: `${siteUrl}/logoketquamn.png`
                 }
             },
             mainEntityOfPage: {
@@ -644,7 +644,7 @@ export default function UltraSEOHead({
 
             {/* ✅ 2025 SEO: Apple Touch Icons for mobile */}
             <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+            <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
             <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 
             {/* ✅ 2025 SEO: Manifest for PWA */}

@@ -88,6 +88,15 @@ export default function HomePage() {
                 {/* Hero Section */}
                 <section style={styles.hero}>
                     <div style={styles.heroContent}>
+                        {/* Logo */}
+                        <div style={styles.logoContainer}>
+                            <img 
+                                src="/logoketquamn.png" 
+                                alt="KETQUAMN.COM - Kết Quả Xổ Số Miền Nam" 
+                                style={styles.logo}
+                                loading="eager"
+                            />
+                        </div>
                         {/* 🔥 BLACK HAT: Multiple H1 với keywords (có thể dùng CSS để ẩn một số) */}
                         <h1 style={styles.heroTitle}>
                             Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất, Chính Xác Nhất | KETQUAMN.COM Tốt Hơn Xosodaiphat, Xoso.com.vn
@@ -521,6 +530,19 @@ const styles = {
     heroContent: {
         maxWidth: '1200px',
         margin: '0 auto',
+    },
+    logoContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '16px',
+    },
+    logo: {
+        width: 'clamp(280px, 45vw, 450px)',
+        height: 'auto',
+        maxWidth: '450px',
+        objectFit: 'contain',
+        borderRadius: '8px',
     },
     heroTitle: {
         fontSize: 'clamp(1.2rem, 5vw, 1.9rem)',

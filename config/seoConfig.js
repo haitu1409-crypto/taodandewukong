@@ -156,7 +156,7 @@ const SEO_CONFIG = {
             'xosominhngoc', 'xo so minh ngoc',
         ].join(', '),
         canonical: SITE_URL,
-        ogImage: `${SITE_URL}/og-image.png`,
+        ogImage: `${SITE_URL}/backgroundseo.png`,
     }
 };
 

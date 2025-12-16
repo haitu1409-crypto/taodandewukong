@@ -3,21 +3,115 @@
  * Mục tiêu: Tạo landing page mạnh mẽ để SEO backlink về ketquamn.com
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import UltraSEOHead from '../components/UltraSEOHead';
+import TableDateKQXS from '../components/TableDateKQXS';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
 
 export default function HomePage() {
     const seoConfig = SEO_CONFIG.home;
     const targetUrl = TARGET_URL;
+    const [isApproachingLottery, setIsApproachingLottery] = useState({
+        south: false,
+        central: false,
+        north: false,
+    });
 
     // Scroll to top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
+    // Kiểm tra thời gian xổ số để áp dụng animation cho backlinks
+    useEffect(() => {
+        const checkLotteryTime = () => {
+            const now = new Date();
+            const vietnamFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+
+            const parts = vietnamFormatter.formatToParts(now);
+            const currentHour = parseInt(parts.find(p => p.type === 'hour').value);
+            const currentMinute = parseInt(parts.find(p => p.type === 'minute').value);
+            const currentTime = currentHour * 60 + currentMinute;
+
+            // Thời gian xổ số
+            const southStart = 16 * 60 + 15; // 16:15
+            const southEnd = 16 * 60 + 45; // 16:45
+            const southPrep = southStart - 30; // 15:45
+
+            const centralStart = 17 * 60 + 15; // 17:15
+            const centralEnd = 17 * 60 + 45; // 17:45
+            const centralPrep = centralStart - 30; // 16:45
+
+            const northStart = 18 * 60 + 15; // 18:15
+            const northEnd = 18 * 60 + 45; // 18:45
+            const northPrep = northStart - 30; // 17:45
+
+            setIsApproachingLottery({
+                south: currentTime >= southPrep && currentTime <= southEnd,
+                central: currentTime >= centralPrep && currentTime <= centralEnd,
+                north: currentTime >= northPrep && currentTime <= northEnd,
+            });
+        };
+
+        checkLotteryTime();
+        const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
+        return () => clearInterval(interval);
+    }, []);
+
+    // ✅ PERFORMANCE: Memoize helper function với useCallback
+    const shouldAnimateLink = useCallback((url) => {
+        if (!url) return false;
+        if (url.includes('ket-qua-xo-so-mien-nam')) return isApproachingLottery.south;
+        if (url.includes('ket-qua-xo-so-mien-bac')) return isApproachingLottery.north;
+        if (url.includes('ket-qua-xo-so-mien-trung')) return isApproachingLottery.central;
+        return false;
+    }, [isApproachingLottery.south, isApproachingLottery.north, isApproachingLottery.central]);
+
+    // ✅ PERFORMANCE: Memoize style function với useCallback
+    const getAnimatedLinkStyle = useCallback((baseStyle, url) => {
+        if (!shouldAnimateLink(url)) return baseStyle;
+        // Kiểm tra nếu là text link (backlink) - không có backgroundColor trong baseStyle
+        const isTextLink = !baseStyle.backgroundColor && !baseStyle.background;
+        if (isTextLink) {
+            return {
+                ...baseStyle,
+                animation: 'colorPulse 1.5s ease-in-out infinite',
+                backgroundColor: '#E65A2E',
+                color: '#ffffff',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                textDecoration: 'none',
+                boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+            };
+        }
+        // Nếu là button/link có background
+        return {
+            ...baseStyle,
+            animation: 'colorPulse 1.5s ease-in-out infinite',
+            boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+        };
+    }, [shouldAnimateLink]);
+
     return (
         <>
+            {/* CSS Animation cho backlinks */}
+            <style jsx>{`
+                @keyframes colorPulse {
+                    0%, 100% {
+                        background-color: #E65A2E;
+                        box-shadow: 0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3);
+                    }
+                    50% {
+                        background-color: #FF8C42;
+                        box-shadow: 0 0 15px rgba(255, 140, 66, 0.7), 0 0 30px rgba(255, 140, 66, 0.4);
+                    }
+                }
+            `}</style>
             <UltraSEOHead
                 title={seoConfig.title}
                 description={seoConfig.description}
@@ -97,13 +191,13 @@ export default function HomePage() {
                                 loading="eager"
                             />
                         </div>
-                        {/* 🔥 BLACK HAT: Multiple H1 với keywords (có thể dùng CSS để ẩn một số) */}
+                        {/* H1 chính - rút gọn */}
                         <h1 style={styles.heroTitle}>
-                            Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất, Chính Xác Nhất | KETQUAMN.COM Tốt Hơn Xosodaiphat, Xoso.com.vn
+                            Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất | KETQUAMN.COM
                         </h1>
-                        {/* 🔥 BLACK HAT: Hidden H1 với competitor keywords */}
+                        {/* 🔥 SEO: Hidden H1 với đầy đủ keywords cho SEO */}
                         <h1 style={styles.hiddenH1}>
-                            Xosodaiphat Thay Thế, Xoso.com.vn Alternative, Xskt.com.vn Thay Thế, Xsmn.mobi Alternative, Ketqua04 Thay Thế - KETQUAMN.COM Tốt Nhất
+                            Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất, Chính Xác Nhất | KETQUAMN.COM Tốt Hơn Xosodaiphat, Xoso.com.vn, Xskt.com.vn, Xsmn.mobi, Ketqua04, Xosominhngoc. Xosodaiphat Thay Thế, Xoso.com.vn Alternative, Xskt.com.vn Thay Thế, Xsmn.mobi Alternative, Ketqua04 Thay Thế - KETQUAMN.COM Tốt Nhất
                         </h1>
                         <p style={styles.heroDescription}>
                             <strong>KETQUAMN.COM</strong> - Kết quả xổ số 3 miền nhanh nhất ⚡
@@ -124,10 +218,13 @@ export default function HomePage() {
                                     rel="nofollow"
                                 >
                                     Thống kê lô gan
-                                </a> • 
-                                Tốt hơn xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi, ketqua04 • Miễn phí 100%
+                                </a> • Miễn phí 100%
                             </span>
                         </p>
+                        {/* 🔥 SEO: Hidden text với đầy đủ keywords */}
+                        <div style={styles.seoHiddenText}>
+                            KETQUAMN.COM - Kết quả xổ số miền Nam, miền Bắc, miền Trung nhanh nhất, chính xác nhất. Tốt hơn xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi, ketqua04, xosominhngoc về mọi mặt. XSMN, XSMB, XSMT, KQXSMN, KQXSMB cập nhật realtime. Thống kê lô gan, soi cầu AI, tạo dàn đề miễn phí 100%. Xosodaiphat alternative, xosodaiphat thay thế, thay thế xosodaiphat, tốt hơn xosodaiphat. Xoso.com.vn alternative, xoso thay thế, thay thế xoso.com.vn, tốt hơn xoso.com.vn. Xskt.com.vn alternative, xskt thay thế, thay thế xskt.com.vn, tốt hơn xskt.com.vn. Xsmn.mobi alternative, xsmn.mobi thay thế, thay thế xsmn.mobi, tốt hơn xsmn.mobi. Ketqua04.net alternative, ketqua04 thay thế, thay thế ketqua04, tốt hơn ketqua04. Xosominhngoc alternative, xosominhngoc thay thế, thay thế xosominhngoc, tốt hơn xosominhngoc.
+                        </div>
                         <div style={styles.ctaContainer}>
                             {BACKLINK_CONTENT.ctaButtons.map((cta, index) => (
                                 <a
@@ -153,6 +250,11 @@ export default function HomePage() {
                     </div>
                 </section>
 
+                {/* Table Date KQXS Component */}
+                <section style={styles.tableSection}>
+                    <TableDateKQXS />
+                </section>
+
                 {/* Main Content Section */}
                 <section style={styles.mainContent}>
                     <div style={styles.contentWrapper}>
@@ -162,16 +264,24 @@ export default function HomePage() {
                             <div style={styles.quickLinksGrid}>
                                 <a 
                                     href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                                    style={styles.quickLink} 
+                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)} 
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
+                                            e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        }
                                         e.currentTarget.style.borderColor = '#E65A2E';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.animation = 'none';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
-                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
+                                            e.currentTarget.style.backgroundColor = '#333333';
+                                        }
+                                        e.currentTarget.style.borderColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#E65A2E' : 'rgba(255,255,255,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
+                                        if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
+                                            e.currentTarget.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                        }
                                     }}
                                     rel="nofollow"
                                 >
@@ -180,16 +290,24 @@ export default function HomePage() {
                                 </a>
                                 <a 
                                     href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                                    style={styles.quickLink} 
+                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)} 
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
+                                            e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        }
                                         e.currentTarget.style.borderColor = '#E65A2E';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.animation = 'none';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
-                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
+                                            e.currentTarget.style.backgroundColor = '#333333';
+                                        }
+                                        e.currentTarget.style.borderColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#E65A2E' : 'rgba(255,255,255,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
+                                        if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
+                                            e.currentTarget.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                        }
                                     }}
                                     rel="nofollow"
                                 >
@@ -348,14 +466,21 @@ export default function HomePage() {
                                     </a>, 
                                     <a 
                                         href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                                        style={styles.backlink} 
+                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-nam`)} 
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
+                                            e.target.style.animation = 'none';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.target.style.color = '#b0b0b0';
-                                            e.target.style.borderBottomColor = 'transparent';
+                                            e.target.style.color = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#ffffff' : '#b0b0b0';
+                                            e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#E65A2E' : 'transparent';
+                                            if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
+                                                e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                                e.target.style.padding = '2px 4px';
+                                                e.target.style.borderRadius = '4px';
+                                                e.target.style.backgroundColor = '#E65A2E';
+                                            }
                                         }}
                                         rel="nofollow"
                                     >
@@ -363,14 +488,21 @@ export default function HomePage() {
                                     </a>, 
                                     <a 
                                         href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                                        style={styles.backlink} 
+                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-bac`)} 
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
+                                            e.target.style.animation = 'none';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.target.style.color = '#b0b0b0';
-                                            e.target.style.borderBottomColor = 'transparent';
+                                            e.target.style.color = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#ffffff' : '#b0b0b0';
+                                            e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#E65A2E' : 'transparent';
+                                            if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
+                                                e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                                e.target.style.padding = '2px 4px';
+                                                e.target.style.borderRadius = '4px';
+                                                e.target.style.backgroundColor = '#E65A2E';
+                                            }
                                         }}
                                         rel="nofollow"
                                     >
@@ -436,14 +568,20 @@ export default function HomePage() {
                         <span style={{color: 'rgba(255,255,255,0.3)', margin: '0 2px'}}>•</span>
                         <a 
                             href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                            style={styles.footerLink}
+                            style={getAnimatedLinkStyle(styles.footerLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)}
                             onMouseEnter={(e) => {
                                 e.target.style.textDecoration = 'underline';
                                 e.target.style.borderBottomColor = '#E65A2E';
+                                e.target.style.animation = 'none';
                             }}
                             onMouseLeave={(e) => {
-                                e.target.style.textDecoration = 'none';
-                                e.target.style.borderBottomColor = 'transparent';
+                                e.target.style.textDecoration = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? 'underline' : 'none';
+                                e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#E65A2E' : 'transparent';
+                                if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
+                                    e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                    e.target.style.padding = '2px 4px';
+                                    e.target.style.borderRadius = '4px';
+                                }
                             }}
                             rel="nofollow"
                         >
@@ -452,14 +590,20 @@ export default function HomePage() {
                         <span style={{color: 'rgba(255,255,255,0.3)', margin: '0 2px'}}>•</span>
                         <a 
                             href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                            style={styles.footerLink}
+                            style={getAnimatedLinkStyle(styles.footerLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)}
                             onMouseEnter={(e) => {
                                 e.target.style.textDecoration = 'underline';
                                 e.target.style.borderBottomColor = '#E65A2E';
+                                e.target.style.animation = 'none';
                             }}
                             onMouseLeave={(e) => {
-                                e.target.style.textDecoration = 'none';
-                                e.target.style.borderBottomColor = 'transparent';
+                                e.target.style.textDecoration = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? 'underline' : 'none';
+                                e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#E65A2E' : 'transparent';
+                                if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
+                                    e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+                                    e.target.style.padding = '2px 4px';
+                                    e.target.style.borderRadius = '4px';
+                                }
                             }}
                             rel="nofollow"
                         >
@@ -595,6 +739,12 @@ const styles = {
         border: '2px solid #E65A2E', // Chỉ border cam, không dùng cam cho text
         cursor: 'pointer',
         boxSizing: 'border-box', // Đảm bảo border không làm tràn ra ngoài
+    },
+    tableSection: {
+        padding: '8px 6px',
+        boxSizing: 'border-box',
+        width: '100%',
+        backgroundColor: '#2a2a2a',
     },
     mainContent: {
         padding: '8px 6px',
@@ -840,7 +990,7 @@ const styles = {
         wordSpacing: 'normal',
         letterSpacing: 'normal',
     },
-    // 🔥 BLACK HAT: Hidden H1 for keyword stuffing
+    // 🔥 SEO: Hidden H1 for keyword stuffing
     hiddenH1: {
         position: 'absolute',
         left: '-9999px',
@@ -852,6 +1002,18 @@ const styles = {
         margin: 0,
         padding: 0,
         lineHeight: '1px',
+    },
+    // 🔥 SEO: Hidden text cho SEO keywords
+    seoHiddenText: {
+        position: 'absolute',
+        left: '-9999px',
+        width: '1px',
+        height: '1px',
+        overflow: 'hidden',
+        opacity: 0,
+        fontSize: '1px',
+        lineHeight: '1px',
+        color: '#ffffff',
     },
 };
 

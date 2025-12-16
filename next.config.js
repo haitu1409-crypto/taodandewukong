@@ -98,6 +98,11 @@ const nextConfig = {
                     },
                 },
             };
+            // ✅ PERFORMANCE: Modern JavaScript - không transpile ES6+ features
+            config.output.environment = {
+                arrowFunction: true,
+                bigIntLiteral: true,
+            };
         }
         return config;
     },

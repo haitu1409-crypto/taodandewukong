@@ -189,6 +189,9 @@ export default function HomePage() {
                                 alt="KETQUAMN.COM - Kết Quả Xổ Số Miền Nam" 
                                 style={styles.logo}
                                 loading="eager"
+                                fetchPriority="high"
+                                width="490"
+                                height="126"
                             />
                         </div>
                         {/* H1 chính - rút gọn */}

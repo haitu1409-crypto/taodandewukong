@@ -236,7 +236,7 @@ const TableDate = () => {
                 {approachingRegion && (
                     <div className={styles.group}>
                         <p className={styles.desc}>
-                            Tường thuật trực tiếp KQXS {approachingRegion} lúc {approachingTime}
+                            <span className={styles.liveBadge}>LIVE</span> Tường thuật trực tiếp KQXS {approachingRegion} lúc {approachingTime}
                         </p>
                         <a 
                             href={getRegionUrl(approachingRegion)} 

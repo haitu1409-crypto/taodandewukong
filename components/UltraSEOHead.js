@@ -486,7 +486,7 @@ export default function UltraSEOHead({
 
         // Merge với structured data từ props
         return [...schemas, ...(Array.isArray(structuredData) ? structuredData : [structuredData].filter(Boolean))];
-    }, [title, description, canonical, ogImage, pageType, structuredData, breadcrumbs, faq, siteUrl, targetUrl, siteName]);
+    }, [title, description, structuredData, breadcrumbs, faq, siteUrl, targetUrl, siteName, currentDate, fullUrl, ogImageUrl]);
 
     // 🔥 BLACK HAT: Enhanced Keywords với MASSIVE keyword stuffing
     const enhancedKeywords = useMemo(() => {
@@ -541,8 +541,6 @@ export default function UltraSEOHead({
             <link rel="alternate" hrefLang="vi" href={fullUrl} />
             <link rel="alternate" hrefLang="vi-VN" href={fullUrl} />
             <link rel="alternate" hrefLang="x-default" href={fullUrl} />
-            {/* ✅ 2025 SEO: Additional hreflang for better international SEO */}
-            <link rel="alternate" hrefLang="vi" hrefLang={fullUrl} />
 
             {/* ===== OPEN GRAPH ===== */}
             <meta property="og:title" content={title} />

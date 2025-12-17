@@ -194,13 +194,13 @@ export default function HomePage() {
                                 height="126"
                             />
                         </div>
-                        {/* H1 chính - rút gọn */}
+                        {/* H1 chính - tối ưu cho SEO */}
                         <h1 style={styles.heroTitle}>
-                            Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất | KETQUAMN.COM
+                            KETQUAMN.COM - Kết Quả Xổ Số 3 Miền Nhanh Nhất | Miễn Phí
                         </h1>
-                        {/* 🔥 SEO: Hidden H1 với đầy đủ keywords cho SEO */}
+                        {/* ✅ SEO: H1 ẩn với keywords bổ sung (an toàn hơn) */}
                         <h1 style={styles.hiddenH1}>
-                            Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất, Chính Xác Nhất | KETQUAMN.COM Tốt Hơn Xosodaiphat, Xoso.com.vn, Xskt.com.vn, Xsmn.mobi, Ketqua04, Xosominhngoc. Xosodaiphat Thay Thế, Xoso.com.vn Alternative, Xskt.com.vn Thay Thế, Xsmn.mobi Alternative, Ketqua04 Thay Thế - KETQUAMN.COM Tốt Nhất
+                            Kết Quả Xổ Số Miền Nam, Miền Bắc, Miền Trung - XSMN, XSMB, XSMT Nhanh Nhất | KETQUAMN.COM
                         </h1>
                         <p style={styles.heroDescription}>
                             <strong>KETQUAMN.COM</strong> - Kết quả xổ số 3 miền nhanh nhất ⚡

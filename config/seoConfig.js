@@ -129,10 +129,10 @@ const { ALL_BLACKHAT_KEYWORDS } = require('./blackhatKeywords');
 
 const SEO_CONFIG = {
     home: {
-        // 🔥 BLACK HAT: Title với MASSIVE keyword stuffing
-        title: 'Kết Quả Xổ Số Miền Nam - XSMN, XSMB Nhanh Nhất | KETQUAMN.COM Tốt Hơn Xosodaiphat, Xoso.com.vn, Xskt.com.vn, Xsmn.mobi, Ketqua04, Xosominhngoc | Thống Kê Lô Gan, Soi Cầu, Tạo Dàn Đề Miễn Phí',
-        // 🔥 BLACK HAT: Description với competitor targeting
-        description: 'KETQUAMN.COM - Kết quả xổ số miền Nam, miền Bắc, miền Trung nhanh nhất, chính xác nhất. TỐT HƠN xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi, ketqua04, xosominhngoc về mọi mặt. XSMN, XSMB, XSMT, KQXSMN, KQXSMB cập nhật realtime. Thống kê lô gan, soi cầu AI, tạo dàn đề miễn phí 100%.',
+        // ✅ OPTIMIZED: Title ngắn gọn, rõ ràng, có brand name
+        title: 'KETQUAMN.COM - Kết Quả Xổ Số 3 Miền Nhanh Nhất | Miễn Phí',
+        // ✅ OPTIMIZED: Description tập trung vào lợi ích, có CTA
+        description: 'Kết quả xổ số 3 miền nhanh nhất, chính xác nhất. XSMN, XSMB, XSMT cập nhật realtime. Thống kê lô gan, soi cầu AI, tạo dàn đề. Miễn phí 100% - Truy cập ngay!',
         keywords: [
             ...TOP_KEYWORDS.primary,
             ...TOP_KEYWORDS.longTail,

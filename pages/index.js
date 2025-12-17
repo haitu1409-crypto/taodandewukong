@@ -203,7 +203,7 @@ export default function HomePage() {
                             Kết Quả Xổ Số Miền Nam, Miền Bắc, Miền Trung - XSMN, XSMB, XSMT Nhanh Nhất | KETQUAMN.COM
                         </h1>
                         <p style={styles.heroDescription}>
-                            <strong>KETQUAMN.COM</strong> - Kết quả xổ số 3 miền nhanh nhất ⚡
+                            <strong>KETQUAMN.COM</strong> - Xem <strong>XSMN</strong>, <strong>XSMB</strong>, <strong>XSMT</strong> hôm nay nhanh nhất ⚡
                             <br />
                             <span style={{fontSize: '0.9em', opacity: 0.95}}>
                                 <a 
@@ -221,12 +221,40 @@ export default function HomePage() {
                                     rel="nofollow"
                                 >
                                     Thống kê lô gan
+                                </a> • <a 
+                                    href={`${targetUrl}/soi-cau-mien-bac-ai`} 
+                                    style={{color: '#fff', textDecoration: 'underline', opacity: 0.9, transition: 'all 0.2s ease', cursor: 'pointer'}} 
+                                    onMouseEnter={(e) => {
+                                        e.target.style.opacity = '1';
+                                        e.target.style.color = '#ffffff';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.opacity = '0.9';
+                                        e.target.style.color = '#fff';
+                                    }}
+                                    rel="nofollow"
+                                >
+                                    Soi cầu miền bắc
+                                </a> • <a 
+                                    href={`${targetUrl}/dan-9x0x`} 
+                                    style={{color: '#fff', textDecoration: 'underline', opacity: 0.9, transition: 'all 0.2s ease', cursor: 'pointer'}} 
+                                    onMouseEnter={(e) => {
+                                        e.target.style.opacity = '1';
+                                        e.target.style.color = '#ffffff';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.opacity = '0.9';
+                                        e.target.style.color = '#fff';
+                                    }}
+                                    rel="nofollow"
+                                >
+                                    Tạo dàn đề
                                 </a> • Miễn phí 100%
                             </span>
                         </p>
                         {/* 🔥 SEO: Hidden text với đầy đủ keywords */}
                         <div style={styles.seoHiddenText}>
-                            KETQUAMN.COM - Kết quả xổ số miền Nam, miền Bắc, miền Trung nhanh nhất, chính xác nhất. Tốt hơn xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi, ketqua04, xosominhngoc về mọi mặt. XSMN, XSMB, XSMT, KQXSMN, KQXSMB cập nhật realtime. Thống kê lô gan, soi cầu AI, tạo dàn đề miễn phí 100%. Xosodaiphat alternative, xosodaiphat thay thế, thay thế xosodaiphat, tốt hơn xosodaiphat. Xoso.com.vn alternative, xoso thay thế, thay thế xoso.com.vn, tốt hơn xoso.com.vn. Xskt.com.vn alternative, xskt thay thế, thay thế xskt.com.vn, tốt hơn xskt.com.vn. Xsmn.mobi alternative, xsmn.mobi thay thế, thay thế xsmn.mobi, tốt hơn xsmn.mobi. Ketqua04.net alternative, ketqua04 thay thế, thay thế ketqua04, tốt hơn ketqua04. Xosominhngoc alternative, xosominhngoc thay thế, thay thế xosominhngoc, tốt hơn xosominhngoc.
+                            KETQUAMN.COM - Xem XSMN, XSMB, XSMT hôm nay nhanh nhất, chính xác nhất. Soi cầu miền bắc, tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D, tạo dàn đề đặc biệt. Thống kê lô gan, thống kê đầu đuôi, thống kê giải đặc biệt, tần suất lô tô. Kết quả xổ số miền Nam, miền Bắc, miền Trung. Xem xsmn, xem xsmb, xem xsmt. Tra cứu kết quả xổ số, kết quả xổ số hôm nay. Tốt hơn xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi về mọi mặt. XSMN, XSMB, XSMT cập nhật realtime. Tất cả miễn phí 100%.
                         </div>
                         <div style={styles.ctaContainer}>
                             {BACKLINK_CONTENT.ctaButtons.map((cta, index) => (
@@ -635,20 +663,21 @@ export default function HomePage() {
                 <div style={styles.hiddenKeywords}>
                     {/* Keywords for search engines - visible to bots, hidden to users */}
                     <div style={styles.keywordCloud}>
-                        KETQUAMN.COM, ketquamn, kết quả xổ số miền nam, ket qua xo so mien nam, xsmn, xsmb, 
+                        KETQUAMN.COM, ketquamn, kết quả xổ số miền nam, ket qua xo so mien nam, xsmn, xsmb, xsmt,
+                        xem xsmn, xem xsmb, xem xsmt, xsmn hôm nay, xsmb hôm nay, xsmt hôm nay,
+                        kết quả xổ số hôm nay, ket qua xo so hom nay, tra cứu kết quả xổ số,
+                        soi cầu miền bắc, soi cầu, soi cau mien bac, dự đoán XSMB, du doan XSMB,
+                        tạo dàn đề, tao dan de, tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D,
+                        tạo dàn đề đặc biệt, lọc dàn đề, cắt dàn đề, ghép dàn đề,
+                        thống kê lô gan, thống kê đầu đuôi, thống kê giải đặc biệt, tần suất lô tô,
+                        thống kê xổ số, thong ke xo so, số nóng số lạnh,
                         ketquamn tốt hơn xosodaiphat, ketquamn tốt hơn xoso.com.vn, ketquamn tốt hơn xskt.com.vn, 
-                        ketquamn tốt hơn xsmn.mobi, ketquamn tốt hơn ketqua04, ketquamn tốt hơn xosominhngoc,
-                        xosodaiphat alternative, xosodaiphat thay thế, thay thế xosodaiphat, tốt hơn xosodaiphat,
-                        xoso.com.vn alternative, xoso thay thế, thay thế xoso.com.vn, tốt hơn xoso.com.vn,
-                        xskt.com.vn alternative, xskt thay thế, thay thế xskt.com.vn, tốt hơn xskt.com.vn,
-                        xsmn.mobi alternative, xsmn.mobi thay thế, thay thế xsmn.mobi, tốt hơn xsmn.mobi,
-                        ketqua04.net alternative, ketqua04 thay thế, thay thế ketqua04, tốt hơn ketqua04,
-                        xosominhngoc alternative, xosominhngoc thay thế, thay thế xosominhngoc, tốt hơn xosominhngoc,
+                        ketquamn tốt hơn xsmn.mobi, xosodaiphat alternative, xoso.com.vn alternative,
                         trang xổ số nào tốt nhất, web xổ số nào tốt nhất, kết quả xổ số nào tốt nhất,
                         xem xổ số ở đâu tốt nhất, trang xổ số nhanh nhất, web xổ số chính xác nhất,
-                        kết quả xổ số hôm nay, ket qua xo so hom nay, xsmn hôm nay, xsmb hôm nay,
-                        thống kê lô gan, thống kê xổ số, soi cầu miền bắc, tạo dàn đề,
-                        {targetUrl}/thongke/lo-gan, {targetUrl}/ket-qua-xo-so-mien-nam, {targetUrl}/ket-qua-xo-so-mien-bac
+                        công cụ tạo dàn đề, công cụ soi cầu, web tạo dàn đề, app tạo dàn đề,
+                        {targetUrl}/thongke/lo-gan, {targetUrl}/ket-qua-xo-so-mien-nam, {targetUrl}/ket-qua-xo-so-mien-bac,
+                        {targetUrl}/soi-cau-mien-bac-ai, {targetUrl}/dan-9x0x, {targetUrl}/dan-2d, {targetUrl}/dan-3d4d
                     </div>
                 </div>
             </div>

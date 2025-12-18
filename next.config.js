@@ -168,7 +168,6 @@ const nextConfig = {
     swcMinify: true, // ✅ PERFORMANCE: Use SWC minifier for faster builds and smaller bundles
     
     // ✅ FIX: Ensure proper build output
-    output: 'standalone', // Generate standalone build with all required files
     
     // Remove console.log in production
     compiler: {

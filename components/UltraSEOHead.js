@@ -581,7 +581,8 @@ export default function UltraSEOHead({
             <meta name="twitter:image" content={ogImageUrl} />
 
             {/* ===== STRUCTURED DATA ===== */}
-            {enhancedStructuredData.map((schema, index) => (
+            {/* ✅ PERFORMANCE: Limit to essential schemas (first 8) to reduce payload */}
+            {enhancedStructuredData.slice(0, 8).map((schema, index) => (
                 <script
                     key={`structured-data-${index}`}
                     type="application/ld+json"

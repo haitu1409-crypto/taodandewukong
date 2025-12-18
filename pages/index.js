@@ -9,21 +9,10 @@ import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
 
-// ✅ PERFORMANCE: Lazy load TableDateKQXS component - enable SSR for better SEO
+// ✅ PERFORMANCE: Lazy load TableDateKQXS component - optimize loading
 const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
-    ssr: true, // Enable SSR for better SEO and initial load
-    loading: () => (
-        <div style={{
-            padding: '20px',
-            textAlign: 'center',
-            color: '#666',
-            minHeight: '200px',
-            width: '100%',
-            boxSizing: 'border-box'
-        }}>
-            Đang tải...
-        </div>
-    )
+    ssr: true, // Enable SSR for better SEO
+    loading: () => null, // ✅ PERFORMANCE: No loading state to reduce layout shift
 });
 
 export default function HomePage() {
@@ -35,57 +24,58 @@ export default function HomePage() {
         north: false,
     });
 
-    // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
+    // ✅ PERFORMANCE: Scroll to top - defer to avoid blocking initial render
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            requestAnimationFrame(() => {
+            // Defer scroll to avoid blocking
+            setTimeout(() => {
                 window.scrollTo(0, 0);
-            });
+            }, 0);
         }
     }, []);
 
-    // Kiểm tra thời gian xổ số để áp dụng animation cho backlinks
+    // ✅ PERFORMANCE: Kiểm tra thời gian xổ số - defer và optimize
     useEffect(() => {
-        const checkLotteryTime = () => {
-            const now = new Date();
-            const vietnamFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Asia/Ho_Chi_Minh',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
+        if (typeof window === 'undefined') return;
 
-            const parts = vietnamFormatter.formatToParts(now);
-            const currentHour = parseInt(parts.find(p => p.type === 'hour').value);
-            const currentMinute = parseInt(parts.find(p => p.type === 'minute').value);
-            const currentTime = currentHour * 60 + currentMinute;
+        // ✅ PERFORMANCE: Defer execution to avoid blocking initial render
+        const timeoutId = setTimeout(() => {
+            const checkLotteryTime = () => {
+                const now = new Date();
+                const currentHour = now.getHours();
+                const currentMinute = now.getMinutes();
+                const currentTime = currentHour * 60 + currentMinute;
 
-            // Thời gian xổ số
-            const southStart = 16 * 60 + 15; // 16:15
-            const southEnd = 16 * 60 + 45; // 16:45
-            const southPrep = southStart - 30; // 15:45
+                // Thời gian xổ số
+                const southStart = 16 * 60 + 15; // 16:15
+                const southEnd = 16 * 60 + 45; // 16:45
+                const southPrep = southStart - 30; // 15:45
 
-            const centralStart = 17 * 60 + 15; // 17:15
-            const centralEnd = 17 * 60 + 45; // 17:45
-            const centralPrep = centralStart - 30; // 16:45
+                const centralStart = 17 * 60 + 15; // 17:15
+                const centralEnd = 17 * 60 + 45; // 17:45
+                const centralPrep = centralStart - 30; // 16:45
 
-            const northStart = 18 * 60 + 15; // 18:15
-            const northEnd = 18 * 60 + 45; // 18:45
-            const northPrep = northStart - 30; // 17:45
+                const northStart = 18 * 60 + 15; // 18:15
+                const northEnd = 18 * 60 + 45; // 18:45
+                const northPrep = northStart - 30; // 17:45
 
-            setIsApproachingLottery({
-                south: currentTime >= southPrep && currentTime <= southEnd,
-                central: currentTime >= centralPrep && currentTime <= centralEnd,
-                north: currentTime >= northPrep && currentTime <= northEnd,
-            });
-        };
+                setIsApproachingLottery({
+                    south: currentTime >= southPrep && currentTime <= southEnd,
+                    central: currentTime >= centralPrep && currentTime <= centralEnd,
+                    north: currentTime >= northPrep && currentTime <= northEnd,
+                });
+            };
 
-        // ✅ PERFORMANCE: Only run on client side
-        if (typeof window !== 'undefined') {
             checkLotteryTime();
             const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
-            return () => clearInterval(interval);
-        }
+
+            return () => {
+                clearTimeout(timeoutId);
+                clearInterval(interval);
+            };
+        }, 200); // Defer 200ms to avoid blocking initial render
+
+        return () => clearTimeout(timeoutId);
     }, []);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
@@ -124,8 +114,8 @@ export default function HomePage() {
 
     return (
         <>
-            {/* CSS Animation cho backlinks */}
-            <style jsx>{`
+            {/* ✅ PERFORMANCE: Move CSS to global to prevent render blocking */}
+            <style jsx global>{`
                 @keyframes colorPulse {
                     0%, 100% {
                         background-color: #E65A2E;
@@ -206,7 +196,9 @@ export default function HomePage() {
             <div style={styles.container}>
                 {/* Table Date KQXS Component - Đưa lên đầu sau navbar */}
                 <section style={styles.tableSection}>
-                    <TableDateKQXS />
+                    <Suspense fallback={null}>
+                        <TableDateKQXS />
+                    </Suspense>
                 </section>
 
                 {/* Hero Section */}

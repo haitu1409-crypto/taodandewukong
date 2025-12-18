@@ -3,11 +3,28 @@
  * Mục tiêu: Tạo landing page mạnh mẽ để SEO backlink về ketquamn.com
  */
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
-import TableDateKQXS from '../components/TableDateKQXS';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
+
+// ✅ PERFORMANCE: Lazy load TableDateKQXS component - disable SSR for better initial load
+const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => (
+        <div style={{
+            padding: '20px',
+            textAlign: 'center',
+            color: '#666',
+            minHeight: '200px',
+            width: '100%',
+            boxSizing: 'border-box'
+        }}>
+            Đang tải...
+        </div>
+    )
+});
 
 export default function HomePage() {
     const seoConfig = SEO_CONFIG.home;
@@ -18,9 +35,13 @@ export default function HomePage() {
         north: false,
     });
 
-    // Scroll to top on mount
+    // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
-        window.scrollTo(0, 0);
+        if (typeof window !== 'undefined') {
+            requestAnimationFrame(() => {
+                window.scrollTo(0, 0);
+            });
+        }
     }, []);
 
     // Kiểm tra thời gian xổ số để áp dụng animation cho backlinks
@@ -59,9 +80,12 @@ export default function HomePage() {
             });
         };
 
-        checkLotteryTime();
-        const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
-        return () => clearInterval(interval);
+        // ✅ PERFORMANCE: Only run on client side
+        if (typeof window !== 'undefined') {
+            checkLotteryTime();
+            const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
+            return () => clearInterval(interval);
+        }
     }, []);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
@@ -878,6 +902,9 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
+        minHeight: '200px', // ✅ PERFORMANCE: Prevent layout shift
+        width: '100%',
+        boxSizing: 'border-box',
         padding: '8px 6px',
         boxSizing: 'border-box',
         width: '100%',

@@ -121,11 +121,14 @@ const nextConfig = {
                     },
                 },
             };
-            // ✅ PERFORMANCE: Modern JavaScript - không transpile ES6+ features
+            // ✅ PERFORMANCE: Transpile for older browsers to reduce bundle size
             config.output.environment = {
-                arrowFunction: true,
-                bigIntLiteral: true,
+                arrowFunction: false, // Transpile arrow functions for compatibility
+                bigIntLiteral: false, // Transpile bigInt for compatibility
             };
+            
+            // ✅ PERFORMANCE: Tree shaking is handled by Next.js automatically
+            // Note: usedExports and sideEffects are managed by Next.js, don't override
         }
         return config;
     },
@@ -134,6 +137,7 @@ const nextConfig = {
     productionBrowserSourceMaps: false,
     generateEtags: false,
     compress: true,
+    swcMinify: true, // ✅ PERFORMANCE: Use SWC minifier for faster builds and smaller bundles
     
     // Remove console.log in production
     compiler: {

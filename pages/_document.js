@@ -45,11 +45,19 @@ export default function Document() {
                 <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 
-                {/* Google Fonts - Roboto - Optimized with font-display swap */}
+                {/* ✅ PERFORMANCE: Optimize font loading - defer non-critical CSS */}
                 <link 
-                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" 
-                    rel="stylesheet"
+                    rel="preload"
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
+                    as="style"
+                    onLoad="this.onload=null;this.rel='stylesheet'"
                 />
+                <noscript>
+                    <link 
+                        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" 
+                        rel="stylesheet"
+                    />
+                </noscript>
             </Head>
             <body>
                 <Main />

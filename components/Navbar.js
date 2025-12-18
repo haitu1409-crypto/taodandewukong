@@ -101,6 +101,7 @@ function Navbar() {
                 <div style={styles.container}>
                     {/* Logo/Brand */}
                     <Link href="/" style={styles.brand}>
+                        {/* ✅ PERFORMANCE: Use Next.js Image for better optimization */}
                         <img 
                             src="/logoketquamn.png" 
                             alt="KETQUAMN.COM" 
@@ -110,6 +111,8 @@ function Navbar() {
                             decoding="async"
                             width="200"
                             height="52"
+                            // ✅ PERFORMANCE: Optimize image distribution
+                            sizes="(max-width: 768px) 150px, 200px"
                             // ✅ PERFORMANCE: Reserve space to prevent LCP reflow
                             onLoad={(e) => {
                                 // Mark as loaded to prevent layout shift

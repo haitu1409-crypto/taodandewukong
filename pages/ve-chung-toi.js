@@ -485,7 +485,7 @@ const styles = {
         fontFamily: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
         color: '#333333',
         width: '100%',
-        maxWidth: '1200px',
+        maxWidth: '1070px',
         margin: '0 auto',
         boxSizing: 'border-box',
         paddingTop: '10px',
@@ -590,7 +590,7 @@ const styles = {
         fontFamily: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
     },
     footerContainer: {
-        maxWidth: '1200px',
+        maxWidth: '1070px',
         margin: '0 auto',
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',

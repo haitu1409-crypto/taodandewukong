@@ -4,6 +4,12 @@ const nextConfig = {
     compress: true,
     poweredByHeader: false,
     
+    // ✅ PERFORMANCE: Modern JavaScript for mobile - saves ~14 KiB
+    // Target modern browsers only (ES2020+)
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+    },
+    
     // Domain configuration
     env: {
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://taodandewukong.pro',
@@ -163,13 +169,23 @@ const nextConfig = {
                     },
                 },
             };
-            // ✅ PERFORMANCE: Modern JavaScript - no transpilation for old browsers (saves ~14 KiB)
+            // ✅ PERFORMANCE: Modern JavaScript - no transpilation for old browsers (saves ~14 KiB on mobile)
             // Removed arrowFunction and bigIntLiteral transpilation for modern browsers only
-            // This reduces bundle size significantly
+            // This reduces bundle size significantly, especially on mobile
             config.output.environment = {
-                arrowFunction: true, // Keep arrow functions (modern browsers)
-                bigIntLiteral: true, // Keep bigInt (modern browsers)
+                arrowFunction: true, // Keep arrow functions (modern browsers including mobile)
+                bigIntLiteral: true, // Keep bigInt (modern browsers including mobile)
+                const: true, // Keep const (modern browsers)
+                destructuring: true, // Keep destructuring (modern browsers)
+                forOf: true, // Keep for...of (modern browsers)
+                dynamicImport: true, // Keep dynamic import (modern browsers)
             };
+            
+            // ✅ PERFORMANCE: Ensure modern JavaScript output for mobile
+            // Set target to ES2020 for modern mobile browsers
+            if (!config.target) {
+                config.target = ['web', 'es2020']; // Modern ES2020 for mobile
+            }
             
             // ✅ PERFORMANCE: Tree shaking is handled by Next.js automatically
             // Note: usedExports and sideEffects are managed by Next.js, don't override

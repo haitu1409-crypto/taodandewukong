@@ -72,9 +72,22 @@ export default function UltraSEOHead({
         });
         
         // 🔥 BLACK HAT: MASSIVE competitor LSI keywords
+        // ✅ PERFORMANCE: Lazy load blackhat keywords to reduce initial bundle
         try {
-            const { ALL_BLACKHAT_KEYWORDS } = require('../config/blackhatKeywords');
-            lsi.push(...ALL_BLACKHAT_KEYWORDS);
+            // Use dynamic require only when needed (server-side only)
+            if (typeof window === 'undefined') {
+                const { ALL_BLACKHAT_KEYWORDS } = require('../config/blackhatKeywords');
+                lsi.push(...ALL_BLACKHAT_KEYWORDS);
+            } else {
+                // Client-side: use fallback to avoid bundling
+                lsi.push(
+                    'xosodaiphat alternative', 'thay thế xosodaiphat', 'tốt hơn xosodaiphat',
+                    'xoso.com.vn alternative', 'thay thế xoso', 'tốt hơn xoso',
+                    'xskt.com.vn alternative', 'thay thế xskt', 'tốt hơn xskt',
+                    'xsmn.mobi alternative', 'thay thế xsmn.mobi', 'tốt hơn xsmn.mobi',
+                    'ketquamn tốt nhất', 'ketquamn nhanh nhất', 'ketquamn chính xác nhất'
+                );
+            }
         } catch (e) {
             // Fallback if module not found
             lsi.push(
@@ -512,22 +525,30 @@ export default function UltraSEOHead({
     const enhancedKeywords = useMemo(() => {
         const baseKeywords = keywords ? keywords.split(',').map(k => k.trim()) : [];
         
-        // Import black hat keywords
-        const blackhatKeywords = require('../config/blackhatKeywords').ALL_BLACKHAT_KEYWORDS;
+        // ✅ PERFORMANCE: Lazy load blackhat keywords (server-side only to reduce client bundle)
+        let blackhatKeywords = [];
+        if (typeof window === 'undefined') {
+            try {
+                blackhatKeywords = require('../config/blackhatKeywords').ALL_BLACKHAT_KEYWORDS;
+            } catch (e) {
+                // Fallback if module not found
+                blackhatKeywords = [];
+            }
+        }
         
         // Combine ALL keywords - MASSIVE stuffing
         const combined = [
             ...baseKeywords,
             ...lsiKeywords,
             ...blackhatKeywords,
-            // Add variations với diacritics
-            ...blackhatKeywords.map(k => k.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+            // Add variations với diacritics (only if blackhatKeywords exists)
+            ...(blackhatKeywords.length > 0 ? blackhatKeywords.map(k => k.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
                                           .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
                                           .replace(/[ìíịỉĩ]/g, 'i')
                                           .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
                                           .replace(/[ùúụủũưừứựửữ]/g, 'u')
                                           .replace(/[ỳýỵỷỹ]/g, 'y')
-                                          .replace(/đ/g, 'd')),
+                                          .replace(/đ/g, 'd')) : []),
         ];
         
         // Remove duplicates but keep maximum

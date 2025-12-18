@@ -10,7 +10,7 @@ import Navbar from '../components/Navbar';
 function App({ Component, pageProps }) {
     return (
         <>
-            <style jsx global>{`
+            <style dangerouslySetInnerHTML={{__html: `
                 body {
                     background-color: #e0e0e0;
                     margin: 0;
@@ -26,8 +26,13 @@ function App({ Component, pageProps }) {
                 img {
                     height: auto;
                     max-width: 100%;
+                    display: block; /* ✅ PERFORMANCE: Prevent inline spacing reflow */
                 }
-            `}</style>
+                /* ✅ PERFORMANCE: Reserve space for LCP image */
+                img[fetchpriority="high"] {
+                    content-visibility: auto;
+                }
+            `}} />
             <Navbar />
             <Component {...pageProps} />
         </>

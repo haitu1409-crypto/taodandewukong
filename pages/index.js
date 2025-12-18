@@ -114,8 +114,9 @@ export default function HomePage() {
 
     return (
         <>
-            {/* ✅ PERFORMANCE: Move CSS to global to prevent render blocking */}
-            <style jsx global>{`
+            {/* ✅ PERFORMANCE: Inline critical CSS to prevent render blocking */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes colorPulse {
                     0%, 100% {
                         background-color: #E65A2E;
@@ -126,7 +127,7 @@ export default function HomePage() {
                         box-shadow: 0 0 15px rgba(255, 140, 66, 0.7), 0 0 30px rgba(255, 140, 66, 0.4);
                     }
                 }
-            `}</style>
+            `}} />
             <UltraSEOHead
                 title={seoConfig.title}
                 description={seoConfig.description}
@@ -894,13 +895,12 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
-        minHeight: '200px', // ✅ PERFORMANCE: Prevent layout shift
+        minHeight: '200px', // ✅ PERFORMANCE: Reserve space to prevent CLS/reflow
         width: '100%',
         boxSizing: 'border-box',
         padding: '8px 6px',
-        boxSizing: 'border-box',
-        width: '100%',
         backgroundColor: '#ffffff',
+        position: 'relative', // ✅ PERFORMANCE: Prevent layout shift
     },
     mainContent: {
         padding: '8px 6px',

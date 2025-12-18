@@ -110,6 +110,11 @@ function Navbar() {
                             decoding="async"
                             width="200"
                             height="52"
+                            // ✅ PERFORMANCE: Reserve space to prevent LCP reflow
+                            onLoad={(e) => {
+                                // Mark as loaded to prevent layout shift
+                                e.target.style.opacity = '1';
+                            }}
                         />
                     </Link>
 

@@ -129,6 +129,8 @@ const nextConfig = {
                 ...config.optimization,
                 splitChunks: {
                     chunks: 'all',
+                    minSize: 20000, // ✅ PERFORMANCE: Only split chunks larger than 20KB
+                    maxSize: 244000, // ✅ PERFORMANCE: Limit chunk size to 244KB
                     cacheGroups: {
                         default: false,
                         vendors: false,
@@ -138,12 +140,22 @@ const nextConfig = {
                             test: /node_modules/,
                             priority: 20,
                             reuseExistingChunk: true,
+                            minChunks: 1,
                         },
                         common: {
                             name: 'common',
                             minChunks: 2,
                             chunks: 'all',
                             priority: 10,
+                            reuseExistingChunk: true,
+                            minSize: 20000,
+                        },
+                        // ✅ PERFORMANCE: Separate React chunks
+                        react: {
+                            name: 'react',
+                            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                            chunks: 'all',
+                            priority: 30,
                             reuseExistingChunk: true,
                         },
                     },

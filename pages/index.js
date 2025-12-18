@@ -9,9 +9,9 @@ import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
 
-// ✅ PERFORMANCE: Lazy load TableDateKQXS component - disable SSR for better initial load
+// ✅ PERFORMANCE: Lazy load TableDateKQXS component - enable SSR for better SEO
 const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
-    ssr: false, // Disable SSR for better initial load performance
+    ssr: true, // Enable SSR for better SEO and initial load
     loading: () => (
         <div style={{
             padding: '20px',

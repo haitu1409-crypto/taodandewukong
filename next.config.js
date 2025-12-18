@@ -80,9 +80,9 @@ const nextConfig = {
                     }
                 ],
             },
-            // ✅ FIX: Proper MIME type for Next.js static files
+            // ✅ FIX: Proper MIME type for Next.js static JS files only
             {
-                source: '/_next/static/:path*',
+                source: '/_next/static/:path*.js',
                 headers: [
                     {
                         key: 'Cache-Control',
@@ -90,7 +90,21 @@ const nextConfig = {
                     },
                     {
                         key: 'Content-Type',
-                        value: 'application/javascript'
+                        value: 'application/javascript; charset=utf-8'
+                    }
+                ],
+            },
+            // ✅ FIX: Proper MIME type for Next.js static CSS files
+            {
+                source: '/_next/static/:path*.css',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
+                    },
+                    {
+                        key: 'Content-Type',
+                        value: 'text/css; charset=utf-8'
                     }
                 ],
             },

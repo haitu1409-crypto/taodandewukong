@@ -80,6 +80,20 @@ const nextConfig = {
                     }
                 ],
             },
+            // ✅ FIX: Proper MIME type for Next.js static files
+            {
+                source: '/_next/static/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
+                    },
+                    {
+                        key: 'Content-Type',
+                        value: 'application/javascript'
+                    }
+                ],
+            },
         ];
     },
 
@@ -135,9 +149,12 @@ const nextConfig = {
 
     // Production optimizations
     productionBrowserSourceMaps: false,
-    generateEtags: false,
+    generateEtags: true, // ✅ FIX: Enable etags for proper manifest generation
     compress: true,
     swcMinify: true, // ✅ PERFORMANCE: Use SWC minifier for faster builds and smaller bundles
+    
+    // ✅ FIX: Ensure proper build output
+    output: 'standalone', // Generate standalone build with all required files
     
     // Remove console.log in production
     compiler: {

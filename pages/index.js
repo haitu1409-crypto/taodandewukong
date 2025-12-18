@@ -834,7 +834,7 @@ const styles = {
         margin: '0 auto',
     },
     heroTitle: {
-        fontSize: 'clamp(1.2rem, 5vw, 1.9rem)',
+        fontSize: '28px',
         fontWeight: 'bold',
         marginBottom: '6px',
         lineHeight: '1.3',
@@ -844,7 +844,7 @@ const styles = {
         marginTop: '0',
     },
     heroSeoDescription: {
-        fontSize: 'clamp(0.9rem, 3.5vw, 1.05rem)',
+        fontSize: '15px',
         margin: '0',
         marginTop: '0',
         marginBottom: '0',

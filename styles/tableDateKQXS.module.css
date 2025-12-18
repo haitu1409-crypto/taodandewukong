@@ -152,7 +152,7 @@
 }
 
 .titleTable {
-    background: transparent !important;
+    background: #FFE8DC !important;
     color: #E65A2E;
     font-size: 1.1rem;
     font-weight: 700;
@@ -162,7 +162,7 @@
     border-top: none;
     min-height: 0 !important;
     height: auto !important;
-    box-shadow: none;
+    box-shadow: 0 1px 3px rgba(230, 90, 46, 0.15);
 }
 
 .titleTable:first-child {

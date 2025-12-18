@@ -270,10 +270,10 @@ const { ALL_BLACKHAT_KEYWORDS } = require('./blackhatKeywords');
 
 const SEO_CONFIG = {
     home: {
-        // ✅ OPTIMIZED: Title bao gồm nhiều keywords phổ biến
-        title: 'KETQUAMN.COM - XSMN, XSMB, Soi Cầu, Tạo Dàn Đề | Miễn Phí',
-        // ✅ OPTIMIZED: Description bao gồm tất cả keywords chính
-        description: 'Xem XSMN, XSMB, XSMT hôm nay nhanh nhất. Soi cầu miền bắc, tạo dàn đề 9x-0x, 2D, 3D-4D. Thống kê lô gan, đầu đuôi, giải đặc biệt. Tất cả miễn phí 100% - Truy cập ngay!',
+        // ✅ OPTIMIZED: Title tập trung vào keywords "tạo dàn đề"
+        title: 'Tạo Dàn Đề | Tạo Dàn Đề 2D, 3D, 4D, 9X-0X | Tạo Ghép Dàn 3D-4D | Tạo Dàn Số Xổ Số Nhanh - Taodandewukong.pro',
+        // ✅ OPTIMIZED: Description bao gồm tất cả keywords "tạo dàn đề"
+        description: 'Tạo dàn đề nhanh, tạo dàn đề xổ số, tạo dàn đề 2D, 3D, 4D, 9X-0X miễn phí. Tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên, tạo dàn ngẫu nhiên. Ứng dụng tạo mức số, dàn đặc biệt xổ số nhanh chóng và chính xác nhất tại taodandewukong.pro',
         keywords: [
             ...TOP_KEYWORDS.primary,
             ...TOP_KEYWORDS.longTail,
@@ -295,6 +295,23 @@ const SEO_CONFIG = {
             'xsmn.mobi', 'xsmn mobi', 'xsmn',
             'ketqua04.net', 'ketqua04 net', 'ketqua04',
             'xosominhngoc', 'xo so minh ngoc',
+            
+            // ✅ SEO: Additional "tạo dàn đề" keywords từ các trang SEO mạnh
+            'dàn đề miễn phí', 'dan de mien phi', 'dàn đề đẹp hôm nay', 'dan de dep hom nay',
+            'dàn đề vip hôm nay', 'dan de vip hom nay', 'dàn đề chuẩn', 'dan de chuan',
+            'dàn đề đánh quanh năm', 'dan de danh quanh nam', 'dàn đề hàng ngày', 'dan de hang ngay',
+            'nuôi dàn đề', 'nuoi dan de', 'lập dàn đề', 'lap dan de', 'tạo dàn xổ số', 'tao dan xo so',
+            'tạo dàn giải mã số học', 'tao dan giai ma so hoc', 'tạo mức dàn đề', 'tao muc dan de',
+            'tạo dàn 3D giải mã số học', 'tao dan 3d giai ma so hoc', 'tạo dàn số học', 'tao dan so hoc',
+            'tạo dàn xổ số nhanh nhất', 'tao dan xo so nhanh nhat', 'tạo dàn 3d 4d', 'tao dan 3d 4d',
+            'ứng dụng tạo dàn xổ số mức số', 'ung dung tao dan xo so muc so',
+            'cách tạo dàn đề', 'cach tao dan de', 'cách tạo dàn đề 3D', 'cach tao dan de 3d',
+            'thống kê dàn đề', 'thong ke dan de', 'dàn đề 90 số', 'dan de 90 so',
+            'dàn đề 64 số', 'dan de 64 so', 'dàn đề 36 số', 'dan de 36 so',
+            'dàn đề 20 số', 'dan de 20 so', 'dàn đề 50 số', 'dan de 50 so',
+            'dàn đề 60 số', 'dan de 60 so', 'dàn đề 10 số', 'dan de 10 so',
+            'dàn đề bất tử', 'dan de bat tu', 'dàn đề bất bại', 'dan de bat bai',
+            'dàn đề miền bắc', 'dan de mien bac', 'dàn đề miền nam', 'dan de mien nam',
         ].join(', '),
         canonical: SITE_URL,
         ogImage: `${SITE_URL}/backgroundseo.png`,

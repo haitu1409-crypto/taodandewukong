@@ -250,9 +250,33 @@ const TableDate = () => {
                 <table className={styles.table}>
                     <tbody>
                         <tr>
-                            <td className={styles.titleTable}>Miền Bắc</td>
-                            <td className={styles.titleTable}>Miền Trung</td>
-                            <td className={styles.titleTable}>Miền Nam</td>
+                            <td className={styles.titleTable}>
+                                <a 
+                                    href={getRegionUrl("Miền Bắc")} 
+                                    className={styles.titleLink}
+                                    rel="nofollow"
+                                >
+                                    Miền Bắc
+                                </a>
+                            </td>
+                            <td className={styles.titleTable}>
+                                <a 
+                                    href={getRegionUrl("Miền Trung")} 
+                                    className={styles.titleLink}
+                                    rel="nofollow"
+                                >
+                                    Miền Trung
+                                </a>
+                            </td>
+                            <td className={styles.titleTable}>
+                                <a 
+                                    href={getRegionUrl("Miền Nam")} 
+                                    className={styles.titleLink}
+                                    rel="nofollow"
+                                >
+                                    Miền Nam
+                                </a>
+                            </td>
                         </tr>
                         {Array.from({ length: maxRows }).map((_, rowIndex) => {
                             // ✅ FIX: Chỉ render data khi đã mounted, trên server render empty cells

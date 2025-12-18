@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
+import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
 import TableDateKQXS from '../components/TableDateKQXS';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
@@ -179,111 +180,27 @@ export default function HomePage() {
             />
 
             <div style={styles.container}>
+                {/* Table Date KQXS Component - Đưa lên đầu sau navbar */}
+                <section style={styles.tableSection}>
+                    <TableDateKQXS />
+                </section>
+
                 {/* Hero Section */}
                 <section style={styles.hero}>
                     <div style={styles.heroContent}>
-                        {/* Logo */}
-                        <div style={styles.logoContainer}>
-                            <img 
-                                src="/logoketquamn.png" 
-                                alt="KETQUAMN.COM - Kết Quả Xổ Số Miền Nam" 
-                                style={styles.logo}
-                                loading="eager"
-                                fetchPriority="high"
-                                width="490"
-                                height="126"
-                            />
-                        </div>
-                        {/* H1 chính - tối ưu cho SEO */}
+                        {/* H1 chính - tối ưu cho SEO với keywords "tạo dàn đề" */}
                         <h1 style={styles.heroTitle}>
-                            KETQUAMN.COM - Kết Quả Xổ Số 3 Miền Nhanh Nhất | Miễn Phí
+                            Tạo Dàn Đề | Tạo Dàn Đề 2D, 3D, 4D, 9X-0X | Tạo Ghép Dàn 3D-4D | Tạo Dàn Số Xổ Số Nhanh - Taodandewukong.pro
                         </h1>
-                        {/* ✅ SEO: H1 ẩn với keywords bổ sung (an toàn hơn) */}
+                        {/* ✅ SEO: H1 ẩn với keywords bổ sung về "tạo dàn đề" */}
                         <h1 style={styles.hiddenH1}>
-                            Kết Quả Xổ Số Miền Nam, Miền Bắc, Miền Trung - XSMN, XSMB, XSMT Nhanh Nhất | KETQUAMN.COM
+                            Tạo Dàn Đề Nhanh, Tạo Dàn Đề Xổ Số, Tạo Dàn Đề 2D 3D 4D, Tạo Ghép Dàn 3D-4D, Tạo Dàn Số, Dàn Đề 9X-0X, Tạo Dàn Xiên Miễn Phí - Taodandewukong.pro
                         </h1>
-                        <p style={styles.heroDescription}>
-                            <strong>KETQUAMN.COM</strong> - Xem <strong>XSMN</strong>, <strong>XSMB</strong>, <strong>XSMT</strong> hôm nay nhanh nhất ⚡
-                            <br />
-                            <span style={{fontSize: '0.9em', opacity: 0.95}}>
-                                <a 
-                                    href={`${targetUrl}/thongke/lo-gan`} 
-                                    style={{color: '#fff', textDecoration: 'underline', opacity: 0.9, transition: 'all 0.2s ease', cursor: 'pointer'}} 
-                                    onMouseEnter={(e) => {
-                                        e.target.style.opacity = '1';
-                                        e.target.style.color = '#ffffff';
-                                        e.target.style.textDecoration = 'underline';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.opacity = '0.9';
-                                        e.target.style.color = '#fff';
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    Thống kê lô gan
-                                </a> • <a 
-                                    href={`${targetUrl}/soi-cau-mien-bac-ai`} 
-                                    style={{color: '#fff', textDecoration: 'underline', opacity: 0.9, transition: 'all 0.2s ease', cursor: 'pointer'}} 
-                                    onMouseEnter={(e) => {
-                                        e.target.style.opacity = '1';
-                                        e.target.style.color = '#ffffff';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.opacity = '0.9';
-                                        e.target.style.color = '#fff';
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    Soi cầu miền bắc
-                                </a> • <a 
-                                    href={`${targetUrl}/dan-9x0x`} 
-                                    style={{color: '#fff', textDecoration: 'underline', opacity: 0.9, transition: 'all 0.2s ease', cursor: 'pointer'}} 
-                                    onMouseEnter={(e) => {
-                                        e.target.style.opacity = '1';
-                                        e.target.style.color = '#ffffff';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.opacity = '0.9';
-                                        e.target.style.color = '#fff';
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    Tạo dàn đề
-                                </a> • Miễn phí 100%
-                            </span>
+                        {/* ✅ SEO: Paragraph mô tả cho SEO với keywords "tạo dàn đề" */}
+                        <p style={styles.heroSeoDescription}>
+                            <strong>Tạo dàn đề</strong> nhanh chóng và chính xác tại <strong>taodandewukong.pro</strong>. Ứng dụng <strong>tạo dàn đề xổ số</strong> miễn phí hỗ trợ <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong>, <strong>tạo dàn ngẫu nhiên</strong>. Công cụ <strong>tạo mức số</strong> và <strong>tạo dàn đặc biệt</strong> xổ số nhanh nhất, chính xác nhất.
                         </p>
-                        {/* 🔥 SEO: Hidden text với đầy đủ keywords */}
-                        <div style={styles.seoHiddenText}>
-                            KETQUAMN.COM - Xem XSMN, XSMB, XSMT hôm nay nhanh nhất, chính xác nhất. Soi cầu miền bắc, tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D, tạo dàn đề đặc biệt. Thống kê lô gan, thống kê đầu đuôi, thống kê giải đặc biệt, tần suất lô tô. Kết quả xổ số miền Nam, miền Bắc, miền Trung. Xem xsmn, xem xsmb, xem xsmt. Tra cứu kết quả xổ số, kết quả xổ số hôm nay. Tốt hơn xosodaiphat, xoso.com.vn, xskt.com.vn, xsmn.mobi về mọi mặt. XSMN, XSMB, XSMT cập nhật realtime. Tất cả miễn phí 100%.
-                        </div>
-                        <div style={styles.ctaContainer}>
-                            {BACKLINK_CONTENT.ctaButtons.map((cta, index) => (
-                                <a
-                                    key={index}
-                                    href={cta.url}
-                                    style={styles.ctaButton}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
-                                        e.currentTarget.style.borderColor = '#E65A2E';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
-                                        e.currentTarget.style.borderColor = '#E65A2E';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    {cta.text}
-                                </a>
-                            ))}
-                        </div>
                     </div>
-                </section>
-
-                {/* Table Date KQXS Component */}
-                <section style={styles.tableSection}>
-                    <TableDateKQXS />
                 </section>
 
                 {/* Main Content Section */}
@@ -291,11 +208,15 @@ export default function HomePage() {
                     <div style={styles.contentWrapper}>
                         {/* Quick Links FIRST - Người dùng muốn xem ngay */}
                         <article style={styles.article}>
-                            <h2 style={styles.h2}>🔗 Truy Cập Nhanh</h2>
+                            <h2 style={styles.h2}>🔗 Truy Cập Nhanh - Kết Quả Xổ Số</h2>
+                            {/* ✅ SEO: Thêm mô tả về truy cập nhanh */}
+                            <p style={{ marginBottom: '20px', color: '#555555', lineHeight: '1.6' }}>
+                                Xem kết quả xổ số miền Nam, miền Bắc, miền Trung nhanh nhất. Sau khi xem kết quả, bạn có thể sử dụng công cụ <strong>tạo dàn đề</strong> để tạo các bộ số may mắn cho lần quay tiếp theo.
+                            </p>
                             <div style={styles.quickLinksGrid}>
-                                <a 
-                                    href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)} 
+                                <a
+                                    href={`${targetUrl}/ket-qua-xo-so-mien-nam`}
+                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)}
                                     onMouseEnter={(e) => {
                                         if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
                                             e.currentTarget.style.backgroundColor = '#3a3a3a';
@@ -319,9 +240,9 @@ export default function HomePage() {
                                     <div style={styles.quickLinkIcon}>📋</div>
                                     <div style={styles.quickLinkText}>XSMN</div>
                                 </a>
-                                <a 
-                                    href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)} 
+                                <a
+                                    href={`${targetUrl}/ket-qua-xo-so-mien-bac`}
+                                    style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)}
                                     onMouseEnter={(e) => {
                                         if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
                                             e.currentTarget.style.backgroundColor = '#3a3a3a';
@@ -345,17 +266,17 @@ export default function HomePage() {
                                     <div style={styles.quickLinkIcon}>📋</div>
                                     <div style={styles.quickLinkText}>XSMB</div>
                                 </a>
-                                <a 
-                                    href={`${targetUrl}/thongke/lo-gan`} 
-                                    style={styles.quickLink} 
+                                <a
+                                    href={`${targetUrl}/thongke/lo-gan`}
+                                    style={styles.quickLink}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        e.currentTarget.style.backgroundColor = '#f0f0f0';
                                         e.currentTarget.style.borderColor = '#E65A2E';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
-                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        e.currentTarget.style.backgroundColor = '#ffffff';
+                                        e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
                                     }}
                                     rel="nofollow"
@@ -363,17 +284,17 @@ export default function HomePage() {
                                     <div style={styles.quickLinkIcon}>📊</div>
                                     <div style={styles.quickLinkText}>Lô Gan</div>
                                 </a>
-                                <a 
-                                    href={`${targetUrl}/soi-cau-mien-bac-ai`} 
-                                    style={styles.quickLink} 
+                                <a
+                                    href={`${targetUrl}/soi-cau-mien-bac-ai`}
+                                    style={styles.quickLink}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                        e.currentTarget.style.backgroundColor = '#f0f0f0';
                                         e.currentTarget.style.borderColor = '#E65A2E';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
-                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        e.currentTarget.style.backgroundColor = '#ffffff';
+                                        e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
                                     }}
                                     rel="nofollow"
@@ -386,22 +307,26 @@ export default function HomePage() {
 
                         {/* Top Tools Only - Những công cụ quan trọng nhất */}
                         <article style={styles.article}>
-                            <h2 style={styles.h2}>🛠️ Công Cụ Xổ Số</h2>
+                            <h2 style={styles.h2}>🛠️ Tạo Dàn Đề - Công Cụ Tạo Dàn Đề 2D, 3D, 4D, 9X-0X Miễn Phí</h2>
+                            {/* ✅ SEO: Thêm mô tả về tạo dàn đề */}
+                            <p style={{ marginBottom: '20px', color: '#555555', lineHeight: '1.6' }}>
+                                <strong>Tạo dàn đề</strong> là công cụ hỗ trợ người chơi xổ số tạo ra các bộ số may mắn. Ứng dụng <strong>tạo dàn đề xổ số</strong> của chúng tôi hỗ trợ <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong> và <strong>tạo dàn ngẫu nhiên</strong>. Công cụ <strong>tạo dàn đề nhanh</strong> này giúp bạn <strong>tạo mức số</strong> và <strong>tạo dàn đặc biệt</strong> một cách chính xác và nhanh chóng nhất.
+                            </p>
                             <div style={styles.toolsCompactGrid}>
                                 {LOTTERY_TOOLS.slice(0, 6).map((tool, index) => (
-                                    <a 
-                                        key={index} 
-                                        href={tool.url} 
+                                    <a
+                                        key={index}
+                                        href={tool.url}
                                         style={styles.toolCompactCard}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#3a3a3a';
+                                            e.currentTarget.style.backgroundColor = '#ffffff';
                                             e.currentTarget.style.borderColor = '#E65A2E';
                                             e.currentTarget.style.transform = 'translateY(-3px)';
-                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)';
+                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#333333';
-                                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                                            e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                                             e.currentTarget.style.transform = 'translateY(0)';
                                             e.currentTarget.style.boxShadow = 'none';
                                         }}
@@ -417,20 +342,20 @@ export default function HomePage() {
                             </div>
                             {/* Thêm backlink về thống kê lô gan */}
                             <div style={styles.importantLink}>
-                                <a 
-                                    href={`${targetUrl}/thongke/lo-gan`} 
+                                <a
+                                    href={`${targetUrl}/thongke/lo-gan`}
                                     style={styles.importantLinkBtn}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#3a3a3a';
-                                        e.currentTarget.style.borderColor = '#E65A2E';
+                                        e.currentTarget.style.backgroundColor = '#FF8C42';
+                                        e.currentTarget.style.borderColor = '#FF8C42';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.4)';
+                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#333333';
+                                        e.currentTarget.style.backgroundColor = '#E65A2E';
                                         e.currentTarget.style.borderColor = '#E65A2E';
                                         e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
                                     }}
                                     rel="nofollow"
                                 >
@@ -439,19 +364,128 @@ export default function HomePage() {
                             </div>
                         </article>
 
+                        {/* ✅ SEO: Section "Dàn Đề Là Gì?" - Giải thích chi tiết */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>📖 Dàn Đề Là Gì? Tìm Hiểu Về Tạo Dàn Đề</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Hiểu một cách đơn giản, <strong>dàn đề</strong> là một tập hợp gồm nhiều con số (từ 2 số trở lên) mà người chơi lựa chọn để dự thưởng trong cùng một kỳ quay. Thay vì chỉ đánh 1-2 con "bạch thủ" với tỷ lệ thắng thấp, việc "dàn" mỏng các con số ra giúp tăng xác suất trúng thưởng lên đáng kể.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tạo dàn đề</strong> là quá trình sử dụng các công cụ và phương pháp để tạo ra các bộ số may mắn. Công cụ <strong>tạo dàn đề xổ số</strong> của chúng tôi hỗ trợ <strong>tạo dàn đề 2D</strong> (2 số cuối), <strong>tạo dàn đề 3D</strong> (3 số cuối), <strong>tạo dàn đề 4D</strong> (4 số cuối), <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, và nhiều loại <strong>tạo dàn số</strong> khác.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Việc <strong>tạo dàn đề nhanh</strong> bằng công cụ tự động giúp bạn tiết kiệm thời gian và giảm thiểu sai sót so với việc tính toán thủ công. <strong>Ứng dụng tạo dàn đề</strong> của chúng tôi sử dụng các thuật toán thống kê và giải mã số học để tạo ra các <strong>dàn đề đẹp hôm nay</strong> với tỷ lệ thắng cao.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Lợi Ích Của Việc Nuôi Dàn Đề" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>💡 Lợi Ích Của Việc Nuôi Dàn Đề Và Tạo Dàn Đề</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tăng Tỷ Lệ Thắng</strong>: Đây là ưu điểm lớn nhất của việc <strong>tạo dàn đề</strong>. Khi bạn chơi 10, 20, hay 50 số thay vì chỉ 1-2 số, cơ hội để giải đặc biệt rơi vào một trong các con số đó cao hơn rất nhiều. Công cụ <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong> giúp bạn tối ưu hóa lựa chọn.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Quản Lý Vốn Hiệu Quả</strong>: Việc <strong>nuôi dàn đề</strong> cho phép bạn chia nhỏ vốn và vào tiền theo tỷ lệ gấp thếp (ví dụ: 1:2:4 hoặc 1:3:10) tùy thuộc vào khung ngày nuôi. <strong>Tạo dàn đề xổ số</strong> giúp bạn có chiến lược đầu tư thông minh hơn.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Giảm Thiểu Rủi Ro</strong>: Thay vì đánh bạch thủ với rủi ro cao, <strong>tạo dàn số</strong> và nuôi dàn đề giúp bạn phân tán rủi ro. Công cụ <strong>tạo dàn đề nhanh</strong> của chúng tôi hỗ trợ bạn tạo ra các <strong>dàn đề miễn phí</strong> với độ chính xác cao.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tiết Kiệm Thời Gian</strong>: Thay vì tính toán thủ công tốn nhiều thời gian và dễ sai sót, <strong>phần mềm tạo dàn đề</strong> và <strong>ứng dụng tạo dàn số</strong> của chúng tôi giúp bạn <strong>tạo dàn xổ số nhanh nhất</strong> chỉ với vài cú nhấp chuột.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Tạo Dàn 2D" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>🎯 Tạo Dàn Đề 2D - Tạo Dàn Số 2 Số Cuối</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tạo dàn đề 2D</strong> là tính năng phổ biến nhất, tập trung vào 2 số cuối của giải đặc biệt. Đây là phương pháp <strong>tạo dàn đề</strong> được nhiều người chơi ưa chuộng vì dễ hiểu và dễ áp dụng.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Bạn có thể <strong>tạo dàn đề nhanh</strong> dựa trên nhiều tiêu chí: <strong>Chạm</strong>, <strong>Tổng</strong>, <strong>Đầu</strong>, <strong>Đuôi</strong>, <strong>Chẵn/Lẻ</strong>, <strong>Lớn/Bé</strong>... Công cụ <strong>tạo dàn đề 2D</strong> của chúng tôi hỗ trợ tính năng độc quyền: <strong>Tạo mức dàn đề</strong> cho phép bạn loại trừ các con số mình không thích hoặc các số đã gan lâu ngày.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tạo dàn số</strong> 2D giúp bạn tạo ra các bộ số từ 00-99, sau đó có thể lọc và ghép để tạo ra <strong>dàn đề đẹp hôm nay</strong>. Công cụ <strong>tạo dàn đề xổ số</strong> 2D của chúng tôi hoàn toàn miễn phí và nhanh chóng.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Tạo Dàn 3D" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>🎲 Tạo Dàn Đề 3D - Tạo Dàn 3 Càng Chuyên Nghiệp</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Cách tạo dàn đề 3D</strong> (3 càng) phức tạp hơn nhiều so với <strong>tạo dàn đề 2D</strong>, nhưng tỷ lệ thưởng cũng cao hơn đáng kể. <strong>Tạo dàn đề 3D</strong> yêu cầu bạn phải chọn đúng 3 số cuối của giải đặc biệt.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Công cụ của chúng tôi hỗ trợ <strong>tạo dàn 3D giải mã số học</strong>, cho phép bạn ghép các chạm, tổng của 3 số. Chúng tôi cũng hỗ trợ <strong>tạo dàn 3d 4d</strong> kết hợp, giúp bạn tối ưu hóa lựa chọn của mình. <strong>Tạo ghép dàn 3D-4D</strong> là tính năng độc đáo giúp bạn tạo ra nhiều bộ số may mắn hơn.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Ứng dụng tạo dàn đề</strong> 3D của chúng tôi sử dụng các thuật toán thống kê tiên tiến để <strong>tạo dàn giải mã số học</strong> với độ chính xác cao. <strong>Tạo dàn xổ số</strong> 3D giúp bạn có cơ hội trúng thưởng lớn hơn.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Tạo Dàn 4D" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>🏆 Tạo Dàn Đề 4D - Đỉnh Cao Của Tạo Dàn Số</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Đây là đỉnh cao của việc "săn thưởng". <strong>Tạo dàn 4D</strong> yêu cầu độ chính xác cực cao vì bạn phải chọn đúng 4 số cuối của giải đặc biệt. <strong>Phần mềm tạo dàn đề</strong> của chúng tôi sẽ giúp bạn lọc và <strong>tạo dàn số học</strong> 4 chữ số dựa trên các thuật toán thống kê xác suất tiên tiến.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tạo dàn đề 4D</strong> kết hợp với <strong>tạo ghép dàn 3D-4D</strong> giúp bạn tạo ra nhiều bộ số may mắn. Công cụ <strong>tạo dàn 3d4d</strong> của chúng tôi hỗ trợ bạn tạo ra các <strong>dàn đề đẹp hôm nay</strong> với tỷ lệ thắng cao.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Tạo dàn xổ số nhanh nhất</strong> với công cụ 4D của chúng tôi. <strong>Tạo dàn giải mã số học</strong> 4D sử dụng các yếu tố "bạc nhớ" và thống kê để tạo ra các bộ số có xác suất trúng cao. <strong>Ứng dụng tạo dàn xổ số mức số</strong> cho phép bạn tùy chỉnh loại bỏ tổng, loại bỏ đầu/đuôi cực kỳ linh hoạt.
+                                </p>
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Kinh Nghiệm Nuôi Dàn Đề" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>📚 Kinh Nghiệm Nuôi Dàn Đề Đánh Quanh Năm</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Sử dụng công cụ <strong>Tạo Dàn Đề</strong> là bước 1, nhưng để thành công, bạn cần có chiến lược <strong>dàn đề đánh quanh năm</strong>:
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Ổn Định Dàn Đề</strong>: Không nên thay đổi dàn số liên tục. Hãy tin tưởng vào <strong>dàn đề chuẩn</strong> mà công cụ <strong>tạo dàn đề</strong> đã cung cấp và theo khung (ví dụ 3 ngày). <strong>Tạo dàn đề nhanh</strong> nhưng phải kiên định với phương pháp đã chọn.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Quản Lý Vốn</strong>: Đây là yếu tố sống còn. Chia nhỏ vốn và vào tiền theo tỷ lệ gấp thếp (ví dụ: 1:2:4 hoặc 1:3:10) tùy thuộc vào khung ngày nuôi. <strong>Tạo dàn đề xổ số</strong> giúp bạn có chiến lược đầu tư thông minh.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Dàn Đề Hàng Ngày</strong>: Luôn sử dụng công cụ để <strong>thống kê dàn đề</strong> và cập nhật xu hướng mới, nhưng hãy kiên định với phương pháp đã chọn. <strong>Tạo dàn số</strong> hàng ngày giúp bạn theo dõi và điều chỉnh chiến lược.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    <strong>Sử Dụng Công Cụ Hiệu Quả</strong>: <strong>Phần mềm tạo dàn đề</strong> và <strong>ứng dụng tạo dàn số</strong> của chúng tôi giúp bạn <strong>tạo dàn xổ số nhanh nhất</strong>. Hãy tận dụng các tính năng như <strong>tạo mức số</strong>, <strong>tạo dàn đặc biệt</strong>, <strong>tạo ghép dàn 3D-4D</strong> để tối ưu hóa kết quả.
+                                </p>
+                            </div>
+                        </article>
+
                         {/* FAQ - Only 3 most important */}
                         <article style={styles.article}>
-                            <h2 style={styles.h2}>❓ FAQ</h2>
+                            <h2 style={styles.h2}>❓ Câu Hỏi Thường Gặp Về Tạo Dàn Đề</h2>
+                            {/* ✅ SEO: Thêm mô tả về FAQ tạo dàn đề */}
+                            <p style={{ marginBottom: '20px', color: '#555555', lineHeight: '1.6' }}>
+                                Dưới đây là các câu hỏi thường gặp về <strong>tạo dàn đề</strong>, <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo ghép dàn 3D-4D</strong> và các công cụ <strong>tạo dàn số</strong> khác.
+                            </p>
                             <div style={styles.faqCompact}>
                                 {FAQ_DATA.slice(0, 3).map((faq, index) => (
                                     <div key={index} style={styles.faqCompactItem}>
                                         <strong style={styles.faqCompactQ}>{faq.question}</strong>
                                         <div style={styles.faqCompactA}>
-                                            {faq.answer.substring(0, 100)}... 
+                                            {faq.answer.substring(0, 100)}...
                                             {faq.question.includes('lô gan') && (
-                                                <> <a 
-                                                    href={`${targetUrl}/thongke/lo-gan`} 
-                                                    style={{...styles.backlink, color: '#b0b0b0'}} 
+                                                <> <a
+                                                    href={`${targetUrl}/thongke/lo-gan`}
+                                                    style={{ ...styles.backlink, color: '#b0b0b0' }}
                                                     onMouseEnter={(e) => e.target.style.borderBottomColor = '#E65A2E'}
                                                     onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}
                                                     rel="nofollow"
@@ -462,6 +496,25 @@ export default function HomePage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        </article>
+
+                        {/* ✅ SEO: Section "Kết Luận" */}
+                        <article style={styles.article}>
+                            <h2 style={styles.h2}>✅ Kết Luận - Tạo Dàn Đề Là Nghệ Thuật Và Khoa Học</h2>
+                            <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Việc <strong>tạo dàn đề</strong> là một nghệ thuật và khoa học. Nó biến trò chơi may rủi thành một bài toán đầu tư có chiến lược. Dù bạn là người mới đang tìm <strong>cách tạo dàn đề</strong> hay một cao thủ muốn có một <strong>dàn đề vip hôm nay</strong>, công cụ <strong>Tạo Dàn Đề</strong> tại taodandewukong.pro đều là trợ thủ đắc lực không thể thiếu.
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Đừng lãng phí thời gian tính toán thủ công. Hãy truy cập ngay <strong>Tạo Dàn Đề</strong> tại taodandewukong.pro để sử dụng <strong>phần mềm tạo dàn đề</strong> và <strong>ứng dụng tạo dàn số</strong> chuyên nghiệp nhất, hoàn toàn miễn phí!
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Công cụ <strong>tạo dàn đề nhanh</strong> của chúng tôi hỗ trợ đầy đủ các tính năng: <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong>, <strong>tạo dàn ngẫu nhiên</strong>, <strong>tạo mức số</strong>, và <strong>tạo dàn đặc biệt</strong>. Tất cả đều <strong>dàn đề miễn phí</strong> 100%!
+                                </p>
+                                <p style={{ marginBottom: '15px' }}>
+                                    Với <strong>ứng dụng tạo dàn đề</strong> của chúng tôi, bạn có thể <strong>tạo dàn xổ số nhanh nhất</strong>, <strong>tạo dàn giải mã số học</strong> chính xác, và <strong>thống kê dàn đề</strong> hiệu quả. Hãy bắt đầu <strong>nuôi dàn đề</strong> ngay hôm nay với công cụ <strong>tạo dàn đề xổ số</strong> tốt nhất!
+                                </p>
                             </div>
                         </article>
 
@@ -480,9 +533,9 @@ export default function HomePage() {
                             {/* Thêm contextual backlinks */}
                             <div style={styles.contextualLinks}>
                                 <p style={styles.contextualText}>
-                                    Xem <a 
-                                        href={`${targetUrl}/thongke/lo-gan`} 
-                                        style={styles.backlink} 
+                                    Xem <a
+                                        href={`${targetUrl}/thongke/lo-gan`}
+                                        style={styles.backlink}
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
@@ -494,10 +547,10 @@ export default function HomePage() {
                                         rel="nofollow"
                                     >
                                         thống kê lô gan miền Bắc
-                                    </a>, 
-                                    <a 
-                                        href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-nam`)} 
+                                    </a>,
+                                    <a
+                                        href={`${targetUrl}/ket-qua-xo-so-mien-nam`}
+                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-nam`)}
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
@@ -516,10 +569,10 @@ export default function HomePage() {
                                         rel="nofollow"
                                     >
                                         {' '}kết quả XSMN
-                                    </a>, 
-                                    <a 
-                                        href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-bac`)} 
+                                    </a>,
+                                    <a
+                                        href={`${targetUrl}/ket-qua-xo-so-mien-bac`}
+                                        style={getAnimatedLinkStyle(styles.backlink, `${targetUrl}/ket-qua-xo-so-mien-bac`)}
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
@@ -538,10 +591,10 @@ export default function HomePage() {
                                         rel="nofollow"
                                     >
                                         {' '}kết quả XSMB
-                                    </a> 
-                                    {' '}và <a 
-                                        href={targetUrl} 
-                                        style={styles.backlink} 
+                                    </a>
+                                    {' '}và <a
+                                        href={targetUrl}
+                                        style={styles.backlink}
                                         onMouseEnter={(e) => {
                                             e.target.style.color = '#ffffff';
                                             e.target.style.borderBottomColor = '#E65A2E';
@@ -559,172 +612,223 @@ export default function HomePage() {
                         </section>
                     </div>
                 </section>
+            </div>
 
-                {/* Footer - Compact với nhiều backlinks */}
-                <footer style={styles.footer}>
-                    <p style={styles.footerText}>
-                        <a 
-                            href={targetUrl} 
-                            style={{...styles.backlink, color: '#b0b0b0'}} 
-                            onMouseEnter={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = '#E65A2E';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = 'transparent';
-                            }}
-                            rel="nofollow"
-                        >
-                            KETQUAMN.COM
-                        </a>
-                        {' - Kết quả xổ số nhanh nhất • Miễn phí 100%'}
+            {/* Footer - Optimized Layout */}
+            <footer style={styles.footer}>
+                <div style={styles.footerContainer} className="footer-container">
+                    {/* Column 1: Logo & Description */}
+                    <div style={styles.footerColumn} className="footer-column">
+                        <div style={styles.footerLogoContainer} className="footer-logo-container">
+                            <a
+                                href={targetUrl}
+                                rel="nofollow"
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.querySelector('img').style.opacity = '0.8';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.querySelector('img').style.opacity = '1';
+                                }}
+                            >
+                                <img
+                                    src="/logoketquamn.png"
+                                    alt="KETQUAMN.COM - Kết Quả Xổ Số Miền Nam"
+                                    style={styles.footerLogo}
+                                    loading="lazy"
+                                    decoding="async"
+                                    width="200"
+                                    height="52"
+                                />
+                            </a>
+                        </div>
+                        <p style={styles.footerDescription} className="footer-description">
+                            Tạo Dàn Đề tại <strong>taodandewukong.pro</strong>. Ứng dụng tạo mức số, dàn đặc biệt xổ số nhanh chóng và chính xác nhất. Hỗ trợ tạo dàn đề, dàn 2D, dàn 3D, dàn xiên, dàn ngẫu nhiên miễn phí.
+                        </p>
+                    </div>
+
+                    {/* Column 2: Quick Links */}
+                    <div style={styles.footerColumn}>
+                        <h3 style={styles.footerColumnTitle} className="footer-column-title">Liên Kết Nhanh</h3>
+                        <div style={styles.footerLinkList} className="footer-link-list">
+                            <a
+                                href={`${targetUrl}/thongke/lo-gan`}
+                                style={styles.footerLinkItem}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = '#E65A2E';
+                                    e.target.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = '#555555';
+                                    e.target.style.textDecoration = 'none';
+                                }}
+                                rel="nofollow"
+                            >
+                                Thống kê lô gan
+                            </a>
+                            <a
+                                href={`${targetUrl}/ket-qua-xo-so-mien-nam`}
+                                style={styles.footerLinkItem}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = '#E65A2E';
+                                    e.target.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = '#555555';
+                                    e.target.style.textDecoration = 'none';
+                                }}
+                                rel="nofollow"
+                            >
+                                XSMN
+                            </a>
+                            <a
+                                href={`${targetUrl}/ket-qua-xo-so-mien-bac`}
+                                style={styles.footerLinkItem}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = '#E65A2E';
+                                    e.target.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = '#555555';
+                                    e.target.style.textDecoration = 'none';
+                                }}
+                                rel="nofollow"
+                            >
+                                XSMB
+                            </a>
+                            <a
+                                href={targetUrl}
+                                style={styles.footerLinkItem}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = '#E65A2E';
+                                    e.target.style.textDecoration = 'underline';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = '#555555';
+                                    e.target.style.textDecoration = 'none';
+                                }}
+                                rel="nofollow"
+                            >
+                                Trang chủ
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Column 3: Contact Info */}
+                    <div style={styles.footerColumn}>
+                        <h3 style={styles.footerColumnTitle} className="footer-column-title">Thông Tin Liên Hệ</h3>
+                        <div style={styles.footerContactList} className="footer-contact-list">
+                            <p style={styles.footerContactItem} className="footer-contact-item">
+                                <strong>Địa chỉ:</strong><br />
+                                138 Phạm Văn Đồng, Xuân Đỉnh<br />
+                                Bắc Từ Liêm, Hà Nội
+                            </p>
+                            <p style={styles.footerContactItem} className="footer-contact-item">
+                                <strong>Hotline:</strong><br />
+                                <a href="tel:+84969736822" style={styles.footerContactLink}>+84-969-736-822</a>
+                            </p>
+                            <p style={styles.footerContactItem} className="footer-contact-item">
+                                <strong>Email:</strong><br />
+                                <a href="mailto:contact@ketquamn.com" style={styles.footerContactLink}>contact@ketquamn.com</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Column 4: About */}
+                    <div style={styles.footerColumn}>
+                        <h3 style={styles.footerColumnTitle} className="footer-column-title">Giới Thiệu</h3>
+                        <div style={styles.footerLinkList} className="footer-link-list">
+                            <Link href="/ve-chung-toi" style={styles.footerLinkItem}>
+                                Về chúng tôi
+                            </Link>
+                            <Link href="/chinh-sach-bao-mat" style={styles.footerLinkItem}>
+                                Chính sách bảo mật
+                            </Link>
+                            <Link href="/lien-he" style={styles.footerLinkItem}>
+                                Liên hệ
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Copyright */}
+                <div style={styles.footerCopyright}>
+                    <p style={styles.footerCopyrightText}>
+                        Copyright {new Date().getFullYear()} © <strong>Tạo Dàn Đề</strong> - Tất cả quyền được bảo lưu
                     </p>
-                    <div style={styles.footerLinks}>
-                        <a 
-                            href={`${targetUrl}/thongke/lo-gan`} 
-                            style={styles.footerLink}
-                            onMouseEnter={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = '#E65A2E';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.textDecoration = 'none';
-                                e.target.style.borderBottomColor = 'transparent';
-                            }}
-                            rel="nofollow"
-                        >
-                            Thống kê lô gan
-                        </a>
-                        <span style={{color: 'rgba(255,255,255,0.3)', margin: '0 2px'}}>•</span>
-                        <a 
-                            href={`${targetUrl}/ket-qua-xo-so-mien-nam`} 
-                            style={getAnimatedLinkStyle(styles.footerLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)}
-                            onMouseEnter={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = '#E65A2E';
-                                e.target.style.animation = 'none';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.textDecoration = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? 'underline' : 'none';
-                                e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#E65A2E' : 'transparent';
-                                if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
-                                    e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
-                                    e.target.style.padding = '2px 4px';
-                                    e.target.style.borderRadius = '4px';
-                                }
-                            }}
-                            rel="nofollow"
-                        >
-                            XSMN
-                        </a>
-                        <span style={{color: 'rgba(255,255,255,0.3)', margin: '0 2px'}}>•</span>
-                        <a 
-                            href={`${targetUrl}/ket-qua-xo-so-mien-bac`} 
-                            style={getAnimatedLinkStyle(styles.footerLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)}
-                            onMouseEnter={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = '#E65A2E';
-                                e.target.style.animation = 'none';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.textDecoration = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? 'underline' : 'none';
-                                e.target.style.borderBottomColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#E65A2E' : 'transparent';
-                                if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
-                                    e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
-                                    e.target.style.padding = '2px 4px';
-                                    e.target.style.borderRadius = '4px';
-                                }
-                            }}
-                            rel="nofollow"
-                        >
-                            XSMB
-                        </a>
-                        <span style={{color: 'rgba(255,255,255,0.3)', margin: '0 2px'}}>•</span>
-                        <a 
-                            href={targetUrl} 
-                            style={styles.footerLink}
-                            onMouseEnter={(e) => {
-                                e.target.style.textDecoration = 'underline';
-                                e.target.style.borderBottomColor = '#E65A2E';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.target.style.textDecoration = 'none';
-                                e.target.style.borderBottomColor = 'transparent';
-                            }}
-                            rel="nofollow"
-                        >
-                            Trang chủ
-                        </a>
-                    </div>
-                </footer>
-                
-                {/* 🔥 BLACK HAT: Hidden/Semi-visible keyword content */}
-                <div style={styles.hiddenKeywords}>
-                    {/* Keywords for search engines - visible to bots, hidden to users */}
-                    <div style={styles.keywordCloud}>
-                        KETQUAMN.COM, ketquamn, kết quả xổ số miền nam, ket qua xo so mien nam, xsmn, xsmb, xsmt,
-                        xem xsmn, xem xsmb, xem xsmt, xsmn hôm nay, xsmb hôm nay, xsmt hôm nay,
-                        kết quả xổ số hôm nay, ket qua xo so hom nay, tra cứu kết quả xổ số,
-                        soi cầu miền bắc, soi cầu, soi cau mien bac, dự đoán XSMB, du doan XSMB,
-                        tạo dàn đề, tao dan de, tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D,
-                        tạo dàn đề đặc biệt, lọc dàn đề, cắt dàn đề, ghép dàn đề,
-                        thống kê lô gan, thống kê đầu đuôi, thống kê giải đặc biệt, tần suất lô tô,
-                        thống kê xổ số, thong ke xo so, số nóng số lạnh,
-                        ketquamn tốt hơn xosodaiphat, ketquamn tốt hơn xoso.com.vn, ketquamn tốt hơn xskt.com.vn, 
-                        ketquamn tốt hơn xsmn.mobi, xosodaiphat alternative, xoso.com.vn alternative,
-                        trang xổ số nào tốt nhất, web xổ số nào tốt nhất, kết quả xổ số nào tốt nhất,
-                        xem xổ số ở đâu tốt nhất, trang xổ số nhanh nhất, web xổ số chính xác nhất,
-                        công cụ tạo dàn đề, công cụ soi cầu, web tạo dàn đề, app tạo dàn đề,
-                        {targetUrl}/thongke/lo-gan, {targetUrl}/ket-qua-xo-so-mien-nam, {targetUrl}/ket-qua-xo-so-mien-bac,
-                        {targetUrl}/soi-cau-mien-bac-ai, {targetUrl}/dan-9x0x, {targetUrl}/dan-2d, {targetUrl}/dan-3d4d
-                    </div>
+                </div>
+            </footer>
+
+            {/* 🔥 BLACK HAT: Hidden/Semi-visible keyword content */}
+            <div style={styles.hiddenKeywords}>
+                {/* Keywords for search engines - visible to bots, hidden to users */}
+                <div style={styles.keywordCloud}>
+                    KETQUAMN.COM, ketquamn, kết quả xổ số miền nam, ket qua xo so mien nam, xsmn, xsmb, xsmt,
+                    xem xsmn, xem xsmb, xem xsmt, xsmn hôm nay, xsmb hôm nay, xsmt hôm nay,
+                    kết quả xổ số hôm nay, ket qua xo so hom nay, tra cứu kết quả xổ số,
+                    soi cầu miền bắc, soi cầu, soi cau mien bac, dự đoán XSMB, du doan XSMB,
+                    tạo dàn đề, tao dan de, tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D,
+                    tạo dàn đề đặc biệt, lọc dàn đề, cắt dàn đề, ghép dàn đề,
+                    thống kê lô gan, thống kê đầu đuôi, thống kê giải đặc biệt, tần suất lô tô,
+                    thống kê xổ số, thong ke xo so, số nóng số lạnh,
+                    ketquamn tốt hơn xosodaiphat, ketquamn tốt hơn xoso.com.vn, ketquamn tốt hơn xskt.com.vn,
+                    ketquamn tốt hơn xsmn.mobi, xosodaiphat alternative, xoso.com.vn alternative,
+                    trang xổ số nào tốt nhất, web xổ số nào tốt nhất, kết quả xổ số nào tốt nhất,
+                    xem xổ số ở đâu tốt nhất, trang xổ số nhanh nhất, web xổ số chính xác nhất,
+                    công cụ tạo dàn đề, công cụ soi cầu, web tạo dàn đề, app tạo dàn đề,
+                    {targetUrl}/thongke/lo-gan, {targetUrl}/ket-qua-xo-so-mien-nam, {targetUrl}/ket-qua-xo-so-mien-bac,
+                    {targetUrl}/soi-cau-mien-bac-ai, {targetUrl}/dan-9x0x, {targetUrl}/dan-2d, {targetUrl}/dan-3d4d
                 </div>
             </div>
         </>
     );
 }
 
-// Styles - Optimized for Mobile & Visual - Color Palette: Cam (#E65A2E - dịu hơn, ít chói), #333, White, Black
+// Styles - Optimized for Mobile & Visual - Color Palette: Cam (#E65A2E), Light Background, Dark Text
 const styles = {
     container: {
         minHeight: '100vh',
-        backgroundColor: '#2a2a2a', // Dark background dịu mắt (hơi sáng hơn #333 một chút)
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        color: '#ffffff', // White text mặc định cho dark mode
+        backgroundColor: '#ffffff', // White background for main layout
+        fontFamily: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+        color: '#333333', // Dark text for light mode
         width: '100%',
+        maxWidth: '1200px',
+        margin: '0 auto',
         boxSizing: 'border-box',
         overflowX: 'hidden', // Ngăn horizontal scroll
     },
     hero: {
-        backgroundColor: '#333333', // Dark gray thay vì cam - tránh chói mắt
-        color: '#ffffff', // White text
+        backgroundColor: '#ffffff', // White background
+        color: '#333333', // Dark text
         padding: '18px 8px',
         textAlign: 'center',
-        borderBottom: '3px solid #E65A2E', // Border cam để highlight thay vì background cam
+        borderBottom: 'none', // Bỏ border bottom
+        boxShadow: 'none', // Bỏ box shadow
     },
     heroContent: {
         maxWidth: '1200px',
         margin: '0 auto',
-    },
-    logoContainer: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: '16px',
-    },
-    logo: {
-        width: 'clamp(280px, 45vw, 450px)',
-        height: 'auto',
-        maxWidth: '450px',
-        objectFit: 'contain',
-        borderRadius: '8px',
     },
     heroTitle: {
         fontSize: 'clamp(1.2rem, 5vw, 1.9rem)',
         fontWeight: 'bold',
         marginBottom: '6px',
         lineHeight: '1.3',
+        textAlign: 'left',
+        paddingTop: '0',
+        paddingBottom: '0',
+        marginTop: '0',
+    },
+    heroSeoDescription: {
+        fontSize: 'clamp(0.9rem, 3.5vw, 1.05rem)',
+        margin: '0',
+        marginTop: '0',
+        marginBottom: '0',
+        lineHeight: '1.5',
+        color: '#333333',
+        fontWeight: '400',
+        textAlign: 'left',
+        paddingTop: '0',
+        paddingBottom: '0',
     },
     heroDescription: {
         fontSize: 'clamp(0.85rem, 3vw, 0.95rem)',
@@ -743,45 +847,46 @@ const styles = {
     ctaButton: {
         display: 'inline-block',
         padding: '8px 14px',
-        backgroundColor: '#333333', // Dark gray
-        color: '#ffffff', // White text thay vì cam - ít chói hơn
+        backgroundColor: '#E65A2E', // Orange background
+        color: '#ffffff', // White text
         textDecoration: 'none',
         borderRadius: '6px',
         fontWeight: 'bold',
         fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
         transition: 'all 0.2s ease',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)', // Shadow đậm hơn cho dark mode
+        boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
         minWidth: '100px',
-        border: '1px solid #E65A2E', // Chỉ border cam, không dùng cam cho text
+        border: '1px solid #E65A2E',
         cursor: 'pointer',
     },
     primaryCtaButton: {
         display: 'block',
         width: '100%',
         padding: '12px 16px',
-        backgroundColor: '#333333', // Dark gray
-        color: '#ffffff', // White text thay vì cam - ít chói hơn
+        backgroundColor: '#E65A2E', // Orange background
+        color: '#ffffff', // White text
         textDecoration: 'none',
         borderRadius: '6px',
         fontWeight: 'bold',
         fontSize: 'clamp(0.95rem, 3vw, 1.15rem)',
         transition: 'all 0.2s ease',
-        boxShadow: '0 2px 5px rgba(0,0,0,0.4)', // Shadow đậm hơn cho dark mode
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
         textAlign: 'center',
-        border: '2px solid #E65A2E', // Chỉ border cam, không dùng cam cho text
+        border: '2px solid #E65A2E',
         cursor: 'pointer',
-        boxSizing: 'border-box', // Đảm bảo border không làm tràn ra ngoài
+        boxSizing: 'border-box',
     },
     tableSection: {
         padding: '8px 6px',
         boxSizing: 'border-box',
         width: '100%',
-        backgroundColor: '#2a2a2a',
+        backgroundColor: '#ffffff',
     },
     mainContent: {
         padding: '8px 6px',
         boxSizing: 'border-box',
         width: '100%',
+        backgroundColor: '#ffffff', // White background
     },
     contentWrapper: {
         maxWidth: '1200px',
@@ -791,41 +896,41 @@ const styles = {
         width: '100%',
     },
     article: {
-        backgroundColor: '#333333', // Dark gray cho cards trên nền tối
+        backgroundColor: '#ffffff', // White background for cards
         padding: '10px 8px',
         marginBottom: '8px',
         borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.3)', // Shadow đậm hơn cho dark mode
-        border: '1px solid rgba(255,255,255,0.1)', // Border trắng nhẹ
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        border: '1px solid rgba(0,0,0,0.1)', // Light border
     },
     h2: {
         fontSize: 'clamp(1.1rem, 4vw, 1.5rem)',
         fontWeight: 'bold',
         marginBottom: '6px',
-        color: '#ffffff', // White cho headings trên nền tối
+        color: '#333333', // Dark text for headings
         lineHeight: '1.3',
     },
     h3: {
         fontSize: 'clamp(1rem, 3.5vw, 1.3rem)',
         fontWeight: 'bold',
         marginBottom: '8px',
-        color: '#ffffff', // White thay vì cam - ít chói hơn
+        color: '#333333', // Dark text
         lineHeight: '1.3',
-        borderLeft: '3px solid #E65A2E', // Border cam bên trái thay vì text cam
+        borderLeft: '3px solid #E65A2E', // Orange border
         paddingLeft: '8px',
     },
     paragraph: {
         fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
         lineHeight: '1.5',
         marginBottom: '8px',
-        color: '#e0e0e0', // Light gray cho text trên nền tối (dễ đọc hơn pure white)
+        color: '#555555', // Dark gray text for readability
     },
     list: {
         fontSize: 'clamp(0.85rem, 2.5vw, 1rem)',
         lineHeight: '1.6',
         marginBottom: '8px',
         paddingLeft: '18px',
-        color: '#e0e0e0', // Light gray cho list items
+        color: '#555555', // Dark gray for list items
     },
     toolsCompactGrid: {
         display: 'grid',
@@ -835,9 +940,9 @@ const styles = {
     },
     toolCompactCard: {
         padding: '10px 6px',
-        backgroundColor: '#3a3a3a', // Dark gray cho cards trên nền tối
+        backgroundColor: '#f8f9fa', // Light gray background
         borderRadius: '6px',
-        border: '1px solid rgba(255,255,255,0.15)', // Border trắng nhẹ
+        border: '1px solid rgba(0,0,0,0.1)', // Light border
         textAlign: 'center',
         textDecoration: 'none',
         display: 'flex',
@@ -851,7 +956,7 @@ const styles = {
     toolCompactTitle: {
         fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
         fontWeight: 'bold',
-        color: '#ffffff', // White text trên nền tối
+        color: '#333333', // Dark text
         lineHeight: '1.3',
     },
     importantLink: {
@@ -861,14 +966,14 @@ const styles = {
     importantLinkBtn: {
         display: 'inline-block',
         padding: '10px 16px',
-        backgroundColor: '#333333', // Dark gray
-        color: '#ffffff', // White text thay vì cam - ít chói hơn
+        backgroundColor: '#E65A2E', // Orange background
+        color: '#ffffff', // White text
         textDecoration: 'none',
         borderRadius: '6px',
         fontWeight: 'bold',
         fontSize: 'clamp(0.85rem, 2.2vw, 0.95rem)',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)', // Shadow đậm hơn cho dark mode
-        border: '1px solid #E65A2E', // Chỉ border cam, không dùng cam cho text
+        boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+        border: '1px solid #E65A2E',
         transition: 'all 0.2s ease',
         cursor: 'pointer',
     },
@@ -878,20 +983,20 @@ const styles = {
     faqCompactItem: {
         marginBottom: '10px',
         paddingBottom: '10px',
-        borderBottom: '1px solid rgba(255,255,255,0.1)', // Border trắng nhẹ trên nền tối
+        borderBottom: '1px solid rgba(0,0,0,0.1)', // Light border
     },
     faqCompactQ: {
         display: 'block',
         fontSize: 'clamp(0.8rem, 2.2vw, 0.9rem)',
-        color: '#ffffff', // White thay vì cam - ít chói hơn
+        color: '#333333', // Dark text
         marginBottom: '5px',
         fontWeight: 'bold',
         paddingLeft: '8px',
-        borderLeft: '2px solid #E65A2E', // Border cam bên trái thay vì text cam
+        borderLeft: '2px solid #E65A2E', // Orange border
     },
     faqCompactA: {
         fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-        color: '#d0d0d0', // Light gray cho answers trên nền tối
+        color: '#555555', // Dark gray for answers
         lineHeight: '1.4',
     },
     toolsGrid: {
@@ -910,17 +1015,17 @@ const styles = {
     },
     quickLink: {
         padding: '12px 8px',
-        backgroundColor: '#333333', // Dark gray thay vì cam - dễ nhìn hơn
-        color: '#ffffff', // White text
+        backgroundColor: '#ffffff', // White background
+        color: '#333333', // Dark text
         borderRadius: '6px',
         textDecoration: 'none',
         textAlign: 'center',
         transition: 'all 0.2s ease',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)', // Shadow đậm hơn cho dark mode
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        border: '1px solid rgba(255,255,255,0.1)', // Border trắng nhẹ
+        border: '1px solid rgba(0,0,0,0.1)', // Light border
         cursor: 'pointer',
     },
     quickLinkIcon: {
@@ -932,19 +1037,19 @@ const styles = {
         fontWeight: 'bold',
     },
     finalCta: {
-        backgroundColor: '#333333', // Dark gray thay vì cam - dễ nhìn hơn
+        backgroundColor: '#ffffff', // White background
         padding: '15px 10px',
         borderRadius: '8px',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.4)', // Shadow đậm hơn cho dark mode
+        boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
         textAlign: 'center',
         marginTop: '8px',
         marginBottom: '8px',
-        color: '#ffffff', // White text
-        border: '2px solid #E65A2E', // Border cam để highlight section
-        boxSizing: 'border-box', // Đảm bảo border không làm tràn ra ngoài
+        color: '#333333', // Dark text
+        border: '2px solid #E65A2E', // Orange border
+        boxSizing: 'border-box',
         width: '100%',
         maxWidth: '100%',
-        overflow: 'hidden', // Ngăn nội dung tràn ra ngoài
+        overflow: 'hidden',
     },
     ctaSubtextCompact: {
         fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
@@ -952,56 +1057,121 @@ const styles = {
         opacity: 0.9,
     },
     backlink: {
-        color: '#b0b0b0', // Light gray thay vì cam - ít chói hơn
+        color: '#E65A2E', // Orange color for links
         textDecoration: 'underline',
         fontWeight: '500',
-        borderBottom: '1px solid #E65A2E', // Border cam nhẹ khi hover
+        borderBottom: '1px solid #E65A2E',
     },
     footer: {
-        backgroundColor: '#1a1a1a', // Đậm hơn một chút để tách biệt với content
-        color: '#ffffff',
-        padding: '16px 12px', // Tăng padding cho đẹp hơn
-        textAlign: 'center',
-        marginTop: '12px', // Tăng margin top
+        backgroundColor: '#FFE8DC', // Same as navbar background
+        color: '#333333', // Dark text
+        padding: '25px 15px 15px 15px',
+        marginTop: '12px',
         marginBottom: '0',
-        borderTop: '1px solid rgba(255,255,255,0.15)', // Border trắng rõ hơn một chút
+        borderTop: '2px solid rgba(230, 90, 46, 0.4)', // Same as navbar border
         width: '100%',
         boxSizing: 'border-box',
+        fontFamily: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
     },
-    footerText: {
-        fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-        lineHeight: '1.5',
-        margin: '0 0 10px 0', // Margin bottom cho spacing
-        color: '#e0e0e0', // Light gray cho dễ đọc
+    footerContainer: {
+        maxWidth: '1200px',
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '0',
+        paddingBottom: '15px',
     },
-    footerLinks: {
-        marginTop: '10px',
-        fontSize: 'clamp(0.7rem, 1.8vw, 0.8rem)',
+    footerColumn: {
         display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '4px 8px', // Gap giữa các links
+        flexDirection: 'column',
     },
-    footerLink: {
-        color: '#b0b0b0', // Light gray thay vì cam - ít chói hơn
+    footerLogoContainer: {
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        marginBottom: '15px',
+    },
+    footerLogo: {
+        height: 'auto',
+        maxHeight: '52px',
+        width: 'auto',
+        maxWidth: '200px',
+        objectFit: 'contain',
+        transition: 'opacity 0.2s ease',
+    },
+    footerDescription: {
+        fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+        lineHeight: '1.6',
+        margin: '0',
+        color: '#555555',
+        textAlign: 'left',
+    },
+    footerBrandLink: {
+        color: '#333333',
         textDecoration: 'none',
-        padding: '2px 4px',
-        borderRadius: '4px',
+        fontWeight: '600',
         transition: 'all 0.2s ease',
-        borderBottom: '1px solid transparent', // Border sẽ hiện khi hover
-        cursor: 'pointer',
+    },
+    footerColumnTitle: {
+        fontSize: 'clamp(1rem, 2.2vw, 1.15rem)',
+        fontWeight: 'bold',
+        color: '#333333',
+        marginBottom: '12px',
+        textAlign: 'left',
+        paddingBottom: '8px',
+        borderBottom: '2px solid rgba(230, 90, 46, 0.3)',
+    },
+    footerLinkList: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+    },
+    footerLinkItem: {
+        color: '#555555',
+        textDecoration: 'none',
+        fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
+        transition: 'all 0.2s ease',
+        lineHeight: '1.5',
+        display: 'block',
+    },
+    footerContactList: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+    },
+    footerContactItem: {
+        margin: '0',
+        textAlign: 'left',
+        fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
+        lineHeight: '1.6',
+        color: '#555555',
+    },
+    footerContactLink: {
+        color: '#E65A2E',
+        textDecoration: 'none',
+        transition: 'all 0.2s ease',
+    },
+    footerCopyright: {
+        marginTop: '20px',
+        paddingTop: '15px',
+        borderTop: '1px solid rgba(0,0,0,0.15)',
+        textAlign: 'center',
+    },
+    footerCopyrightText: {
+        fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
+        color: '#666666',
+        margin: '0',
     },
     contextualLinks: {
         marginTop: '15px',
         padding: '10px',
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: '#f8f9fa', // Light gray background
         borderRadius: '6px',
     },
     contextualText: {
         fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
         lineHeight: '1.6',
-        color: '#fff',
+        color: '#333333', // Dark text
         margin: '0',
     },
     // 🔥 BLACK HAT: Hidden keyword content (visible to bots, hidden to users)

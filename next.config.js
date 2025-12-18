@@ -11,13 +11,16 @@ const nextConfig = {
         NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME || 'Tạo Dàn Đề WuKong | Taodandewukong.pro',
     },
 
-    // Images configuration
+    // Images configuration - Optimized for performance
     images: {
         formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         minimumCacheTTL: 31536000,
         unoptimized: false,
+        dangerouslyAllowSVG: false,
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+        remotePatterns: [],
     },
 
     // Headers for SEO and security
@@ -54,6 +57,26 @@ const nextConfig = {
                     {
                         key: 'X-DNS-Prefetch-Control',
                         value: 'on'
+                    }
+                ],
+            },
+            // ✅ Performance: Static assets caching
+            {
+                source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|avif)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
+                    }
+                ],
+            },
+            // ✅ Performance: Fonts caching
+            {
+                source: '/:all*(woff|woff2|ttf|otf)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable'
                     }
                 ],
             },

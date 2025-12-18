@@ -176,17 +176,18 @@ export default function UltraSEOHead({
             url: targetUrl
         });
 
-        // 3. Service Schema (Backlink strategy)
+        // 3. Service Schema - Tạo Dàn Đề Service
         schemas.push({
             '@context': 'https://schema.org',
             '@type': 'Service',
-            serviceType: 'Kết Quả Xổ Số Online',
+            serviceType: 'Tạo Dàn Đề Xổ Số Online',
+            name: 'Tạo Dàn Đề 2D, 3D, 4D, 9X-0X',
             provider: {
                 '@type': 'Organization',
                 name: 'Kết Quả MN',
                 url: targetUrl,
             },
-            description: 'Dịch vụ cung cấp kết quả xổ số 3 miền nhanh nhất, chính xác nhất tại ' + targetUrl,
+            description: 'Dịch vụ tạo dàn đề nhanh, tạo dàn đề xổ số, tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên miễn phí tại ' + siteUrl,
             areaServed: {
                 '@type': 'Country',
                 name: 'Vietnam'
@@ -196,7 +197,13 @@ export default function UltraSEOHead({
                 price: '0',
                 priceCurrency: 'VND',
                 availability: 'https://schema.org/InStock',
-                url: targetUrl
+                url: siteUrl
+            },
+            serviceOutput: {
+                '@type': 'SoftwareApplication',
+                name: 'Công Cụ Tạo Dàn Đề',
+                applicationCategory: 'UtilityApplication',
+                operatingSystem: 'Web Browser'
             }
         });
 
@@ -304,54 +311,67 @@ export default function UltraSEOHead({
             });
         }
 
-        // 9. HowTo Schema - Hướng dẫn xem kết quả
+        // 9. HowTo Schema - Hướng dẫn tạo dàn đề
         schemas.push({
             '@context': 'https://schema.org',
             '@type': 'HowTo',
-            name: 'Cách xem kết quả xổ số miền Nam nhanh nhất',
-            description: 'Hướng dẫn xem kết quả xổ số tại KETQUAMN.COM',
+            name: 'Cách tạo dàn đề 2D, 3D, 4D, 9X-0X nhanh nhất',
+            description: 'Hướng dẫn tạo dàn đề, tạo dàn đề xổ số, tạo ghép dàn 3D-4D tại taodandewukong.pro',
             step: [
                 {
                     '@type': 'HowToStep',
-                    name: 'Truy cập KETQUAMN.COM',
-                    text: `Truy cập ${targetUrl} để xem kết quả xổ số`,
-                    url: targetUrl
+                    name: 'Truy cập taodandewukong.pro',
+                    text: `Truy cập ${siteUrl} để sử dụng công cụ tạo dàn đề`,
+                    url: siteUrl
                 },
                 {
                     '@type': 'HowToStep',
-                    name: 'Chọn miền',
-                    text: 'Chọn XSMN, XSMB, hoặc XSMT'
+                    name: 'Chọn loại dàn đề',
+                    text: 'Chọn tạo dàn đề 2D, tạo dàn đề 3D, tạo dàn đề 4D, tạo dàn đề 9X-0X, hoặc tạo ghép dàn 3D-4D'
                 },
                 {
                     '@type': 'HowToStep',
-                    name: 'Xem kết quả',
-                    text: 'Xem kết quả được cập nhật realtime'
+                    name: 'Tạo dàn đề',
+                    text: 'Nhấn nút tạo dàn đề để tạo các bộ số may mắn'
                 }
             ]
         });
 
-        // 10. Product Schema - Định vị như một sản phẩm dịch vụ
+        // 10. Product Schema - Tạo Dàn Đề Product
         schemas.push({
             '@context': 'https://schema.org',
             '@type': 'Product',
-            name: 'Kết Quả Xổ Số KETQUAMN.COM',
-            description: 'Dịch vụ xem kết quả xổ số 3 miền nhanh nhất, chính xác nhất',
+            name: 'Tạo Dàn Đề - Công Cụ Tạo Dàn Đề 2D, 3D, 4D, 9X-0X',
+            description: 'Công cụ tạo dàn đề nhanh, tạo dàn đề xổ số, tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên miễn phí',
             brand: {
                 '@type': 'Brand',
-                name: 'Kết Quả MN'
+                name: 'Taodandewukong.pro'
             },
+            category: 'Công Cụ Xổ Số',
             offers: {
                 '@type': 'Offer',
                 price: '0',
                 priceCurrency: 'VND',
                 availability: 'https://schema.org/InStock',
-                url: targetUrl
+                url: siteUrl
             },
             aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: '4.9',
                 reviewCount: '2500'
-            }
+            },
+            additionalProperty: [
+                {
+                    '@type': 'PropertyValue',
+                    name: 'Tính năng',
+                    value: 'Tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên'
+                },
+                {
+                    '@type': 'PropertyValue',
+                    name: 'Miễn phí',
+                    value: 'Có'
+                }
+            ]
         });
 
         // 11. Review Schema - Chi tiết reviews
@@ -621,7 +641,9 @@ export default function UltraSEOHead({
 
             {/* ✅ 2025 SEO: Resource Hints for better performance */}
             <link rel="prefetch" href={targetUrl} />
-            <link rel="prerender" href={targetUrl} />
+            
+            {/* ✅ 2025 SEO: Preload critical resources */}
+            <link rel="preload" href="/logoketquamn.png" as="image" fetchpriority="high" />
 
             {/* ✅ 2025 SEO: AEO/GEO Optimization - Meta tags for AI search engines */}
             <meta name="AI-searchable" content="true" />

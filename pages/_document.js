@@ -17,7 +17,7 @@ export default function Document() {
                     rel="preload" 
                     href="/logoketquamn.png" 
                     as="image" 
-                    fetchPriority="high"
+                    fetchpriority="high"
                 />
                 {/* Favicon */}
                 <link rel="icon" href="/favicon.ico" />
@@ -44,6 +44,12 @@ export default function Document() {
                 {/* ✅ 2025 SEO: Performance optimization */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                
+                {/* Google Fonts - Roboto - Optimized with font-display swap */}
+                <link 
+                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" 
+                    rel="stylesheet"
+                />
             </Head>
             <body>
                 <Main />

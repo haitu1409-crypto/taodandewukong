@@ -96,9 +96,18 @@ function Navbar() {
                         display: none !important;
                     }
                 }
+                /* ✅ PERFORMANCE: Bỏ padding trên dưới navbar trên mobile */
+                @media (max-width: 767px) {
+                    .navbar-container-mobile {
+                        padding-top: 0 !important;
+                        padding-bottom: 0 !important;
+                        padding-left: 16px !important;
+                        padding-right: 16px !important;
+                    }
+                }
             `}</style>
             <nav style={styles.navbar(isScrolled)}>
-                <div style={styles.container}>
+                <div style={styles.container} className="navbar-container-mobile">
                     {/* Logo/Brand */}
                     <Link href="/" style={styles.brand}>
                         <img 

@@ -27,7 +27,7 @@ const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
 });
 
 // ✅ PERFORMANCE: Lazy load DanDeGenerator component - disable SSR for better initial load
-// ✅ PERFORMANCE: Prefetch component on idle for faster interaction
+// ✅ PERFORMANCE: Only load when needed (on scroll/interaction) to improve mobile PageSpeed
 const DanDeGenerator = dynamic(() => import('../components/DanDeGenerator'), {
     ssr: false, // Disable SSR for better initial load performance
     loading: () => (
@@ -44,21 +44,6 @@ const DanDeGenerator = dynamic(() => import('../components/DanDeGenerator'), {
     )
 });
 
-// ✅ PERFORMANCE: Prefetch component after page load for faster interaction
-if (typeof window !== 'undefined') {
-    // Prefetch on idle
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-            import('../components/DanDeGenerator');
-        }, { timeout: 2000 });
-    } else {
-        // Fallback for browsers without requestIdleCallback
-        setTimeout(() => {
-            import('../components/DanDeGenerator');
-        }, 1000);
-    }
-}
-
 export default function HomePage() {
     const seoConfig = SEO_CONFIG.home;
     const targetUrl = TARGET_URL;
@@ -67,6 +52,8 @@ export default function HomePage() {
         central: false,
         north: false,
     });
+    // ✅ PERFORMANCE: Only load component when user scrolls near it or interacts
+    const [shouldLoadDanDeGenerator, setShouldLoadDanDeGenerator] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
@@ -121,8 +108,94 @@ export default function HomePage() {
         }
     }, []);
 
-    // ✅ PERFORMANCE: Component is near top, so load immediately but with prefetch optimization
-    // Prefetch already handled in module-level code above
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load component khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadDanDeGenerator(true), 3000);
+            } else {
+                setShouldLoadDanDeGenerator(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadDanDeGenerator(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('dan-de-generator-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadDanDeGenerator(true), 3000);
+                } else {
+                    setShouldLoadDanDeGenerator(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadDanDeGenerator) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadDanDeGenerator) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/DanDeGenerator').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadDanDeGenerator]);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
@@ -282,20 +355,36 @@ export default function HomePage() {
                     }}>
                         Tạo Dàn Đề 9X-0X Ngẫu Nhiên
                     </h2>
-                    <Suspense fallback={
+                    {/* ✅ PERFORMANCE: Placeholder for Intersection Observer - không block render */}
+                    <div id="dan-de-generator-placeholder" style={{ minHeight: '1px', width: '100%' }} />
+                    {shouldLoadDanDeGenerator ? (
+                        <Suspense fallback={
+                            <div style={{
+                                padding: '20px',
+                                textAlign: 'center',
+                                color: '#666',
+                                minHeight: '200px',
+                                width: '100%',
+                                boxSizing: 'border-box'
+                            }}>
+                                Đang tải công cụ tạo dàn đề...
+                            </div>
+                        }>
+                            <DanDeGenerator />
+                        </Suspense>
+                    ) : (
                         <div style={{
                             padding: '20px',
                             textAlign: 'center',
-                            color: '#666',
+                            color: '#999',
                             minHeight: '200px',
                             width: '100%',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            fontSize: '14px'
                         }}>
-                            Đang tải công cụ tạo dàn đề...
+                            Cuộn xuống để tải công cụ tạo dàn đề...
                         </div>
-                    }>
-                        <DanDeGenerator />
-                    </Suspense>
+                    )}
                 </section>
 
                 {/* Main Content Section */}

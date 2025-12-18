@@ -17,7 +17,7 @@ const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
             padding: '20px',
             textAlign: 'center',
             color: '#666',
-            minHeight: '200px',
+            minHeight: '170px',
             width: '100%',
             boxSizing: 'border-box'
         }}>
@@ -25,6 +25,39 @@ const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
         </div>
     )
 });
+
+// ✅ PERFORMANCE: Lazy load DanDeGenerator component - disable SSR for better initial load
+// ✅ PERFORMANCE: Prefetch component on idle for faster interaction
+const DanDeGenerator = dynamic(() => import('../components/DanDeGenerator'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => (
+        <div style={{
+            padding: '20px',
+            textAlign: 'center',
+            color: '#666',
+            minHeight: '200px',
+            width: '100%',
+            boxSizing: 'border-box'
+        }}>
+            Đang tải công cụ tạo dàn đề...
+        </div>
+    )
+});
+
+// ✅ PERFORMANCE: Prefetch component after page load for faster interaction
+if (typeof window !== 'undefined') {
+    // Prefetch on idle
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            import('../components/DanDeGenerator');
+        }, { timeout: 2000 });
+    } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+            import('../components/DanDeGenerator');
+        }, 1000);
+    }
+}
 
 export default function HomePage() {
     const seoConfig = SEO_CONFIG.home;
@@ -87,6 +120,9 @@ export default function HomePage() {
             return () => clearInterval(interval);
         }
     }, []);
+
+    // ✅ PERFORMANCE: Component is near top, so load immediately but with prefetch optimization
+    // Prefetch already handled in module-level code above
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
@@ -220,7 +256,7 @@ export default function HomePage() {
                     <div style={styles.heroContent}>
                         {/* H1 chính - tối ưu cho SEO với keywords "tạo dàn đề" */}
                         <h1 style={styles.heroTitle} className="hero-title-mobile">
-                            Tạo Dàn Đề | Tạo Dàn Đề 2D, 3D, 4D, 9X-0X | Tạo Ghép Dàn 3D-4D | Tạo Dàn Số Xổ Số Nhanh - Taodandewukong.pro
+                            Tạo Dàn Đề 2D, 3D, 4D, 9X-0X | Tạo Ghép Dàn 3D-4D | Tạo Dàn Số Xổ Số Nhanh - Taodandewukong.pro
                         </h1>
                         {/* ✅ SEO: H1 ẩn với keywords bổ sung về "tạo dàn đề" */}
                         <h1 style={styles.hiddenH1}>
@@ -228,9 +264,38 @@ export default function HomePage() {
                         </h1>
                         {/* ✅ SEO: Paragraph mô tả cho SEO với keywords "tạo dàn đề" */}
                         <p style={styles.heroSeoDescription}>
-                            <strong>Tạo dàn đề</strong> nhanh chóng và chính xác tại <strong>taodandewukong.pro</strong>. Ứng dụng <strong>tạo dàn đề xổ số</strong> miễn phí hỗ trợ <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong>, <strong>tạo dàn ngẫu nhiên</strong>. Công cụ <strong>tạo mức số</strong> và <strong>tạo dàn đặc biệt</strong> xổ số nhanh nhất, chính xác nhất.
+                            Ứng dụng <strong>tạo dàn đề xổ số</strong>, <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong>, <strong>tạo dàn ngẫu nhiên</strong>. Công cụ <strong>tạo mức số</strong> và <strong>tạo dàn đặc biệt</strong> xổ số nhanh nhất, chính xác nhất.
                         </p>
                     </div>
+                </section>
+
+                {/* DanDeGenerator Component - Render ngay sau box tiêu đề */}
+                <section style={{ ...styles.mainContent, marginTop: '0' }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        paddingBottom: '15px',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Tạo Dàn Đề 9X-0X Ngẫu Nhiên
+                    </h2>
+                    <Suspense fallback={
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#666',
+                            minHeight: '200px',
+                            width: '100%',
+                            boxSizing: 'border-box'
+                        }}>
+                            Đang tải công cụ tạo dàn đề...
+                        </div>
+                    }>
+                        <DanDeGenerator />
+                    </Suspense>
                 </section>
 
                 {/* Main Content Section */}
@@ -830,7 +895,7 @@ const styles = {
     hero: {
         backgroundColor: '#ffffff', // White background
         color: '#333333', // Dark text
-        padding: '18px 8px',
+        padding: '0 8px',
         textAlign: 'center',
         borderBottom: 'none', // Bỏ border bottom
         boxShadow: 'none', // Bỏ box shadow
@@ -908,7 +973,7 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
-        minHeight: '200px', // ✅ PERFORMANCE: Prevent layout shift
+        minHeight: '170px', // ✅ PERFORMANCE: Prevent layout shift
         width: '100%',
         boxSizing: 'border-box',
         padding: '8px 6px',

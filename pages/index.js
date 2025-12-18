@@ -823,13 +823,18 @@ const styles = {
         textAlign: 'center',
         borderBottom: 'none', // Bỏ border bottom
         boxShadow: 'none', // Bỏ box shadow
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        minHeight: 'clamp(120px, 20vw, 150px)', // Reserve space for H1 + paragraph
+        boxSizing: 'border-box',
     },
     heroContent: {
         maxWidth: '1070px',
         margin: '0 auto',
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        minHeight: 'clamp(100px, 18vw, 130px)', // Reserve space for content
     },
     heroTitle: {
-        fontSize: '28px',
+        fontSize: 'clamp(23px, 4vw, 28px)', // ✅ RESPONSIVE: 23px on mobile, 28px on desktop
         fontWeight: 'bold',
         marginBottom: '6px',
         lineHeight: '1.3',
@@ -837,6 +842,8 @@ const styles = {
         paddingTop: '0',
         paddingBottom: '0',
         marginTop: '0',
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        minHeight: 'clamp(60px, 10vw, 75px)', // Reserve space for 2-3 lines of text
     },
     heroSeoDescription: {
         fontSize: '15px',
@@ -849,6 +856,8 @@ const styles = {
         textAlign: 'left',
         paddingTop: '0',
         paddingBottom: '0',
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        minHeight: 'clamp(45px, 8vw, 60px)', // Reserve space for paragraph text
     },
     heroDescription: {
         fontSize: 'clamp(0.85rem, 3vw, 0.95rem)',
@@ -1113,6 +1122,8 @@ const styles = {
         justifyContent: 'flex-start',
         alignItems: 'center',
         marginBottom: '15px',
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        minHeight: 'clamp(39px, 6.5vw, 52px)', // Reserve space for logo
     },
     footerLogo: {
         height: 'auto',
@@ -1121,6 +1132,12 @@ const styles = {
         maxWidth: '200px',
         objectFit: 'contain',
         transition: 'opacity 0.2s ease',
+        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
+        display: 'block',
+        aspectRatio: '200 / 52', // Maintain aspect ratio
+        // ✅ PERFORMANCE: Fixed dimensions on mobile
+        minHeight: 'clamp(39px, 6.5vw, 52px)', // Reserve space
+        minWidth: 'clamp(150px, 25vw, 200px)', // Reserve space
     },
     footerDescription: {
         fontSize: 'clamp(0.9rem, 2vw, 1rem)',

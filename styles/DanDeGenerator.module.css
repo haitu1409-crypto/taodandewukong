@@ -542,21 +542,96 @@
   contain: layout style paint;
 }
 
-.inputErrorText {
+/* ✅ PERFORMANCE: Modal nhỏ hiển thị lỗi ngay cạnh input */
+.inputErrorModal {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  margin-top: 4px;
+  animation: slideDownFade 0.2s ease;
+}
+
+.inputErrorModalContent {
+  background: #fff;
+  border: 2px solid #dc2626;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.inputErrorModalMessage {
+  flex: 1;
   font-size: var(--text-xs);
   color: #dc2626;
-  line-height: var(--line-height-relaxed);
-  margin-top: 4px;
+  line-height: 1.4;
   font-weight: var(--font-medium);
-  min-height: 16px;
-  height: 16px;
+  word-wrap: break-word;
+  min-width: 0;
+}
+
+.inputErrorModalClose {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #dc2626;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: all var(--transition-base);
+}
+
+.inputErrorModalClose:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 1024px) {
-  .inputErrorText {
-    min-height: 14px;
-    height: 14px;
+  .inputErrorModal {
+    margin-top: 4px;
   }
+  
+  .inputErrorModalContent {
+    padding: 6px 10px;
+  }
+  
+  .inputErrorModalMessage {
+    font-size: 12px;
+  }
+  
+  .inputErrorModalClose {
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Legacy - giữ lại để tránh lỗi nếu có code cũ */
+.inputErrorText {
+  display: none;
 }
 
 @media (min-width: 1024px) {

@@ -4,7 +4,7 @@
  * ✅ Performance Optimized: No external icon library, optimized re-renders
  */
 
-import React, { useState, useCallback, useEffect, useMemo, memo, useDeferredValue, startTransition } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, memo, useDeferredValue, startTransition, useRef } from 'react';
 import styles from '../styles/DanDeGenerator.module.css';
 import axios from 'axios';
 import { getAllSpecialSets, getCombinedSpecialSetNumbers } from '../utils/specialSets';
@@ -118,6 +118,10 @@ const DanDeGenerator = memo(() => {
   // States cho validation errors
   const [combinationError, setCombinationError] = useState(null);
   const [excludeError, setExcludeError] = useState(null);
+
+  // Refs cho input elements để tính toán vị trí modal
+  const combinationInputRef = useRef(null);
+  const excludeInputRef = useRef(null);
 
   // States cho mobile navbar
   const [activeNavItem, setActiveNavItem] = useState('generator');
@@ -748,9 +752,11 @@ const DanDeGenerator = memo(() => {
   const deferredCombinationNumbers = useDeferredValue(combinationNumbers);
   const deferredExcludeNumbers = useDeferredValue(excludeNumbers);
 
-  // Xử lý input số kết hợp với startTransition
+  // Xử lý input số kết hợp với startTransition - Chỉ cho phép nhập số, dấu phẩy và khoảng trắng
   const handleCombinationChange = useCallback((e) => {
-    const value = e.target.value;
+    let value = e.target.value;
+    // Chỉ cho phép số, dấu phẩy và khoảng trắng
+    value = value.replace(/[^\d,\s]/g, '');
     setCombinationNumbers(value);
 
     // Use startTransition for non-urgent updates
@@ -797,9 +803,11 @@ const DanDeGenerator = memo(() => {
     [combinationNumbers, selectedSpecialSets, selectedTouches, selectedSums]
   );
 
-  // Xử lý input số loại bỏ với startTransition
+  // Xử lý input số loại bỏ với startTransition - Chỉ cho phép nhập số, dấu phẩy và khoảng trắng
   const handleExcludeChange = useCallback((e) => {
-    const value = e.target.value;
+    let value = e.target.value;
+    // Chỉ cho phép số, dấu phẩy và khoảng trắng
+    value = value.replace(/[^\d,\s]/g, '');
     setExcludeNumbers(value);
 
     // Use startTransition for non-urgent updates
@@ -1250,42 +1258,76 @@ const DanDeGenerator = memo(() => {
               />
             </div>
 
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ position: 'relative' }}>
               <label htmlFor="combinationNumbers" className={styles.inputLabel}>
                 Thêm số:
               </label>
               <input
+                ref={combinationInputRef}
                 id="combinationNumbers"
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9,]*"
                 value={combinationNumbers}
                 onChange={handleCombinationChange}
                 placeholder="45,50,67"
                 className={styles.input}
                 disabled={loading}
               />
-              {combinationError && (
-                <div className={styles.inputErrorText}>
-                  {combinationError}
+              {combinationError && combinationInputRef.current && (
+                <div
+                  className={styles.inputErrorModal}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles.inputErrorModalContent}>
+                    <div className={styles.inputErrorModalMessage}>
+                      {combinationError}
+                    </div>
+                    <button
+                      className={styles.inputErrorModalClose}
+                      onClick={() => setCombinationError(null)}
+                      aria-label="Đóng"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ position: 'relative' }}>
               <label htmlFor="excludeNumbers" className={styles.inputLabel}>
                 Loại bỏ số:
               </label>
               <input
+                ref={excludeInputRef}
                 id="excludeNumbers"
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9,]*"
                 value={excludeNumbers}
                 onChange={handleExcludeChange}
                 placeholder="83,84,85"
                 className={styles.input}
                 disabled={loading}
               />
-              {excludeError && (
-                <div className={styles.inputErrorText}>
-                  {excludeError}
+              {excludeError && excludeInputRef.current && (
+                <div
+                  className={styles.inputErrorModal}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className={styles.inputErrorModalContent}>
+                    <div className={styles.inputErrorModalMessage}>
+                      {excludeError}
+                    </div>
+                    <button
+                      className={styles.inputErrorModalClose}
+                      onClick={() => setExcludeError(null)}
+                      aria-label="Đóng"
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

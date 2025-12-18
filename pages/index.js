@@ -3,16 +3,27 @@
  * Mục tiêu: Tạo landing page mạnh mẽ để SEO backlink về ketquamn.com
  */
 
-import { useEffect, useState, useMemo, useCallback, Suspense } from 'react';
+import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
 
-// ✅ PERFORMANCE: Lazy load TableDateKQXS component - optimize loading
+// ✅ PERFORMANCE: Lazy load TableDateKQXS component - disable SSR for better initial load
 const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
-    ssr: true, // Enable SSR for better SEO
-    loading: () => null, // ✅ PERFORMANCE: No loading state to reduce layout shift
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => (
+        <div style={{
+            padding: '20px',
+            textAlign: 'center',
+            color: '#666',
+            minHeight: '200px',
+            width: '100%',
+            boxSizing: 'border-box'
+        }}>
+            Đang tải...
+        </div>
+    )
 });
 
 export default function HomePage() {
@@ -24,58 +35,57 @@ export default function HomePage() {
         north: false,
     });
 
-    // ✅ PERFORMANCE: Scroll to top - defer to avoid blocking initial render
+    // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            // Defer scroll to avoid blocking
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 window.scrollTo(0, 0);
-            }, 0);
+            });
         }
     }, []);
 
-    // ✅ PERFORMANCE: Kiểm tra thời gian xổ số - defer và optimize
+    // Kiểm tra thời gian xổ số để áp dụng animation cho backlinks
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        const checkLotteryTime = () => {
+            const now = new Date();
+            const vietnamFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Ho_Chi_Minh',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
 
-        // ✅ PERFORMANCE: Defer execution to avoid blocking initial render
-        const timeoutId = setTimeout(() => {
-            const checkLotteryTime = () => {
-                const now = new Date();
-                const currentHour = now.getHours();
-                const currentMinute = now.getMinutes();
-                const currentTime = currentHour * 60 + currentMinute;
+            const parts = vietnamFormatter.formatToParts(now);
+            const currentHour = parseInt(parts.find(p => p.type === 'hour').value);
+            const currentMinute = parseInt(parts.find(p => p.type === 'minute').value);
+            const currentTime = currentHour * 60 + currentMinute;
 
-                // Thời gian xổ số
-                const southStart = 16 * 60 + 15; // 16:15
-                const southEnd = 16 * 60 + 45; // 16:45
-                const southPrep = southStart - 30; // 15:45
+            // Thời gian xổ số
+            const southStart = 16 * 60 + 15; // 16:15
+            const southEnd = 16 * 60 + 45; // 16:45
+            const southPrep = southStart - 30; // 15:45
 
-                const centralStart = 17 * 60 + 15; // 17:15
-                const centralEnd = 17 * 60 + 45; // 17:45
-                const centralPrep = centralStart - 30; // 16:45
+            const centralStart = 17 * 60 + 15; // 17:15
+            const centralEnd = 17 * 60 + 45; // 17:45
+            const centralPrep = centralStart - 30; // 16:45
 
-                const northStart = 18 * 60 + 15; // 18:15
-                const northEnd = 18 * 60 + 45; // 18:45
-                const northPrep = northStart - 30; // 17:45
+            const northStart = 18 * 60 + 15; // 18:15
+            const northEnd = 18 * 60 + 45; // 18:45
+            const northPrep = northStart - 30; // 17:45
 
-                setIsApproachingLottery({
-                    south: currentTime >= southPrep && currentTime <= southEnd,
-                    central: currentTime >= centralPrep && currentTime <= centralEnd,
-                    north: currentTime >= northPrep && currentTime <= northEnd,
-                });
-            };
+            setIsApproachingLottery({
+                south: currentTime >= southPrep && currentTime <= southEnd,
+                central: currentTime >= centralPrep && currentTime <= centralEnd,
+                north: currentTime >= northPrep && currentTime <= northEnd,
+            });
+        };
 
+        // ✅ PERFORMANCE: Only run on client side
+        if (typeof window !== 'undefined') {
             checkLotteryTime();
             const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
-
-            return () => {
-                clearTimeout(timeoutId);
-                clearInterval(interval);
-            };
-        }, 200); // Defer 200ms to avoid blocking initial render
-
-        return () => clearTimeout(timeoutId);
+            return () => clearInterval(interval);
+        }
     }, []);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
@@ -114,9 +124,8 @@ export default function HomePage() {
 
     return (
         <>
-            {/* ✅ PERFORMANCE: Inline critical CSS to prevent render blocking */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
+            {/* CSS Animation cho backlinks */}
+            <style jsx>{`
                 @keyframes colorPulse {
                     0%, 100% {
                         background-color: #E65A2E;
@@ -127,7 +136,13 @@ export default function HomePage() {
                         box-shadow: 0 0 15px rgba(255, 140, 66, 0.7), 0 0 30px rgba(255, 140, 66, 0.4);
                     }
                 }
-            `}} />
+                /* ✅ RESPONSIVE: Giảm font-size H1 trên mobile */
+                @media (max-width: 768px) {
+                    .hero-title-mobile {
+                        font-size: 23px !important;
+                    }
+                }
+            `}</style>
             <UltraSEOHead
                 title={seoConfig.title}
                 description={seoConfig.description}
@@ -197,16 +212,14 @@ export default function HomePage() {
             <div style={styles.container}>
                 {/* Table Date KQXS Component - Đưa lên đầu sau navbar */}
                 <section style={styles.tableSection}>
-                    <Suspense fallback={null}>
-                        <TableDateKQXS />
-                    </Suspense>
+                    <TableDateKQXS />
                 </section>
 
                 {/* Hero Section */}
                 <section style={styles.hero}>
                     <div style={styles.heroContent}>
                         {/* H1 chính - tối ưu cho SEO với keywords "tạo dàn đề" */}
-                        <h1 style={styles.heroTitle}>
+                        <h1 style={styles.heroTitle} className="hero-title-mobile">
                             Tạo Dàn Đề | Tạo Dàn Đề 2D, 3D, 4D, 9X-0X | Tạo Ghép Dàn 3D-4D | Tạo Dàn Số Xổ Số Nhanh - Taodandewukong.pro
                         </h1>
                         {/* ✅ SEO: H1 ẩn với keywords bổ sung về "tạo dàn đề" */}
@@ -656,8 +669,6 @@ export default function HomePage() {
                                     decoding="async"
                                     width="200"
                                     height="52"
-                                    // ✅ PERFORMANCE: Optimize image distribution
-                                    sizes="(max-width: 768px) 150px, 200px"
                                 />
                             </a>
                         </div>
@@ -823,18 +834,13 @@ const styles = {
         textAlign: 'center',
         borderBottom: 'none', // Bỏ border bottom
         boxShadow: 'none', // Bỏ box shadow
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        minHeight: 'clamp(120px, 20vw, 150px)', // Reserve space for H1 + paragraph
-        boxSizing: 'border-box',
     },
     heroContent: {
         maxWidth: '1070px',
         margin: '0 auto',
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        minHeight: 'clamp(100px, 18vw, 130px)', // Reserve space for content
     },
     heroTitle: {
-        fontSize: 'clamp(23px, 4vw, 28px)', // ✅ RESPONSIVE: 23px on mobile, 28px on desktop
+        fontSize: '28px',
         fontWeight: 'bold',
         marginBottom: '6px',
         lineHeight: '1.3',
@@ -842,8 +848,6 @@ const styles = {
         paddingTop: '0',
         paddingBottom: '0',
         marginTop: '0',
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        minHeight: 'clamp(60px, 10vw, 75px)', // Reserve space for 2-3 lines of text
     },
     heroSeoDescription: {
         fontSize: '15px',
@@ -856,8 +860,6 @@ const styles = {
         textAlign: 'left',
         paddingTop: '0',
         paddingBottom: '0',
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        minHeight: 'clamp(45px, 8vw, 60px)', // Reserve space for paragraph text
     },
     heroDescription: {
         fontSize: 'clamp(0.85rem, 3vw, 0.95rem)',
@@ -906,13 +908,13 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
-        // ✅ PERFORMANCE: Reserve space to prevent CLS/reflow (responsive)
-        minHeight: 'clamp(180px, 25vw, 200px)', // Responsive: 180px on mobile, 200px on desktop
+        minHeight: '200px', // ✅ PERFORMANCE: Prevent layout shift
         width: '100%',
         boxSizing: 'border-box',
         padding: '8px 6px',
+        boxSizing: 'border-box',
+        width: '100%',
         backgroundColor: '#ffffff',
-        position: 'relative', // ✅ PERFORMANCE: Prevent layout shift
     },
     mainContent: {
         padding: '8px 6px',
@@ -1122,8 +1124,6 @@ const styles = {
         justifyContent: 'flex-start',
         alignItems: 'center',
         marginBottom: '15px',
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        minHeight: 'clamp(39px, 6.5vw, 52px)', // Reserve space for logo
     },
     footerLogo: {
         height: 'auto',
@@ -1132,12 +1132,6 @@ const styles = {
         maxWidth: '200px',
         objectFit: 'contain',
         transition: 'opacity 0.2s ease',
-        // ✅ PERFORMANCE: Reserve space to prevent CLS on mobile
-        display: 'block',
-        aspectRatio: '200 / 52', // Maintain aspect ratio
-        // ✅ PERFORMANCE: Fixed dimensions on mobile
-        minHeight: 'clamp(39px, 6.5vw, 52px)', // Reserve space
-        minWidth: 'clamp(150px, 25vw, 200px)', // Reserve space
     },
     footerDescription: {
         fontSize: 'clamp(0.9rem, 2vw, 1rem)',

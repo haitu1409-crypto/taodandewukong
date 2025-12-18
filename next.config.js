@@ -4,12 +4,6 @@ const nextConfig = {
     compress: true,
     poweredByHeader: false,
     
-    // ✅ PERFORMANCE: Modern JavaScript for mobile - saves ~14 KiB
-    // Target modern browsers only (ES2020+)
-    compiler: {
-        removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
-    },
-    
     // Domain configuration
     env: {
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://taodandewukong.pro',
@@ -17,9 +11,9 @@ const nextConfig = {
         NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME || 'Tạo Dàn Đề WuKong | Taodandewukong.pro',
     },
 
-    // Images configuration - Optimized for performance and distribution
+    // Images configuration - Optimized for performance
     images: {
-        formats: ['image/avif', 'image/webp'], // ✅ PERFORMANCE: Modern formats first (saves ~19 KiB)
+        formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
         minimumCacheTTL: 31536000,
@@ -27,8 +21,6 @@ const nextConfig = {
         dangerouslyAllowSVG: false,
         contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
         remotePatterns: [],
-        // ✅ PERFORMANCE: Optimize image distribution - reduce quality slightly
-        // Note: quality is handled by Next.js Image component, but we can optimize file sizes
     },
 
     // Headers for SEO and security
@@ -88,34 +80,6 @@ const nextConfig = {
                     }
                 ],
             },
-            // ✅ FIX: Proper MIME type for Next.js static JS files only
-            {
-                source: '/_next/static/:path*.js',
-                headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'public, max-age=31536000, immutable'
-                    },
-                    {
-                        key: 'Content-Type',
-                        value: 'application/javascript; charset=utf-8'
-                    }
-                ],
-            },
-            // ✅ FIX: Proper MIME type for Next.js static CSS files
-            {
-                source: '/_next/static/:path*.css',
-                headers: [
-                    {
-                        key: 'Cache-Control',
-                        value: 'public, max-age=31536000, immutable'
-                    },
-                    {
-                        key: 'Content-Type',
-                        value: 'text/css; charset=utf-8'
-                    }
-                ],
-            },
         ];
     },
 
@@ -137,8 +101,6 @@ const nextConfig = {
                 ...config.optimization,
                 splitChunks: {
                     chunks: 'all',
-                    minSize: 20000, // ✅ PERFORMANCE: Only split chunks larger than 20KB
-                    maxSize: 244000, // ✅ PERFORMANCE: Limit chunk size to 244KB
                     cacheGroups: {
                         default: false,
                         vendors: false,
@@ -148,7 +110,6 @@ const nextConfig = {
                             test: /node_modules/,
                             priority: 20,
                             reuseExistingChunk: true,
-                            minChunks: 1,
                         },
                         common: {
                             name: 'common',
@@ -156,36 +117,15 @@ const nextConfig = {
                             chunks: 'all',
                             priority: 10,
                             reuseExistingChunk: true,
-                            minSize: 20000,
-                        },
-                        // ✅ PERFORMANCE: Separate React chunks
-                        react: {
-                            name: 'react',
-                            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-                            chunks: 'all',
-                            priority: 30,
-                            reuseExistingChunk: true,
                         },
                     },
                 },
             };
-            // ✅ PERFORMANCE: Modern JavaScript - no transpilation for old browsers (saves ~14 KiB on mobile)
-            // Removed arrowFunction and bigIntLiteral transpilation for modern browsers only
-            // This reduces bundle size significantly, especially on mobile
+            // ✅ PERFORMANCE: Transpile for older browsers to reduce bundle size
             config.output.environment = {
-                arrowFunction: true, // Keep arrow functions (modern browsers including mobile)
-                bigIntLiteral: true, // Keep bigInt (modern browsers including mobile)
-                const: true, // Keep const (modern browsers)
-                destructuring: true, // Keep destructuring (modern browsers)
-                forOf: true, // Keep for...of (modern browsers)
-                dynamicImport: true, // Keep dynamic import (modern browsers)
+                arrowFunction: false, // Transpile arrow functions for compatibility
+                bigIntLiteral: false, // Transpile bigInt for compatibility
             };
-            
-            // ✅ PERFORMANCE: Ensure modern JavaScript output for mobile
-            // Set target to ES2020 for modern mobile browsers
-            if (!config.target) {
-                config.target = ['web', 'es2020']; // Modern ES2020 for mobile
-            }
             
             // ✅ PERFORMANCE: Tree shaking is handled by Next.js automatically
             // Note: usedExports and sideEffects are managed by Next.js, don't override
@@ -195,11 +135,9 @@ const nextConfig = {
 
     // Production optimizations
     productionBrowserSourceMaps: false,
-    generateEtags: true, // ✅ FIX: Enable etags for proper manifest generation
+    generateEtags: false,
     compress: true,
     swcMinify: true, // ✅ PERFORMANCE: Use SWC minifier for faster builds and smaller bundles
-    
-    // ✅ FIX: Ensure proper build output
     
     // Remove console.log in production
     compiler: {

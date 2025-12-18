@@ -371,8 +371,6 @@ export default function LienHe() {
                                     decoding="async"
                                     width="200"
                                     height="52"
-                                    // ✅ PERFORMANCE: Optimize image distribution
-                                    sizes="(max-width: 768px) 150px, 200px"
                                 />
                             </a>
                         </div>

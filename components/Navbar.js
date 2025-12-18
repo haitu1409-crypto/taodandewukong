@@ -250,22 +250,26 @@ const styles = {
         left: 0,
         right: 0,
         zIndex: 1000,
-        backgroundColor: isScrolled ? '#FFE8DC' : '#FFE8DC',
+        backgroundColor: '#FFE8DC',
         borderBottom: '3px solid rgba(230, 90, 46, 0.4)',
         boxShadow: isScrolled ? '0 2px 8px rgba(230, 90, 46, 0.2)' : '0 1px 3px rgba(230, 90, 46, 0.15)',
-        transition: 'all 0.3s ease',
+        transition: 'box-shadow 0.3s ease', // ✅ PERFORMANCE: Only transition box-shadow to prevent layout shift
         width: '100%',
         boxSizing: 'border-box',
         fontFamily: '"Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
+        // ✅ PERFORMANCE: Fixed height to prevent layout shift on mobile (responsive with clamp)
+        minHeight: 'clamp(60px, 8vw, 72px)', // Responsive: 60px on mobile, 72px on desktop
     }),
     container: {
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '10px 16px',
+        padding: 'clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px)', // ✅ PERFORMANCE: Responsive padding
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         boxSizing: 'border-box',
+        // ✅ PERFORMANCE: Fixed height to prevent layout shift
+        minHeight: 'clamp(40px, 6vw, 52px)', // Responsive: 40px on mobile, 52px on desktop
     },
     brand: {
         display: 'flex',
@@ -275,10 +279,13 @@ const styles = {
     },
     logo: {
         height: 'auto',
-        maxHeight: '52px',
+        maxHeight: 'clamp(39px, 6.5vw, 52px)', // ✅ PERFORMANCE: Responsive height
         width: 'auto',
-        maxWidth: '200px',
+        maxWidth: 'clamp(150px, 25vw, 200px)', // ✅ PERFORMANCE: Responsive width
         objectFit: 'contain',
+        // ✅ PERFORMANCE: Reserve space to prevent layout shift on mobile
+        display: 'block',
+        aspectRatio: '200 / 52', // Maintain aspect ratio
     },
     desktopMenu: {
         display: 'flex',
@@ -334,6 +341,15 @@ const styles = {
         animation: 'slideDown 0.3s ease',
         width: '100%',
         boxSizing: 'border-box',
+        // ✅ PERFORMANCE: Use transform instead of height to prevent layout shift
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        zIndex: 999,
+        // ✅ PERFORMANCE: Reserve space to prevent layout shift (responsive)
+        maxHeight: 'calc(100vh - clamp(60px, 8vw, 72px))', // Responsive: 60px on mobile, 72px on desktop
+        overflowY: 'auto',
     },
     mobileMenuItem: (isActive) => ({
         padding: '16px 20px',

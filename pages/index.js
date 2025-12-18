@@ -897,7 +897,8 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
-        minHeight: '200px', // ✅ PERFORMANCE: Reserve space to prevent CLS/reflow
+        // ✅ PERFORMANCE: Reserve space to prevent CLS/reflow (responsive)
+        minHeight: 'clamp(180px, 25vw, 200px)', // Responsive: 180px on mobile, 200px on desktop
         width: '100%',
         boxSizing: 'border-box',
         padding: '8px 6px',

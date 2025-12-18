@@ -3,7 +3,7 @@
  * Mục tiêu: Tạo landing page mạnh mẽ để SEO backlink về ketquamn.com
  */
 
-import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useMemo, useCallback, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';

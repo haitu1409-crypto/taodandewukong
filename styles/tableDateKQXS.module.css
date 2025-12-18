@@ -152,7 +152,7 @@
 }
 
 .titleTable {
-    background: transparent !important;
+    background: rgb(255, 232, 220) !important;
     color: #E65A2E;
     font-size: 1.1rem;
     font-weight: 700;

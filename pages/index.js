@@ -369,7 +369,7 @@ export default function HomePage() {
                             <h2 style={styles.h2}>📖 Dàn Đề Là Gì? Tìm Hiểu Về Tạo Dàn Đề</h2>
                             <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
                                 <p style={{ marginBottom: '15px' }}>
-                                    Hiểu một cách đơn giản, <strong>dàn đề</strong> là một tập hợp gồm nhiều con số (từ 2 số trở lên) mà người chơi lựa chọn để dự thưởng trong cùng một kỳ quay. Thay vì chỉ đánh 1-2 con "bạch thủ" với tỷ lệ thắng thấp, việc "dàn" mỏng các con số ra giúp tăng xác suất trúng thưởng lên đáng kể.
+                                    Hiểu một cách đơn giản, <strong>dàn đề</strong> là một tập hợp gồm nhiều con số (từ 2 số trở lên) mà người chơi lựa chọn để dự thưởng trong cùng một kỳ quay. Thay vì chỉ đánh 1-2 con &quot;bạch thủ&quot; với tỷ lệ thắng thấp, việc &quot;dàn&quot; mỏng các con số ra giúp tăng xác suất trúng thưởng lên đáng kể.
                                 </p>
                                 <p style={{ marginBottom: '15px' }}>
                                     <strong>Tạo dàn đề</strong> là quá trình sử dụng các công cụ và phương pháp để tạo ra các bộ số may mắn. Công cụ <strong>tạo dàn đề xổ số</strong> của chúng tôi hỗ trợ <strong>tạo dàn đề 2D</strong> (2 số cuối), <strong>tạo dàn đề 3D</strong> (3 số cuối), <strong>tạo dàn đề 4D</strong> (4 số cuối), <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, và nhiều loại <strong>tạo dàn số</strong> khác.
@@ -436,13 +436,13 @@ export default function HomePage() {
                             <h2 style={styles.h2}>🏆 Tạo Dàn Đề 4D - Đỉnh Cao Của Tạo Dàn Số</h2>
                             <div style={{ color: '#555555', lineHeight: '1.8', marginBottom: '20px' }}>
                                 <p style={{ marginBottom: '15px' }}>
-                                    Đây là đỉnh cao của việc "săn thưởng". <strong>Tạo dàn 4D</strong> yêu cầu độ chính xác cực cao vì bạn phải chọn đúng 4 số cuối của giải đặc biệt. <strong>Phần mềm tạo dàn đề</strong> của chúng tôi sẽ giúp bạn lọc và <strong>tạo dàn số học</strong> 4 chữ số dựa trên các thuật toán thống kê xác suất tiên tiến.
+                                    Đây là đỉnh cao của việc &quot;săn thưởng&quot;. <strong>Tạo dàn 4D</strong> yêu cầu độ chính xác cực cao vì bạn phải chọn đúng 4 số cuối của giải đặc biệt. <strong>Phần mềm tạo dàn đề</strong> của chúng tôi sẽ giúp bạn lọc và <strong>tạo dàn số học</strong> 4 chữ số dựa trên các thuật toán thống kê xác suất tiên tiến.
                                 </p>
                                 <p style={{ marginBottom: '15px' }}>
                                     <strong>Tạo dàn đề 4D</strong> kết hợp với <strong>tạo ghép dàn 3D-4D</strong> giúp bạn tạo ra nhiều bộ số may mắn. Công cụ <strong>tạo dàn 3d4d</strong> của chúng tôi hỗ trợ bạn tạo ra các <strong>dàn đề đẹp hôm nay</strong> với tỷ lệ thắng cao.
                                 </p>
                                 <p style={{ marginBottom: '15px' }}>
-                                    <strong>Tạo dàn xổ số nhanh nhất</strong> với công cụ 4D của chúng tôi. <strong>Tạo dàn giải mã số học</strong> 4D sử dụng các yếu tố "bạc nhớ" và thống kê để tạo ra các bộ số có xác suất trúng cao. <strong>Ứng dụng tạo dàn xổ số mức số</strong> cho phép bạn tùy chỉnh loại bỏ tổng, loại bỏ đầu/đuôi cực kỳ linh hoạt.
+                                    <strong>Tạo dàn xổ số nhanh nhất</strong> với công cụ 4D của chúng tôi. <strong>Tạo dàn giải mã số học</strong> 4D sử dụng các yếu tố &quot;bạc nhớ&quot; và thống kê để tạo ra các bộ số có xác suất trúng cao. <strong>Ứng dụng tạo dàn xổ số mức số</strong> cho phép bạn tùy chỉnh loại bỏ tổng, loại bỏ đầu/đuôi cực kỳ linh hoạt.
                                 </p>
                             </div>
                         </article>
@@ -630,6 +630,7 @@ export default function HomePage() {
                                     e.currentTarget.querySelector('img').style.opacity = '1';
                                 }}
                             >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="/logoketquamn.png"
                                     alt="KETQUAMN.COM - Kết Quả Xổ Số Miền Nam"

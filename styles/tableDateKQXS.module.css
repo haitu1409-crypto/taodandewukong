@@ -40,6 +40,8 @@
     padding: 3px 0px;
     background: transparent;
     border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    min-height: 50px; /* ✅ CLS: Reserve space for approachingRegion banner to prevent layout shift */
+    box-sizing: border-box;
 }
 
 .desc {
@@ -137,18 +139,19 @@
 
 .table tr {
     height: auto !important;
-    min-height: 0 !important;
-    line-height: 1;
+    min-height: 48px !important; /* ✅ CLS: Fixed min-height to prevent layout shift */
+    line-height: 1.3;
 }
 
 .table tbody tr {
     height: auto !important;
-    min-height: 0 !important;
+    min-height: 48px !important; /* ✅ CLS: Fixed min-height to prevent layout shift */
 }
 
 .table tbody tr>td {
     height: auto !important;
-    min-height: 0 !important;
+    min-height: 48px !important; /* ✅ CLS: Fixed min-height to prevent layout shift */
+    vertical-align: middle;
 }
 
 .titleTable {
@@ -199,9 +202,9 @@
 }
 
 .table td:empty {
-    padding: 0;
-    height: 0;
-    min-height: 0;
+    padding: 3px 6px; /* ✅ CLS: Keep padding even when empty */
+    height: auto;
+    min-height: 48px !important; /* ✅ CLS: Fixed min-height even for empty cells */
 }
 
 .table td:first-child {
@@ -340,10 +343,12 @@
     .table td {
         padding: 2px 4px;
         line-height: 1.3;
+        min-height: 48px !important; /* ✅ CLS: Fixed min-height */
     }
 
     .table td:empty {
-        padding: 0;
+        padding: 2px 4px; /* ✅ CLS: Keep padding even when empty */
+        min-height: 48px !important; /* ✅ CLS: Fixed min-height even for empty cells */
     }
 
     .stationName {
@@ -400,10 +405,12 @@
     .table td {
         padding: 2px 3px;
         line-height: 1.3;
+        min-height: 48px !important; /* ✅ CLS: Fixed min-height */
     }
 
     .table td:empty {
-        padding: 0;
+        padding: 2px 3px; /* ✅ CLS: Keep padding even when empty */
+        min-height: 48px !important; /* ✅ CLS: Fixed min-height even for empty cells */
     }
 
     .stationRow {

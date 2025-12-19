@@ -1,50 +1,78 @@
 /**
  * Landing Page - SEO Backlink Strategy
  * Mục tiêu: Tạo landing page mạnh mẽ để SEO backlink về ketquamn.com
+ * ✅ PERFORMANCE: Optimized for smooth rendering
  */
 
-import { useEffect, useState, useMemo, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import UltraSEOHead from '../components/UltraSEOHead';
 import { SEO_CONFIG, FAQ_DATA, BACKLINK_CONTENT, LOTTERY_TOOLS, TARGET_URL } from '../config/seoConfig';
 
+// ✅ PERFORMANCE: Memoized loading component to prevent recreation
+const TableLoadingPlaceholder = memo(() => (
+    <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        color: '#666',
+        minHeight: '170px',
+        width: '100%',
+        boxSizing: 'border-box'
+    }}>
+        Đang tải...
+    </div>
+));
+TableLoadingPlaceholder.displayName = 'TableLoadingPlaceholder';
+
+const DanDeLoadingPlaceholder = memo(() => (
+    <div style={{
+        padding: '20px',
+        textAlign: 'center',
+        color: '#666',
+        minHeight: '200px',
+        width: '100%',
+        boxSizing: 'border-box'
+    }}>
+        Đang tải công cụ tạo dàn đề...
+    </div>
+));
+DanDeLoadingPlaceholder.displayName = 'DanDeLoadingPlaceholder';
+
 // ✅ PERFORMANCE: Lazy load TableDateKQXS component - disable SSR for better initial load
 const TableDateKQXS = dynamic(() => import('../components/TableDateKQXS'), {
     ssr: false, // Disable SSR for better initial load performance
-    loading: () => (
-        <div style={{
-            padding: '20px',
-            textAlign: 'center',
-            color: '#666',
-            minHeight: '170px',
-            width: '100%',
-            boxSizing: 'border-box'
-        }}>
-            Đang tải...
-        </div>
-    )
+    loading: () => <TableLoadingPlaceholder />
 });
 
 // ✅ PERFORMANCE: Lazy load DanDeGenerator component - disable SSR for better initial load
 // ✅ PERFORMANCE: Only load when needed (on scroll/interaction) to improve mobile PageSpeed
 const DanDeGenerator = dynamic(() => import('../components/DanDeGenerator'), {
     ssr: false, // Disable SSR for better initial load performance
-    loading: () => (
-        <div style={{
-            padding: '20px',
-            textAlign: 'center',
-            color: '#666',
-            minHeight: '200px',
-            width: '100%',
-            boxSizing: 'border-box'
-        }}>
-            Đang tải công cụ tạo dàn đề...
-        </div>
-    )
+    loading: () => <DanDeLoadingPlaceholder />
 });
 
-export default function HomePage() {
+// ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
+const ANIMATION_STYLES = `
+    @keyframes colorPulse {
+        0%, 100% {
+            background-color: #E65A2E;
+            box-shadow: 0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3);
+        }
+        50% {
+            background-color: #FF8C42;
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.7), 0 0 30px rgba(255, 140, 66, 0.4);
+        }
+    }
+    /* ✅ RESPONSIVE: Giảm font-size H1 trên mobile */
+    @media (max-width: 768px) {
+        .hero-title-mobile {
+            font-size: 23px !important;
+        }
+    }
+`;
+
+function HomePage() {
     const seoConfig = SEO_CONFIG.home;
     const targetUrl = TARGET_URL;
     const [isApproachingLottery, setIsApproachingLottery] = useState({
@@ -58,13 +86,33 @@ export default function HomePage() {
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            requestAnimationFrame(() => {
-                window.scrollTo(0, 0);
-            });
+            // Use requestIdleCallback if available for better performance
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    window.scrollTo(0, 0);
+                }, { timeout: 100 });
+            } else {
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, 0);
+                });
+            }
         }
     }, []);
 
     // Kiểm tra thời gian xổ số để áp dụng animation cho backlinks
+    // ✅ PERFORMANCE: Memoize lottery time constants
+    const lotteryTimes = useMemo(() => ({
+        southStart: 16 * 60 + 15, // 16:15
+        southEnd: 16 * 60 + 45, // 16:45
+        southPrep: (16 * 60 + 15) - 30, // 15:45
+        centralStart: 17 * 60 + 15, // 17:15
+        centralEnd: 17 * 60 + 45, // 17:45
+        centralPrep: (17 * 60 + 15) - 30, // 16:45
+        northStart: 18 * 60 + 15, // 18:15
+        northEnd: 18 * 60 + 45, // 18:45
+        northPrep: (18 * 60 + 15) - 30, // 17:45
+    }), []);
+
     useEffect(() => {
         const checkLotteryTime = () => {
             const now = new Date();
@@ -80,23 +128,10 @@ export default function HomePage() {
             const currentMinute = parseInt(parts.find(p => p.type === 'minute').value);
             const currentTime = currentHour * 60 + currentMinute;
 
-            // Thời gian xổ số
-            const southStart = 16 * 60 + 15; // 16:15
-            const southEnd = 16 * 60 + 45; // 16:45
-            const southPrep = southStart - 30; // 15:45
-
-            const centralStart = 17 * 60 + 15; // 17:15
-            const centralEnd = 17 * 60 + 45; // 17:45
-            const centralPrep = centralStart - 30; // 16:45
-
-            const northStart = 18 * 60 + 15; // 18:15
-            const northEnd = 18 * 60 + 45; // 18:45
-            const northPrep = northStart - 30; // 17:45
-
             setIsApproachingLottery({
-                south: currentTime >= southPrep && currentTime <= southEnd,
-                central: currentTime >= centralPrep && currentTime <= centralEnd,
-                north: currentTime >= northPrep && currentTime <= northEnd,
+                south: currentTime >= lotteryTimes.southPrep && currentTime <= lotteryTimes.southEnd,
+                central: currentTime >= lotteryTimes.centralPrep && currentTime <= lotteryTimes.centralEnd,
+                north: currentTime >= lotteryTimes.northPrep && currentTime <= lotteryTimes.northEnd,
             });
         };
 
@@ -106,7 +141,7 @@ export default function HomePage() {
             const interval = setInterval(checkLotteryTime, 60000); // Cập nhật mỗi phút
             return () => clearInterval(interval);
         }
-    }, []);
+    }, [lotteryTimes]);
 
     // ✅ PERFORMANCE: Intersection Observer để chỉ load component khi scroll đến (cải thiện mobile PageSpeed)
     useEffect(() => {
@@ -206,6 +241,23 @@ export default function HomePage() {
         return false;
     }, [isApproachingLottery.south, isApproachingLottery.north, isApproachingLottery.central]);
 
+    // ✅ PERFORMANCE: Memoize animated text link style
+    const animatedTextLinkStyle = useMemo(() => ({
+        animation: 'colorPulse 1.5s ease-in-out infinite',
+        backgroundColor: '#E65A2E',
+        color: '#ffffff',
+        padding: '2px 6px',
+        borderRadius: '4px',
+        textDecoration: 'none',
+        boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+    }), []);
+
+    // ✅ PERFORMANCE: Memoize animated button style
+    const animatedButtonStyle = useMemo(() => ({
+        animation: 'colorPulse 1.5s ease-in-out infinite',
+        boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+    }), []);
+
     // ✅ PERFORMANCE: Memoize style function với useCallback
     const getAnimatedLinkStyle = useCallback((baseStyle, url) => {
         if (!shouldAnimateLink(url)) return baseStyle;
@@ -214,44 +266,149 @@ export default function HomePage() {
         if (isTextLink) {
             return {
                 ...baseStyle,
-                animation: 'colorPulse 1.5s ease-in-out infinite',
-                backgroundColor: '#E65A2E',
-                color: '#ffffff',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                textDecoration: 'none',
-                boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+                ...animatedTextLinkStyle,
             };
         }
         // Nếu là button/link có background
         return {
             ...baseStyle,
-            animation: 'colorPulse 1.5s ease-in-out infinite',
-            boxShadow: '0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3)',
+            ...animatedButtonStyle,
         };
+    }, [shouldAnimateLink, animatedTextLinkStyle, animatedButtonStyle]);
+
+    // ✅ PERFORMANCE: Memoize common event handlers
+    const handleButtonHover = useCallback((e) => {
+        e.currentTarget.style.backgroundColor = '#FF8C42';
+        e.currentTarget.style.borderColor = '#FF8C42';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+    }, []);
+
+    const handleButtonLeave = useCallback((e) => {
+        e.currentTarget.style.backgroundColor = '#E65A2E';
+        e.currentTarget.style.borderColor = '#E65A2E';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    }, []);
+
+    const handleToolCardHover = useCallback((e) => {
+        e.currentTarget.style.backgroundColor = '#ffffff';
+        e.currentTarget.style.borderColor = '#E65A2E';
+        e.currentTarget.style.transform = 'translateY(-3px)';
+        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+    }, []);
+
+    const handleToolCardLeave = useCallback((e) => {
+        e.currentTarget.style.backgroundColor = '#f8f9fa';
+        e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'none';
+    }, []);
+
+    const handleBacklinkHover = useCallback((e) => {
+        e.target.style.color = '#ffffff';
+        e.target.style.borderBottomColor = '#E65A2E';
+        e.target.style.animation = 'none';
+    }, []);
+
+    const handleBacklinkLeave = useCallback((url) => (e) => {
+        const shouldAnimate = shouldAnimateLink(url);
+        e.target.style.color = shouldAnimate ? '#ffffff' : '#b0b0b0';
+        e.target.style.borderBottomColor = shouldAnimate ? '#E65A2E' : 'transparent';
+        if (shouldAnimate) {
+            e.target.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+            e.target.style.padding = '2px 4px';
+            e.target.style.borderRadius = '4px';
+            e.target.style.backgroundColor = '#E65A2E';
+        }
     }, [shouldAnimateLink]);
+
+    const handleFooterLinkHover = useCallback((e) => {
+        e.target.style.color = '#E65A2E';
+        e.target.style.textDecoration = 'underline';
+    }, []);
+
+    const handleFooterLinkLeave = useCallback((e) => {
+        e.target.style.color = '#555555';
+        e.target.style.textDecoration = 'none';
+    }, []);
+
+    const handleLogoHover = useCallback((e) => {
+        const img = e.currentTarget.querySelector('img');
+        if (img) img.style.opacity = '0.8';
+    }, []);
+
+    const handleLogoLeave = useCallback((e) => {
+        const img = e.currentTarget.querySelector('img');
+        if (img) img.style.opacity = '1';
+    }, []);
+
+    // ✅ PERFORMANCE: Memoize tool cards data
+    const topTools = useMemo(() => LOTTERY_TOOLS.slice(0, 6), []);
+    const topFaqs = useMemo(() => FAQ_DATA.slice(0, 3), []);
+
+    // ✅ PERFORMANCE: Memoize structured data
+    const structuredData = useMemo(() => [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                {
+                    '@type': 'ListItem',
+                    position: 1,
+                    name: 'Trang chủ',
+                    item: seoConfig.canonical
+                }
+            ]
+        },
+        // SoftwareApplication Schema for Tools
+        {
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Công Cụ Xổ Số KETQUAMN.COM',
+            applicationCategory: 'GameApplication',
+            operatingSystem: 'Web Browser',
+            offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'VND'
+            },
+            aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                reviewCount: '2500'
+            },
+            featureList: LOTTERY_TOOLS.map(tool => tool.name).join(', ')
+        },
+        // ItemList Schema for Tools
+        {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: 'Danh Sách Công Cụ Xổ Số',
+            description: 'Các công cụ xổ số chuyên nghiệp tại KETQUAMN.COM',
+            itemListElement: LOTTERY_TOOLS.map((tool, index) => ({
+                '@type': 'ListItem',
+                position: index + 1,
+                item: {
+                    '@type': 'SoftwareApplication',
+                    name: tool.name,
+                    url: tool.url,
+                    description: tool.description,
+                    applicationCategory: 'GameApplication',
+                    offers: {
+                        '@type': 'Offer',
+                        price: '0',
+                        priceCurrency: 'VND'
+                    }
+                }
+            }))
+        }
+    ], [seoConfig.canonical]);
 
     return (
         <>
-            {/* CSS Animation cho backlinks */}
-            <style jsx>{`
-                @keyframes colorPulse {
-                    0%, 100% {
-                        background-color: #E65A2E;
-                        box-shadow: 0 0 10px rgba(230, 90, 46, 0.5), 0 0 20px rgba(230, 90, 46, 0.3);
-                    }
-                    50% {
-                        background-color: #FF8C42;
-                        box-shadow: 0 0 15px rgba(255, 140, 66, 0.7), 0 0 30px rgba(255, 140, 66, 0.4);
-                    }
-                }
-                /* ✅ RESPONSIVE: Giảm font-size H1 trên mobile */
-                @media (max-width: 768px) {
-                    .hero-title-mobile {
-                        font-size: 23px !important;
-                    }
-                }
-            `}</style>
+            {/* CSS Animation cho backlinks - ✅ PERFORMANCE: Static styles */}
+            <style jsx>{ANIMATION_STYLES}</style>
             <UltraSEOHead
                 title={seoConfig.title}
                 description={seoConfig.description}
@@ -260,62 +417,7 @@ export default function HomePage() {
                 ogImage={seoConfig.ogImage}
                 pageType="website"
                 faq={FAQ_DATA}
-                structuredData={[
-                    {
-                        '@context': 'https://schema.org',
-                        '@type': 'BreadcrumbList',
-                        itemListElement: [
-                            {
-                                '@type': 'ListItem',
-                                position: 1,
-                                name: 'Trang chủ',
-                                item: seoConfig.canonical
-                            }
-                        ]
-                    },
-                    // SoftwareApplication Schema for Tools
-                    {
-                        '@context': 'https://schema.org',
-                        '@type': 'SoftwareApplication',
-                        name: 'Công Cụ Xổ Số KETQUAMN.COM',
-                        applicationCategory: 'GameApplication',
-                        operatingSystem: 'Web Browser',
-                        offers: {
-                            '@type': 'Offer',
-                            price: '0',
-                            priceCurrency: 'VND'
-                        },
-                        aggregateRating: {
-                            '@type': 'AggregateRating',
-                            ratingValue: '4.9',
-                            reviewCount: '2500'
-                        },
-                        featureList: LOTTERY_TOOLS.map(tool => tool.name).join(', ')
-                    },
-                    // ItemList Schema for Tools
-                    {
-                        '@context': 'https://schema.org',
-                        '@type': 'ItemList',
-                        name: 'Danh Sách Công Cụ Xổ Số',
-                        description: 'Các công cụ xổ số chuyên nghiệp tại KETQUAMN.COM',
-                        itemListElement: LOTTERY_TOOLS.map((tool, index) => ({
-                            '@type': 'ListItem',
-                            position: index + 1,
-                            item: {
-                                '@type': 'SoftwareApplication',
-                                name: tool.name,
-                                url: tool.url,
-                                description: tool.description,
-                                applicationCategory: 'GameApplication',
-                                offers: {
-                                    '@type': 'Offer',
-                                    price: '0',
-                                    priceCurrency: 'VND'
-                                }
-                            }
-                        }))
-                    }
-                ]}
+                structuredData={structuredData}
             />
 
             <div style={styles.container}>
@@ -343,7 +445,7 @@ export default function HomePage() {
                 </section>
 
                 {/* DanDeGenerator Component - Render ngay sau box tiêu đề */}
-                <section style={{ ...styles.mainContent, marginTop: '0' }}>
+                <section style={{ ...styles.mainContent, marginTop: '0', minHeight: '450px' /* ✅ CLS: Reserve space for DanDeGenerator */ }}>
                     <h2 style={{
                         fontSize: '24px',
                         fontWeight: 'bold',
@@ -355,32 +457,22 @@ export default function HomePage() {
                     }}>
                         Tạo Dàn Đề 9X-0X Ngẫu Nhiên
                     </h2>
-                    {/* ✅ PERFORMANCE: Placeholder for Intersection Observer - không block render */}
-                    <div id="dan-de-generator-placeholder" style={{ minHeight: '1px', width: '100%' }} />
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="dan-de-generator-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
                     {shouldLoadDanDeGenerator ? (
-                        <Suspense fallback={
-                            <div style={{
-                                padding: '20px',
-                                textAlign: 'center',
-                                color: '#666',
-                                minHeight: '200px',
-                                width: '100%',
-                                boxSizing: 'border-box'
-                            }}>
-                                Đang tải công cụ tạo dàn đề...
-                            </div>
-                        }>
-                            <DanDeGenerator />
-                        </Suspense>
+                        <DanDeGenerator />
                     ) : (
                         <div style={{
                             padding: '20px',
                             textAlign: 'center',
                             color: '#999',
-                            minHeight: '200px',
+                            minHeight: '400px', /* ✅ CLS: Match placeholder height */
                             width: '100%',
                             boxSizing: 'border-box',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
                             Cuộn xuống để tải công cụ tạo dàn đề...
                         </div>
@@ -398,61 +490,26 @@ export default function HomePage() {
                                 Xem kết quả xổ số miền Nam, miền Bắc, miền Trung nhanh nhất. Sau khi xem kết quả, bạn có thể sử dụng công cụ <strong>tạo dàn đề</strong> để tạo các bộ số may mắn cho lần quay tiếp theo.
                             </p>
                             <div style={styles.quickLinksGrid}>
-                                <a
+                                <QuickLink
                                     href={`${targetUrl}/ket-qua-xo-so-mien-nam`}
                                     style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-nam`)}
-                                    onMouseEnter={(e) => {
-                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
-                                            e.currentTarget.style.backgroundColor = '#3a3a3a';
-                                        }
-                                        e.currentTarget.style.borderColor = '#E65A2E';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.animation = 'none';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
-                                            e.currentTarget.style.backgroundColor = '#333333';
-                                        }
-                                        e.currentTarget.style.borderColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`) ? '#E65A2E' : 'rgba(255,255,255,0.1)';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)) {
-                                            e.currentTarget.style.animation = 'colorPulse 1.5s ease-in-out infinite';
-                                        }
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    <div style={styles.quickLinkIcon}>📋</div>
-                                    <div style={styles.quickLinkText}>XSMN</div>
-                                </a>
-                                <a
+                                    shouldAnimate={shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-nam`)}
+                                    icon="📋"
+                                    text="XSMN"
+                                />
+                                <QuickLink
                                     href={`${targetUrl}/ket-qua-xo-so-mien-bac`}
                                     style={getAnimatedLinkStyle(styles.quickLink, `${targetUrl}/ket-qua-xo-so-mien-bac`)}
-                                    onMouseEnter={(e) => {
-                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
-                                            e.currentTarget.style.backgroundColor = '#3a3a3a';
-                                        }
-                                        e.currentTarget.style.borderColor = '#E65A2E';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.animation = 'none';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (!shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
-                                            e.currentTarget.style.backgroundColor = '#333333';
-                                        }
-                                        e.currentTarget.style.borderColor = shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`) ? '#E65A2E' : 'rgba(255,255,255,0.1)';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        if (shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)) {
-                                            e.currentTarget.style.animation = 'colorPulse 1.5s ease-in-out infinite';
-                                        }
-                                    }}
-                                    rel="nofollow"
-                                >
-                                    <div style={styles.quickLinkIcon}>📋</div>
-                                    <div style={styles.quickLinkText}>XSMB</div>
-                                </a>
-                                <a
+                                    shouldAnimate={shouldAnimateLink(`${targetUrl}/ket-qua-xo-so-mien-bac`)}
+                                    icon="📋"
+                                    text="XSMB"
+                                />
+                                <QuickLink
                                     href={`${targetUrl}/thongke/lo-gan`}
                                     style={styles.quickLink}
+                                    shouldAnimate={false}
+                                    icon="📊"
+                                    text="Lô Gan"
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.backgroundColor = '#f0f0f0';
                                         e.currentTarget.style.borderColor = '#E65A2E';
@@ -463,14 +520,13 @@ export default function HomePage() {
                                         e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
                                     }}
-                                    rel="nofollow"
-                                >
-                                    <div style={styles.quickLinkIcon}>📊</div>
-                                    <div style={styles.quickLinkText}>Lô Gan</div>
-                                </a>
-                                <a
+                                />
+                                <QuickLink
                                     href={`${targetUrl}/soi-cau-mien-bac-ai`}
                                     style={styles.quickLink}
+                                    shouldAnimate={false}
+                                    icon="🔮"
+                                    text="Soi Cầu"
                                     onMouseEnter={(e) => {
                                         e.currentTarget.style.backgroundColor = '#f0f0f0';
                                         e.currentTarget.style.borderColor = '#E65A2E';
@@ -481,11 +537,7 @@ export default function HomePage() {
                                         e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
                                         e.currentTarget.style.transform = 'translateY(0)';
                                     }}
-                                    rel="nofollow"
-                                >
-                                    <div style={styles.quickLinkIcon}>🔮</div>
-                                    <div style={styles.quickLinkText}>Soi Cầu</div>
-                                </a>
+                                />
                             </div>
                         </article>
 
@@ -497,23 +549,13 @@ export default function HomePage() {
                                 <strong>Tạo dàn đề</strong> là công cụ hỗ trợ người chơi xổ số tạo ra các bộ số may mắn. Ứng dụng <strong>tạo dàn đề xổ số</strong> của chúng tôi hỗ trợ <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo dàn đề 9X-0X</strong>, <strong>tạo ghép dàn 3D-4D</strong>, <strong>tạo dàn số</strong>, <strong>tạo dàn xiên</strong> và <strong>tạo dàn ngẫu nhiên</strong>. Công cụ <strong>tạo dàn đề nhanh</strong> này giúp bạn <strong>tạo mức số</strong> và <strong>tạo dàn đặc biệt</strong> một cách chính xác và nhanh chóng nhất.
                             </p>
                             <div style={styles.toolsCompactGrid}>
-                                {LOTTERY_TOOLS.slice(0, 6).map((tool, index) => (
+                                {topTools.map((tool, index) => (
                                     <a
                                         key={index}
                                         href={tool.url}
                                         style={styles.toolCompactCard}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#ffffff';
-                                            e.currentTarget.style.borderColor = '#E65A2E';
-                                            e.currentTarget.style.transform = 'translateY(-3px)';
-                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#f8f9fa';
-                                            e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)';
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
+                                        onMouseEnter={handleToolCardHover}
+                                        onMouseLeave={handleToolCardLeave}
                                         rel="nofollow"
                                         title={tool.name}
                                     >
@@ -529,18 +571,8 @@ export default function HomePage() {
                                 <a
                                     href={`${targetUrl}/thongke/lo-gan`}
                                     style={styles.importantLinkBtn}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#FF8C42';
-                                        e.currentTarget.style.borderColor = '#FF8C42';
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#E65A2E';
-                                        e.currentTarget.style.borderColor = '#E65A2E';
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                                    }}
+                                    onMouseEnter={handleButtonHover}
+                                    onMouseLeave={handleButtonLeave}
                                     rel="nofollow"
                                 >
                                     📊 Xem Thống Kê Lô Gan →
@@ -661,7 +693,7 @@ export default function HomePage() {
                                 Dưới đây là các câu hỏi thường gặp về <strong>tạo dàn đề</strong>, <strong>tạo dàn đề 2D</strong>, <strong>tạo dàn đề 3D</strong>, <strong>tạo dàn đề 4D</strong>, <strong>tạo ghép dàn 3D-4D</strong> và các công cụ <strong>tạo dàn số</strong> khác.
                             </p>
                             <div style={styles.faqCompact}>
-                                {FAQ_DATA.slice(0, 3).map((faq, index) => (
+                                {topFaqs.map((faq, index) => (
                                     <div key={index} style={styles.faqCompactItem}>
                                         <strong style={styles.faqCompactQ}>{faq.question}</strong>
                                         <div style={styles.faqCompactA}>
@@ -807,12 +839,8 @@ export default function HomePage() {
                             <a
                                 href={targetUrl}
                                 rel="nofollow"
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.querySelector('img').style.opacity = '0.8';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.querySelector('img').style.opacity = '1';
-                                }}
+                                onMouseEnter={handleLogoHover}
+                                onMouseLeave={handleLogoLeave}
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
@@ -838,14 +866,8 @@ export default function HomePage() {
                             <a
                                 href={`${targetUrl}/thongke/lo-gan`}
                                 style={styles.footerLinkItem}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#E65A2E';
-                                    e.target.style.textDecoration = 'underline';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#555555';
-                                    e.target.style.textDecoration = 'none';
-                                }}
+                                onMouseEnter={handleFooterLinkHover}
+                                onMouseLeave={handleFooterLinkLeave}
                                 rel="nofollow"
                             >
                                 Thống kê lô gan
@@ -853,14 +875,8 @@ export default function HomePage() {
                             <a
                                 href={`${targetUrl}/ket-qua-xo-so-mien-nam`}
                                 style={styles.footerLinkItem}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#E65A2E';
-                                    e.target.style.textDecoration = 'underline';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#555555';
-                                    e.target.style.textDecoration = 'none';
-                                }}
+                                onMouseEnter={handleFooterLinkHover}
+                                onMouseLeave={handleFooterLinkLeave}
                                 rel="nofollow"
                             >
                                 XSMN
@@ -868,14 +884,8 @@ export default function HomePage() {
                             <a
                                 href={`${targetUrl}/ket-qua-xo-so-mien-bac`}
                                 style={styles.footerLinkItem}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#E65A2E';
-                                    e.target.style.textDecoration = 'underline';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#555555';
-                                    e.target.style.textDecoration = 'none';
-                                }}
+                                onMouseEnter={handleFooterLinkHover}
+                                onMouseLeave={handleFooterLinkLeave}
                                 rel="nofollow"
                             >
                                 XSMB
@@ -883,14 +893,8 @@ export default function HomePage() {
                             <a
                                 href={targetUrl}
                                 style={styles.footerLinkItem}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#E65A2E';
-                                    e.target.style.textDecoration = 'underline';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#555555';
-                                    e.target.style.textDecoration = 'none';
-                                }}
+                                onMouseEnter={handleFooterLinkHover}
+                                onMouseLeave={handleFooterLinkLeave}
                                 rel="nofollow"
                             >
                                 Trang chủ
@@ -968,7 +972,53 @@ export default function HomePage() {
     );
 }
 
+// ✅ PERFORMANCE: Memoized QuickLink component to prevent re-renders
+const QuickLink = memo(({ href, style, shouldAnimate, icon, text, onMouseEnter, onMouseLeave }) => {
+    const handleMouseEnter = useCallback((e) => {
+        if (onMouseEnter) {
+            onMouseEnter(e);
+        } else {
+            if (!shouldAnimate) {
+                e.currentTarget.style.backgroundColor = '#3a3a3a';
+            }
+            e.currentTarget.style.borderColor = '#E65A2E';
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.animation = 'none';
+        }
+    }, [shouldAnimate, onMouseEnter]);
+
+    const handleMouseLeave = useCallback((e) => {
+        if (onMouseLeave) {
+            onMouseLeave(e);
+        } else {
+            if (!shouldAnimate) {
+                e.currentTarget.style.backgroundColor = '#333333';
+            }
+            e.currentTarget.style.borderColor = shouldAnimate ? '#E65A2E' : 'rgba(255,255,255,0.1)';
+            e.currentTarget.style.transform = 'translateY(0)';
+            if (shouldAnimate) {
+                e.currentTarget.style.animation = 'colorPulse 1.5s ease-in-out infinite';
+            }
+        }
+    }, [shouldAnimate, onMouseLeave]);
+
+    return (
+        <a
+            href={href}
+            style={style}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            rel="nofollow"
+        >
+            <div style={styles.quickLinkIcon}>{icon}</div>
+            <div style={styles.quickLinkText}>{text}</div>
+        </a>
+    );
+});
+QuickLink.displayName = 'QuickLink';
+
 // Styles - Optimized for Mobile & Visual - Color Palette: Cam (#E65A2E), Light Background, Dark Text
+// ✅ PERFORMANCE: Move styles outside component to prevent recreation
 const styles = {
     container: {
         minHeight: '100vh',
@@ -988,6 +1038,8 @@ const styles = {
         textAlign: 'center',
         borderBottom: 'none', // Bỏ border bottom
         boxShadow: 'none', // Bỏ box shadow
+        minHeight: '120px', // ✅ CLS: Reserve space to prevent layout shift
+        boxSizing: 'border-box',
     },
     heroContent: {
         maxWidth: '1070px',
@@ -1062,12 +1114,10 @@ const styles = {
         boxSizing: 'border-box',
     },
     tableSection: {
-        minHeight: '170px', // ✅ PERFORMANCE: Prevent layout shift
+        minHeight: '185px',
         width: '100%',
         boxSizing: 'border-box',
         padding: '8px 6px',
-        boxSizing: 'border-box',
-        width: '100%',
         backgroundColor: '#ffffff',
     },
     mainContent: {
@@ -1075,6 +1125,7 @@ const styles = {
         boxSizing: 'border-box',
         width: '100%',
         backgroundColor: '#ffffff', // White background
+        minHeight: '200px', // ✅ CLS: Minimum height to prevent layout shift
     },
     contentWrapper: {
         maxWidth: '1070px',
@@ -1090,6 +1141,8 @@ const styles = {
         borderRadius: '8px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         border: '1px solid rgba(0,0,0,0.1)', // Light border
+        minHeight: '100px', // ✅ CLS: Minimum height to prevent layout shift
+        boxSizing: 'border-box',
     },
     h2: {
         fontSize: 'clamp(1.1rem, 4vw, 1.5rem)',
@@ -1406,4 +1459,7 @@ const styles = {
         color: '#ffffff',
     },
 };
+
+// ✅ PERFORMANCE: Export memoized component
+export default memo(HomePage);
 

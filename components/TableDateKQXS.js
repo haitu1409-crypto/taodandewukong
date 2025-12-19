@@ -233,20 +233,23 @@ const TableDate = () => {
                 <div className={styles.header}>
                     <h1 className={styles.title}>Xổ Số - Kết quả xổ số 3 Miền - KQXS Hôm nay</h1>
                 </div>
-                {approachingRegion && (
-                    <div className={styles.group}>
-                        <p className={styles.desc}>
-                            <span className={styles.liveBadge}>LIVE</span> Tường thuật trực tiếp KQXS {approachingRegion} lúc {approachingTime}
-                        </p>
-                        <a 
-                            href={getRegionUrl(approachingRegion)} 
-                            className={styles.action}
-                            rel="nofollow"
-                        >
-                            Xem Ngay
-                        </a>
-                    </div>
-                )}
+                {/* ✅ CLS: Always render group div to prevent layout shift, hide content when not approaching */}
+                <div className={styles.group} style={{ visibility: approachingRegion ? 'visible' : 'hidden' }}>
+                    {approachingRegion && (
+                        <>
+                            <p className={styles.desc}>
+                                <span className={styles.liveBadge}>LIVE</span> Tường thuật trực tiếp KQXS {approachingRegion} lúc {approachingTime}
+                            </p>
+                            <a 
+                                href={getRegionUrl(approachingRegion)} 
+                                className={styles.action}
+                                rel="nofollow"
+                            >
+                                Xem Ngay
+                            </a>
+                        </>
+                    )}
+                </div>
                 <table className={styles.table}>
                     <tbody>
                         <tr>

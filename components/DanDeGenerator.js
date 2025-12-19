@@ -165,14 +165,46 @@ const DanDeGenerator = memo(() => {
     return () => window.removeEventListener('scroll', throttledHandleScroll, scrollOptions);
   }, []);
 
-  // Memoize special sets data
+  // ✅ PERFORMANCE: Memoize special sets data - only compute once
   const specialSetsData = useMemo(() => getAllSpecialSets(), []);
 
-  // Memoize touch data
+  // ✅ PERFORMANCE: Memoize touch data - only compute once
   const touchData = useMemo(() => getTouchInfo(), []);
 
-  // Memoize sum data
+  // ✅ PERFORMANCE: Memoize sum data - only compute once
   const sumData = useMemo(() => getSumInfo(), []);
+
+  // ✅ PERFORMANCE: Memoize parsed combination numbers to avoid recalculation
+  const parsedCombinationNums = useMemo(() => {
+    if (!combinationNumbers.trim()) return [];
+    const processedValue = combinationNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
+    const numbers = processedValue.split(',').map(n => n.trim()).filter(n => n !== '');
+    const uniqueNumbers = [...new Set(numbers)];
+    
+    let excludeSet = new Set();
+    if (excludeNumbers.trim()) {
+      const processedExclude = excludeNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
+      const excludeArr = processedExclude.split(',').map(n => n.trim()).filter(n => n !== '');
+      const validExclude = excludeArr.filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99).map(n => n.padStart(2, '0'));
+      excludeSet = new Set(validExclude);
+    }
+
+    return uniqueNumbers
+      .filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99)
+      .map(n => n.padStart(2, '0'))
+      .filter(n => !excludeSet.has(n));
+  }, [combinationNumbers, excludeNumbers]);
+
+  // ✅ PERFORMANCE: Memoize parsed exclude numbers
+  const parsedExcludeNums = useMemo(() => {
+    if (!excludeNumbers.trim()) return [];
+    const processedValue = excludeNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
+    const numbers = processedValue.split(',').map(n => n.trim()).filter(n => n !== '');
+    const uniqueNumbers = [...new Set(numbers)];
+    return uniqueNumbers
+      .filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99)
+      .map(n => n.padStart(2, '0'));
+  }, [excludeNumbers]);
 
   // Handler cho chọn/bỏ chọn bộ số đặc biệt
   const handleSpecialSetToggle = useCallback((setId) => {
@@ -816,43 +848,11 @@ const DanDeGenerator = memo(() => {
     });
   }, [debouncedExcludeChange]);
 
-  // Parse số kết hợp thành mảng
-  const parseCombinationNumbers = useCallback(() => {
-    if (!combinationNumbers.trim()) return [];
+  // ✅ PERFORMANCE: Use memoized values instead of recalculating
+  const parseCombinationNumbers = useCallback(() => parsedCombinationNums, [parsedCombinationNums]);
 
-    const processedValue = combinationNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
-    const numbers = processedValue.split(',').map(n => n.trim()).filter(n => n !== '');
-
-    const uniqueNumbers = [...new Set(numbers)];
-
-    let excludeSet = new Set();
-    if (excludeNumbers.trim()) {
-      const processedExclude = excludeNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
-      const excludeArr = processedExclude.split(',').map(n => n.trim()).filter(n => n !== '');
-      const validExclude = excludeArr.filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99).map(n => n.padStart(2, '0'));
-      excludeSet = new Set(validExclude);
-    }
-
-    return uniqueNumbers
-      .filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99)
-      .map(n => n.padStart(2, '0'))
-      .filter(n => !excludeSet.has(n));
-  }, [combinationNumbers, excludeNumbers]);
-
-  // Parse số loại bỏ thành mảng
-  const parseExcludeNumbers = useCallback(() => {
-    if (!excludeNumbers.trim()) return [];
-
-    const processedValue = excludeNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
-    const numbers = processedValue.split(',').map(n => n.trim()).filter(n => n !== '');
-
-    // Loại bỏ số trùng lặp và giữ thứ tự
-    const uniqueNumbers = [...new Set(numbers)];
-
-    return uniqueNumbers
-      .filter(n => /^\d{2}$/.test(n) && parseInt(n) <= 99)
-      .map(n => n.padStart(2, '0'));
-  }, [excludeNumbers]);
+  // ✅ PERFORMANCE: Use memoized values instead of recalculating
+  const parseExcludeNumbers = useCallback(() => parsedExcludeNums, [parsedExcludeNums]);
 
   // Kiểm tra tính hợp lệ của input để bật/tắt nút tạo dàn
   const isValidForCreate = useCallback(() => {
@@ -871,16 +871,13 @@ const DanDeGenerator = memo(() => {
       return false;
     }
 
-    // Kiểm tra giới hạn số lượng
-    const combinationNums = parseCombinationNumbers();
-    const excludeNums = parseExcludeNumbers();
-
-    if (combinationNums.length > 100 || excludeNums.length > 20) {
+    // ✅ PERFORMANCE: Use memoized values
+    if (parsedCombinationNums.length > 100 || parsedExcludeNums.length > 20) {
       return false;
     }
 
     return true;
-  }, [combinationNumbers, excludeNumbers, selectedSpecialSets, selectedTouches, selectedSums, combinationError, excludeError, parseCombinationNumbers, parseExcludeNumbers]);
+  }, [combinationNumbers, excludeNumbers, selectedSpecialSets, selectedTouches, selectedSums, combinationError, excludeError, parsedCombinationNums, parsedExcludeNums]);
 
   // Xử lý checkbox loại bỏ kép bằng
   const handleExcludeDoublesChange = useCallback((e) => {
@@ -898,9 +895,9 @@ const DanDeGenerator = memo(() => {
       return;
     }
 
-    // Validate số kết hợp và số loại bỏ
-    const combinationNums = parseCombinationNumbers();
-    const excludeNums = parseExcludeNumbers();
+    // ✅ PERFORMANCE: Use memoized values instead of recalculating
+    const combinationNums = parsedCombinationNums;
+    const excludeNums = parsedExcludeNums;
 
     // Validate bộ số đặc biệt
     if (selectedSpecialSets.length > 5) {
@@ -1000,7 +997,7 @@ const DanDeGenerator = memo(() => {
       setLoading(false);
       setIsRequestInProgress(false);
     }
-  }, [quantity, combinationNumbers, excludeNumbers, excludeDoubles, selectedSpecialSets, selectedTouches, selectedSums, combinationError, excludeError, parseCombinationNumbers, parseExcludeNumbers, generateClientSideWithAllLogics, isRequestInProgress]);
+  }, [quantity, combinationNumbers, excludeNumbers, excludeDoubles, selectedSpecialSets, selectedTouches, selectedSums, combinationError, excludeError, parsedCombinationNums, parsedExcludeNums, generateClientSideWithAllLogics, isRequestInProgress]);
 
   const handleCopyDan = useCallback(() => {
     if (levelsList.length === 0) {
@@ -1432,20 +1429,23 @@ const DanDeGenerator = memo(() => {
 
                       <div className={styles.specialSetsContainer}>
                         <div className={styles.specialSetsList}>
-                          {specialSetsData.map(set => (
-                            <div
-                              key={set.id}
-                              className={`${styles.specialSetItem} ${selectedSpecialSets.includes(set.id) ? styles.selected : ''
-                                } ${selectedSpecialSets.length >= 5 && !selectedSpecialSets.includes(set.id) ? styles.disabled : ''}`}
-                              onClick={() => !loading && handleSpecialSetToggle(set.id)}
-                              title={`Bộ ${set.id}: ${set.numbers.join(', ')}`}
-                            >
-                              <div className={styles.specialSetHeader}>
-                                <span className={styles.specialSetId}>Bộ {set.id}</span>
-                                <span className={styles.specialSetCount}>({set.count} số)</span>
+                          {specialSetsData.map(set => {
+                            const isSelected = selectedSpecialSets.includes(set.id);
+                            const isDisabled = selectedSpecialSets.length >= 5 && !isSelected;
+                            return (
+                              <div
+                                key={set.id}
+                                className={`${styles.specialSetItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                                onClick={() => !loading && handleSpecialSetToggle(set.id)}
+                                title={`Bộ ${set.id}: ${set.numbers.join(', ')}`}
+                              >
+                                <div className={styles.specialSetHeader}>
+                                  <span className={styles.specialSetId}>Bộ {set.id}</span>
+                                  <span className={styles.specialSetCount}>({set.count} số)</span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -1466,20 +1466,23 @@ const DanDeGenerator = memo(() => {
                       </label>
                       <div className={styles.touchSelectionContainer}>
                         <div className={styles.touchSelectionList}>
-                          {touchData.map(touch => (
-                            <div
-                              key={touch.id}
-                              className={`${styles.touchSelectionItem} ${selectedTouches.includes(touch.id) ? styles.selected : ''
-                                } ${selectedTouches.length >= 10 && !selectedTouches.includes(touch.id) ? styles.disabled : ''}`}
-                              onClick={() => !loading && handleTouchToggle(touch.id)}
-                              title={`Chạm ${touch.id}: ${touch.numbers.join(', ')}`}
-                            >
-                              <div className={styles.touchSelectionHeader}>
-                                <span className={styles.touchSelectionId}>Chạm {touch.id}</span>
-                                <span className={styles.touchSelectionCount}>({touch.count} số)</span>
+                          {touchData.map(touch => {
+                            const isSelected = selectedTouches.includes(touch.id);
+                            const isDisabled = selectedTouches.length >= 10 && !isSelected;
+                            return (
+                              <div
+                                key={touch.id}
+                                className={`${styles.touchSelectionItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                                onClick={() => !loading && handleTouchToggle(touch.id)}
+                                title={`Chạm ${touch.id}: ${touch.numbers.join(', ')}`}
+                              >
+                                <div className={styles.touchSelectionHeader}>
+                                  <span className={styles.touchSelectionId}>Chạm {touch.id}</span>
+                                  <span className={styles.touchSelectionCount}>({touch.count} số)</span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                       {selectedTouches.length > 0 && (
@@ -1496,20 +1499,23 @@ const DanDeGenerator = memo(() => {
                       </label>
                       <div className={styles.sumSelectionContainer}>
                         <div className={styles.sumSelectionList}>
-                          {sumData.map(sum => (
-                            <div
-                              key={sum.id}
-                              className={`${styles.sumSelectionItem} ${selectedSums.includes(sum.id) ? styles.selected : ''
-                                } ${selectedSums.length >= 10 && !selectedSums.includes(sum.id) ? styles.disabled : ''}`}
-                              onClick={() => !loading && handleSumToggle(sum.id)}
-                              title={`Tổng ${sum.id}: ${sum.numbers.join(', ')}`}
-                            >
-                              <div className={styles.sumSelectionHeader}>
-                                <span className={styles.sumSelectionId}>Tổng {sum.id}</span>
-                                <span className={styles.sumSelectionCount}>({sum.count} số)</span>
+                          {sumData.map(sum => {
+                            const isSelected = selectedSums.includes(sum.id);
+                            const isDisabled = selectedSums.length >= 10 && !isSelected;
+                            return (
+                              <div
+                                key={sum.id}
+                                className={`${styles.sumSelectionItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                                onClick={() => !loading && handleSumToggle(sum.id)}
+                                title={`Tổng ${sum.id}: ${sum.numbers.join(', ')}`}
+                              >
+                                <div className={styles.sumSelectionHeader}>
+                                  <span className={styles.sumSelectionId}>Tổng {sum.id}</span>
+                                  <span className={styles.sumSelectionCount}>({sum.count} số)</span>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                       {selectedSums.length > 0 && (
@@ -1617,7 +1623,7 @@ const DanDeGenerator = memo(() => {
                           >
                             <span className={styles.mobileStatIcon}>➕</span>
                             <span className={styles.mobileStatText}>
-                              +{parseCombinationNumbers().length}
+                              +{parsedCombinationNums.length}
                             </span>
                           </div>
                         )}
@@ -1629,7 +1635,7 @@ const DanDeGenerator = memo(() => {
                           >
                             <span className={styles.mobileStatIcon}>➖</span>
                             <span className={styles.mobileStatText}>
-                              -{parseExcludeNumbers().length}
+                              -{parsedExcludeNums.length}
                             </span>
                           </div>
                         )}
@@ -1741,23 +1747,26 @@ const DanDeGenerator = memo(() => {
             </div>
             <div className={styles.specialSetsModalContent}>
               <div className={styles.specialSetsList}>
-                {specialSetsData.map(set => (
-                  <div
-                    key={set.id}
-                    className={`${styles.specialSetItem} ${selectedSpecialSets.includes(set.id) ? styles.selected : ''
-                      } ${selectedSpecialSets.length >= 5 && !selectedSpecialSets.includes(set.id) ? styles.disabled : ''}`}
-                    onClick={() => !loading && handleSpecialSetToggle(set.id)}
-                    title={`Bộ ${set.id}: ${set.numbers.join(', ')}`}
-                  >
-                    <div className={styles.specialSetHeader}>
-                      <span className={styles.specialSetId}>Bộ {set.id}</span>
-                      <span className={styles.specialSetCount}>({set.count} số)</span>
+                {specialSetsData.map(set => {
+                  const isSelected = selectedSpecialSets.includes(set.id);
+                  const isDisabled = selectedSpecialSets.length >= 5 && !isSelected;
+                  return (
+                    <div
+                      key={set.id}
+                      className={`${styles.specialSetItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                      onClick={() => !loading && handleSpecialSetToggle(set.id)}
+                      title={`Bộ ${set.id}: ${set.numbers.join(', ')}`}
+                    >
+                      <div className={styles.specialSetHeader}>
+                        <span className={styles.specialSetId}>Bộ {set.id}</span>
+                        <span className={styles.specialSetCount}>({set.count} số)</span>
+                      </div>
+                      <div className={styles.specialSetNumbers}>
+                        {set.numbers.join(', ')}
+                      </div>
                     </div>
-                    <div className={styles.specialSetNumbers}>
-                      {set.numbers.join(', ')}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className={styles.specialSetsModalFooter}>
@@ -1822,10 +1831,10 @@ const DanDeGenerator = memo(() => {
               {statsDetailType === 'combinationNumbers' && (
                 <div>
                   <div className={styles.statsDetailInfo}>
-                    <strong>Số lượng:</strong> {parseCombinationNumbers().length}/100 số
+                    <strong>Số lượng:</strong> {parsedCombinationNums.length}/100 số
                   </div>
                   <div className={styles.statsDetailNumbers}>
-                    {parseCombinationNumbers().join(', ')}
+                    {parsedCombinationNums.join(', ')}
                   </div>
                 </div>
               )}
@@ -1833,10 +1842,10 @@ const DanDeGenerator = memo(() => {
               {statsDetailType === 'excludeNumbers' && (
                 <div>
                   <div className={styles.statsDetailInfo}>
-                    <strong>Số lượng:</strong> {parseExcludeNumbers().length}/20 số
+                    <strong>Số lượng:</strong> {parsedExcludeNums.length}/20 số
                   </div>
                   <div className={styles.statsDetailNumbers}>
-                    {parseExcludeNumbers().join(', ')}
+                    {parsedExcludeNums.join(', ')}
                   </div>
                 </div>
               )}
@@ -1928,23 +1937,26 @@ const DanDeGenerator = memo(() => {
             </div>
             <div className={styles.specialSetsModalContent}>
               <div className={styles.specialSetsList}>
-                {touchData.map(touch => (
-                  <div
-                    key={touch.id}
-                    className={`${styles.specialSetItem} ${selectedTouches.includes(touch.id) ? styles.selected : ''
-                      } ${selectedTouches.length >= 10 && !selectedTouches.includes(touch.id) ? styles.disabled : ''}`}
-                    onClick={() => !loading && handleTouchToggle(touch.id)}
-                    title={`Chạm ${touch.id}: ${touch.numbers.join(', ')}`}
-                  >
-                    <div className={styles.specialSetHeader}>
-                      <span className={styles.specialSetId}>Chạm {touch.id}</span>
-                      <span className={styles.specialSetCount}>({touch.count} số)</span>
+                {touchData.map(touch => {
+                  const isSelected = selectedTouches.includes(touch.id);
+                  const isDisabled = selectedTouches.length >= 10 && !isSelected;
+                  return (
+                    <div
+                      key={touch.id}
+                      className={`${styles.specialSetItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                      onClick={() => !loading && handleTouchToggle(touch.id)}
+                      title={`Chạm ${touch.id}: ${touch.numbers.join(', ')}`}
+                    >
+                      <div className={styles.specialSetHeader}>
+                        <span className={styles.specialSetId}>Chạm {touch.id}</span>
+                        <span className={styles.specialSetCount}>({touch.count} số)</span>
+                      </div>
+                      <div className={styles.specialSetNumbers}>
+                        {touch.numbers.join(', ')}
+                      </div>
                     </div>
-                    <div className={styles.specialSetNumbers}>
-                      {touch.numbers.join(', ')}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className={styles.specialSetsModalFooter}>
@@ -1977,23 +1989,26 @@ const DanDeGenerator = memo(() => {
             </div>
             <div className={styles.specialSetsModalContent}>
               <div className={styles.specialSetsList}>
-                {sumData.map(sum => (
-                  <div
-                    key={sum.id}
-                    className={`${styles.specialSetItem} ${selectedSums.includes(sum.id) ? styles.selected : ''
-                      } ${selectedSums.length >= 10 && !selectedSums.includes(sum.id) ? styles.disabled : ''}`}
-                    onClick={() => !loading && handleSumToggle(sum.id)}
-                    title={`Tổng ${sum.id}: ${sum.numbers.join(', ')}`}
-                  >
-                    <div className={styles.specialSetHeader}>
-                      <span className={styles.specialSetId}>Tổng {sum.id}</span>
-                      <span className={styles.specialSetCount}>({sum.count} số)</span>
+                {sumData.map(sum => {
+                  const isSelected = selectedSums.includes(sum.id);
+                  const isDisabled = selectedSums.length >= 10 && !isSelected;
+                  return (
+                    <div
+                      key={sum.id}
+                      className={`${styles.specialSetItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+                      onClick={() => !loading && handleSumToggle(sum.id)}
+                      title={`Tổng ${sum.id}: ${sum.numbers.join(', ')}`}
+                    >
+                      <div className={styles.specialSetHeader}>
+                        <span className={styles.specialSetId}>Tổng {sum.id}</span>
+                        <span className={styles.specialSetCount}>({sum.count} số)</span>
+                      </div>
+                      <div className={styles.specialSetNumbers}>
+                        {sum.numbers.join(', ')}
+                      </div>
                     </div>
-                    <div className={styles.specialSetNumbers}>
-                      {sum.numbers.join(', ')}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className={styles.specialSetsModalFooter}>

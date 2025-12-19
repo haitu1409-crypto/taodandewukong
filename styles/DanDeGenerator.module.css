@@ -3236,6 +3236,7 @@
 .resultsTitle {
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1;
+  text-transform: uppercase;
 }
 
 /* Reduce paint complexity */

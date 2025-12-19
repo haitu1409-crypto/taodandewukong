@@ -1083,18 +1083,6 @@ function Dan2DGenerator() {
                             </div>
                         </div>
 
-                        {loading && (
-                            <p 
-                                className={styles.loadingText}
-                                role="status"
-                                aria-live="polite"
-                                aria-busy="true"
-                            >
-                                <IconClock size={16} style={{ display: 'inline', marginRight: '4px' }} aria-hidden="true" />
-                                Đang xử lý...
-                            </p>
-                        )}
-
                         <div className={styles.resultTextareaWrapper}>
                             <label htmlFor="result-textarea" className={styles.srOnly}>
                                 Kết quả dàn số {viewMode || ''}

@@ -548,7 +548,6 @@ function HomePage() {
                         color: '#ea580c',
                         marginTop: '0',
                         marginBottom: '0',
-                        paddingBottom: '15px',
                         borderBottom: '2px solid #555'
                     }}>
                         Tạo Dàn Đề 9X-0X Ngẫu Nhiên
@@ -583,7 +582,6 @@ function HomePage() {
                         color: '#ea580c',
                         marginTop: '0',
                         marginBottom: '0',
-                        paddingBottom: '15px',
                         borderBottom: '2px solid #555'
                     }}>
                         Tạo dàn đề mức số 1D,2D, 3D,4D ngẫu nhiên

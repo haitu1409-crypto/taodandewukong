@@ -82,7 +82,10 @@ const parseInput = (input) => {
 
     nums.forEach(num => {
         const strNum = num.toString();
-        if (strNum.length === 2 && !isNaN(parseInt(strNum))) {
+        if (strNum.length === 1 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 1 chữ số - thêm 0 vào trước (1 → 01)
+            pairs.push(strNum.padStart(2, '0'));
+        } else if (strNum.length === 2 && !isNaN(parseInt(strNum))) {
             pairs.push(strNum.padStart(2, '0'));
         } else if (strNum.length >= 3 && !isNaN(parseInt(strNum))) {
             for (let i = 0; i < strNum.length - 1; i++) {
@@ -147,13 +150,20 @@ const parseInput3D = (input) => {
 
     nums.forEach(num => {
         const strNum = num.toString();
-        if (strNum.length >= 3 && !isNaN(parseInt(strNum))) {
+        if (strNum.length === 1 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 1 chữ số - thêm 2 số 0 vào trước (1 → 001)
+            validNumbers.push(strNum.padStart(3, '0'));
+        } else if (strNum.length === 2 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 2 chữ số - thêm 1 số 0 vào trước (12 → 012)
+            validNumbers.push(strNum.padStart(3, '0'));
+        } else if (strNum.length === 3 && !isNaN(parseInt(strNum))) {
+            validNumbers.push(strNum);
+        } else if (strNum.length > 3 && !isNaN(parseInt(strNum))) {
+            // Xử lý số nhiều hơn 3 chữ số - tách thành các số 3 chữ số
             for (let i = 0; i <= strNum.length - 3; i++) {
                 const threeDigit = strNum.slice(i, i + 3);
                 validNumbers.push(threeDigit);
             }
-        } else if (strNum.length === 3) {
-            validNumbers.push(strNum);
         }
     });
 
@@ -177,13 +187,23 @@ const parseInput4D = (input) => {
 
     nums.forEach(num => {
         const strNum = num.toString();
-        if (strNum.length >= 4 && !isNaN(parseInt(strNum))) {
+        if (strNum.length === 1 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 1 chữ số - thêm 3 số 0 vào trước (1 → 0001)
+            validNumbers.push(strNum.padStart(4, '0'));
+        } else if (strNum.length === 2 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 2 chữ số - thêm 2 số 0 vào trước (12 → 0012)
+            validNumbers.push(strNum.padStart(4, '0'));
+        } else if (strNum.length === 3 && !isNaN(parseInt(strNum))) {
+            // ✅ FIX: Xử lý số 3 chữ số - thêm 1 số 0 vào trước (123 → 0123)
+            validNumbers.push(strNum.padStart(4, '0'));
+        } else if (strNum.length === 4 && !isNaN(parseInt(strNum))) {
+            validNumbers.push(strNum);
+        } else if (strNum.length > 4 && !isNaN(parseInt(strNum))) {
+            // Xử lý số nhiều hơn 4 chữ số - tách thành các số 4 chữ số
             for (let i = 0; i <= strNum.length - 4; i++) {
                 const fourDigit = strNum.slice(i, i + 4);
                 validNumbers.push(fourDigit);
             }
-        } else if (strNum.length === 4) {
-            validNumbers.push(strNum);
         }
     });
 
@@ -242,6 +262,8 @@ function Dan2DGenerator() {
     
     // ✅ PERFORMANCE: Ref to track current viewMode without causing re-renders
     const viewModeRef = useRef(null);
+    // ✅ FIX: Ref to track lastActiveViewMode to check if we should use API result for 1D
+    const lastActiveViewModeRef = useRef(null);
 
     // ✅ PERFORMANCE: Deferred values for better performance
     const deferredDisplayInput = useDeferredValue(displayInput);
@@ -250,6 +272,11 @@ function Dan2DGenerator() {
     useEffect(() => {
         viewModeRef.current = viewMode;
     }, [viewMode]);
+
+    // ✅ FIX: Sync lastActiveViewModeRef with lastActiveViewMode state
+    useEffect(() => {
+        lastActiveViewModeRef.current = lastActiveViewMode;
+    }, [lastActiveViewMode]);
 
     // Cleanup timeouts khi component unmount
     useEffect(() => {
@@ -363,7 +390,12 @@ function Dan2DGenerator() {
 
             if (response.data.success) {
                 setLevels2D(response.data.data.levels2D);
-                setLevels1D(response.data.data.levels1D);
+                // ✅ FIX: Không overwrite levels1D khi đang ở mode 1D vì API parse theo logic 2D, khác với parseInput1D
+                // API endpoint /api/dande/2d parse input theo logic 2D (tạo cặp 2D) và tính 1D từ đó
+                // Nhưng parseInput1D parse trực tiếp input thành các chữ số, nên kết quả khác nhau
+                if (lastActiveViewModeRef.current !== '1D' && viewModeRef.current !== '1D') {
+                    setLevels1D(response.data.data.levels1D);
+                }
                 setError(''); // Clear any previous errors
                 setOfflineMode(false); // Reset offline mode on success
             }
@@ -448,16 +480,19 @@ function Dan2DGenerator() {
         []
     );
 
-    // ✅ PERFORMANCE: Handle input change - Optimized with startTransition
+    // ✅ PERFORMANCE: Handle input change - Optimized with startTransition - Chỉ cho phép nhập số và ký tự phân tách
     const handleInputChange = useCallback((e) => {
         const value = e.target.value;
+        
+        // Chỉ cho phép nhập số, dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng
+        const filteredValue = value.replace(/[^0-9\s,;\r\n]/g, '');
 
         // Update immediately for responsive UI
-        setDisplayInput(value);
+        setDisplayInput(filteredValue);
 
         // Use startTransition for non-urgent validation
         startTransition(() => {
-            debouncedInputValidation(value);
+            debouncedInputValidation(filteredValue);
         });
     }, [debouncedInputValidation]);
 
@@ -671,23 +706,54 @@ function Dan2DGenerator() {
         setShowModal(true);
     }, []);
 
+    // ✅ Helper function to create empty levels (all numbers at level 0)
+    const createEmptyLevels = useCallback((type) => {
+        const emptyLevels = { 0: [] };
 
-    // ✅ PERFORMANCE: Memoize sorted levels2D entries
-    const sortedLevels2D = useMemo(() => {
-        return Object.entries(levels2D)
+        if (type === '1D') {
+            // Tạo tất cả số từ 0-9
+            for (let i = 0; i <= 9; i++) {
+                emptyLevels[0].push(i.toString());
+            }
+        } else if (type === '2D') {
+            // Tạo tất cả số từ 00-99
+            for (let i = 0; i <= 99; i++) {
+                emptyLevels[0].push(i.toString().padStart(2, '0'));
+            }
+        } else if (type === '3D') {
+            // Tạo tất cả số từ 000-999
+            for (let i = 0; i <= 999; i++) {
+                emptyLevels[0].push(i.toString().padStart(3, '0'));
+            }
+        } else if (type === '4D') {
+            // Tạo tất cả số từ 0000-9999
+            for (let i = 0; i <= 9999; i++) {
+                emptyLevels[0].push(i.toString().padStart(4, '0'));
+            }
+        }
+
+        return emptyLevels;
+    }, []);
+
+    // ✅ PERFORMANCE: Copy dàn 2D - Memoized - Sử dụng logic tương tự currentLevels để đảm bảo copy đúng
+    const handleCopy2D = useCallback(() => {
+        // Tính toán levels cho 2D (tương tự currentLevels logic)
+        let levels = levels2D;
+        if (Object.keys(levels).length === 0 && totalSelected === 0) {
+            levels = createEmptyLevels('2D');
+        }
+
+        const sorted = Object.entries(levels)
             .sort(([a], [b]) => parseInt(b) - parseInt(a))
             .filter(([, nums]) => nums.length > 0);
-    }, [levels2D]);
 
-    // ✅ PERFORMANCE: Copy dàn 2D - Memoized
-    const handleCopy2D = useCallback(() => {
-        if (sortedLevels2D.length === 0) {
+        if (sorted.length === 0) {
             setModalMessage('Chưa có dàn số để copy');
             setShowModal(true);
             return;
         }
 
-        const copyText = sortedLevels2D
+        const copyText = sorted
             .map(([level, nums]) => `Mức ${level} (${nums.length} số)\n${nums.join(',')}`)
             .join('\n\n');
 
@@ -699,38 +765,27 @@ function Dan2DGenerator() {
             setModalMessage('Lỗi khi sao chép');
             setShowModal(true);
         });
-    }, [sortedLevels2D]);
+    }, [levels2D, totalSelected, createEmptyLevels]);
 
-    // ✅ PERFORMANCE: Memoize sorted levels1D entries
-    const sortedLevels1D = useMemo(() => {
-        return Object.entries(levels1D)
+    // ✅ PERFORMANCE: Copy dàn 1D - Memoized - Sử dụng logic tương tự currentLevels để đảm bảo copy đúng
+    const handleCopy1D = useCallback(() => {
+        // Tính toán levels cho 1D (tương tự currentLevels logic)
+        let levels = levels1D;
+        if (Object.keys(levels).length === 0 && totalSelected === 0) {
+            levels = createEmptyLevels('1D');
+        }
+
+        const sorted = Object.entries(levels)
             .sort(([a], [b]) => parseInt(b) - parseInt(a))
             .filter(([, digits]) => digits.length > 0);
-    }, [levels1D]);
 
-    // ✅ PERFORMANCE: Memoize sorted levels3D entries
-    const sortedLevels3D = useMemo(() => {
-        return Object.entries(levels3D)
-            .sort(([a], [b]) => parseInt(b) - parseInt(a))
-            .filter(([, nums]) => nums.length > 0);
-    }, [levels3D]);
-
-    // ✅ PERFORMANCE: Memoize sorted levels4D entries
-    const sortedLevels4D = useMemo(() => {
-        return Object.entries(levels4D)
-            .sort(([a], [b]) => parseInt(b) - parseInt(a))
-            .filter(([, nums]) => nums.length > 0);
-    }, [levels4D]);
-
-    // ✅ PERFORMANCE: Copy dàn 1D - Memoized
-    const handleCopy1D = useCallback(() => {
-        if (sortedLevels1D.length === 0) {
+        if (sorted.length === 0) {
             setModalMessage('Chưa có dàn số để copy');
             setShowModal(true);
             return;
         }
 
-        const copyText = sortedLevels1D
+        const copyText = sorted
             .map(([level, digits]) => `Mức ${level} (${digits.length} số)\n${digits.join(',')}`)
             .join('\n\n');
 
@@ -742,17 +797,27 @@ function Dan2DGenerator() {
             setModalMessage('Lỗi khi sao chép');
             setShowModal(true);
         });
-    }, [sortedLevels1D]);
+    }, [levels1D, totalSelected, createEmptyLevels]);
 
-    // ✅ PERFORMANCE: Copy dàn 3D - Memoized
+    // ✅ PERFORMANCE: Copy dàn 3D - Memoized - Sử dụng logic tương tự currentLevels để đảm bảo copy đúng
     const handleCopy3D = useCallback(() => {
-        if (sortedLevels3D.length === 0) {
+        // Tính toán levels cho 3D (tương tự currentLevels logic)
+        let levels = levels3D;
+        if (Object.keys(levels).length === 0 && totalSelected === 0) {
+            levels = createEmptyLevels('3D');
+        }
+
+        const sorted = Object.entries(levels)
+            .sort(([a], [b]) => parseInt(b) - parseInt(a))
+            .filter(([, nums]) => nums.length > 0);
+
+        if (sorted.length === 0) {
             setModalMessage('Chưa có dàn số để copy');
             setShowModal(true);
             return;
         }
 
-        const copyText = sortedLevels3D
+        const copyText = sorted
             .map(([level, nums]) => `Mức ${level} (${nums.length} số)\n${nums.join(',')}`)
             .join('\n\n');
 
@@ -764,17 +829,27 @@ function Dan2DGenerator() {
             setModalMessage('Lỗi khi sao chép');
             setShowModal(true);
         });
-    }, [sortedLevels3D]);
+    }, [levels3D, totalSelected, createEmptyLevels]);
 
-    // ✅ PERFORMANCE: Copy dàn 4D - Memoized
+    // ✅ PERFORMANCE: Copy dàn 4D - Memoized - Sử dụng logic tương tự currentLevels để đảm bảo copy đúng
     const handleCopy4D = useCallback(() => {
-        if (sortedLevels4D.length === 0) {
+        // Tính toán levels cho 4D (tương tự currentLevels logic)
+        let levels = levels4D;
+        if (Object.keys(levels).length === 0 && totalSelected === 0) {
+            levels = createEmptyLevels('4D');
+        }
+
+        const sorted = Object.entries(levels)
+            .sort(([a], [b]) => parseInt(b) - parseInt(a))
+            .filter(([, nums]) => nums.length > 0);
+
+        if (sorted.length === 0) {
             setModalMessage('Chưa có dàn số để copy');
             setShowModal(true);
             return;
         }
 
-        const copyText = sortedLevels4D
+        const copyText = sorted
             .map(([level, nums]) => `Mức ${level} (${nums.length} số)\n${nums.join(',')}`)
             .join('\n\n');
 
@@ -786,7 +861,7 @@ function Dan2DGenerator() {
             setModalMessage('Lỗi khi sao chép');
             setShowModal(true);
         });
-    }, [sortedLevels4D]);
+    }, [levels4D, totalSelected, createEmptyLevels]);
 
     // ✅ PERFORMANCE: Close modal - Memoized
     const closeModal = useCallback(() => {
@@ -836,35 +911,6 @@ function Dan2DGenerator() {
         setDeleteStatus(true);
         const timeoutId = setTimeout(() => setDeleteStatus(false), 2000);
         timeoutRefs.current.push(timeoutId);
-    }, []);
-
-    // ✅ Helper function to create empty levels (all numbers at level 0)
-    const createEmptyLevels = useCallback((type) => {
-        const emptyLevels = { 0: [] };
-
-        if (type === '1D') {
-            // Tạo tất cả số từ 0-9
-            for (let i = 0; i <= 9; i++) {
-                emptyLevels[0].push(i.toString());
-            }
-        } else if (type === '2D') {
-            // Tạo tất cả số từ 00-99
-            for (let i = 0; i <= 99; i++) {
-                emptyLevels[0].push(i.toString().padStart(2, '0'));
-            }
-        } else if (type === '3D') {
-            // Tạo tất cả số từ 000-999
-            for (let i = 0; i <= 999; i++) {
-                emptyLevels[0].push(i.toString().padStart(3, '0'));
-            }
-        } else if (type === '4D') {
-            // Tạo tất cả số từ 0000-9999
-            for (let i = 0; i <= 9999; i++) {
-                emptyLevels[0].push(i.toString().padStart(4, '0'));
-            }
-        }
-
-        return emptyLevels;
     }, []);
 
     // ✅ PERFORMANCE: Memoize sorted levels based on viewMode - Hỗ trợ 2D, 1D, 3D, 4D
@@ -961,7 +1007,7 @@ function Dan2DGenerator() {
                                 ) : (
                                     <>
                                         <IconDice size={16} aria-hidden="true" />
-                                        <span className={styles.buttonText}>Tạo</span>
+                                        <span className={styles.buttonText}>Tạo ngẫu nhiên</span>
                                     </>
                                 )}
                             </button>
@@ -973,7 +1019,7 @@ function Dan2DGenerator() {
                             <input
                                 id="quantity-input"
                                 type="number"
-                                placeholder="Nhập số lượng"
+                                placeholder="Số lượng"
                                 className={styles.numberInput}
                                 value={quantity}
                                 onChange={handleQuantityChange}
@@ -994,7 +1040,7 @@ function Dan2DGenerator() {
                                 disabled={loading}
                                 aria-label="Chọn mức số (1D, 2D, 3D, 4D)"
                             >
-                                <option value="">Chọn mức</option>
+                                <option value="">Mức</option>
                                 <option value="1D">1D</option>
                                 <option value="2D">2D</option>
                                 <option value="3D">3D</option>
@@ -1061,22 +1107,22 @@ function Dan2DGenerator() {
                                 aria-label="Chọn loại dàn số để xem"
                             >
                                 <TabButton
-                                    label="Dàn 1D"
+                                    label="Tạo Mức 1D"
                                     isActive={viewMode === '1D'}
                                     onClick={handleViewMode1D}
                                 />
                                 <TabButton
-                                    label="Dàn 2D"
+                                    label="Tạo Mức 2D"
                                     isActive={viewMode === '2D'}
                                     onClick={handleViewMode2D}
                                 />
                                 <TabButton
-                                    label="Dàn 3D"
+                                    label="Tạo Mức 3D"
                                     isActive={viewMode === '3D'}
                                     onClick={handleViewMode3D}
                                 />
                                 <TabButton
-                                    label="Dàn 4D"
+                                    label="Tạo Mức 4D"
                                     isActive={viewMode === '4D'}
                                     onClick={handleViewMode4D}
                                 />
@@ -1104,7 +1150,7 @@ function Dan2DGenerator() {
                                     <button
                                         onClick={handleCopy2D}
                                         className={`${styles.copyButton} ${copy2DStatus ? styles.successButton : ''}`}
-                                        disabled={totalSelected === 0 || loading}
+                                        disabled={!generateResultText.trim() || loading}
                                         aria-label={copy2DStatus ? 'Đã sao chép dàn 2D' : 'Sao chép dàn 2D'}
                                         aria-pressed={copy2DStatus}
                                     >
@@ -1117,7 +1163,7 @@ function Dan2DGenerator() {
                                     <button
                                         onClick={handleCopy1D}
                                         className={`${styles.copyButton} ${copy1DStatus ? styles.successButton : ''}`}
-                                        disabled={totalSelected === 0 || loading}
+                                        disabled={!generateResultText.trim() || loading}
                                         aria-label={copy1DStatus ? 'Đã sao chép dàn 1D' : 'Sao chép dàn 1D'}
                                         aria-pressed={copy1DStatus}
                                     >
@@ -1130,7 +1176,7 @@ function Dan2DGenerator() {
                                     <button
                                         onClick={handleCopy3D}
                                         className={`${styles.copyButton} ${copy3DStatus ? styles.successButton : ''}`}
-                                        disabled={totalSelected === 0 || loading}
+                                        disabled={!generateResultText.trim() || loading}
                                         aria-label={copy3DStatus ? 'Đã sao chép dàn 3D' : 'Sao chép dàn 3D'}
                                         aria-pressed={copy3DStatus}
                                     >
@@ -1143,7 +1189,7 @@ function Dan2DGenerator() {
                                     <button
                                         onClick={handleCopy4D}
                                         className={`${styles.copyButton} ${copy4DStatus ? styles.successButton : ''}`}
-                                        disabled={totalSelected === 0 || loading}
+                                        disabled={!generateResultText.trim() || loading}
                                         aria-label={copy4DStatus ? 'Đã sao chép dàn 4D' : 'Sao chép dàn 4D'}
                                         aria-pressed={copy4DStatus}
                                     >

@@ -180,7 +180,7 @@ const DanDeGenerator = memo(() => {
     const processedValue = combinationNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
     const numbers = processedValue.split(',').map(n => n.trim()).filter(n => n !== '');
     const uniqueNumbers = [...new Set(numbers)];
-    
+
     let excludeSet = new Set();
     if (excludeNumbers.trim()) {
       const processedExclude = excludeNumbers.replace(/[;,\s]+/g, ',').replace(/,+/g, ',').replace(/^,|,$/g, '');
@@ -1707,7 +1707,7 @@ const DanDeGenerator = memo(() => {
             >
               <h2 className={styles.resultsTitle}>Kết quả tạo dàn</h2>
               <textarea
-                className={styles.resultsTextarea}
+                className={styles.generatorResultsTextarea}
                 value={generateTextareaContent}
                 readOnly
                 placeholder="Kết quả tạo dàn sẽ hiển thị ở đây..."

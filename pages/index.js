@@ -58,6 +58,12 @@ const Dan2DGenerator = dynamic(() => import('../components/Dan2DGenerator'), {
     loading: () => <DanDeLoadingPlaceholder />
 });
 
+// ✅ PERFORMANCE: Lazy load DanDeFilter component - disable SSR for better initial load
+const DanDeFilter = dynamic(() => import('../components/DanDeFilter'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => <DanDeLoadingPlaceholder />
+});
+
 // ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
 const ANIMATION_STYLES = `
     @keyframes colorPulse {
@@ -89,6 +95,7 @@ function HomePage() {
     // ✅ PERFORMANCE: Only load component when user scrolls near it or interacts
     const [shouldLoadDanDeGenerator, setShouldLoadDanDeGenerator] = useState(false);
     const [shouldLoadDan2DGenerator, setShouldLoadDan2DGenerator] = useState(false);
+    const [shouldLoadDanDeFilter, setShouldLoadDanDeFilter] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
@@ -327,6 +334,95 @@ function HomePage() {
             window.removeEventListener('load', handleLoad);
         };
     }, [shouldLoadDan2DGenerator]);
+
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load DanDeFilter khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadDanDeFilter(true), 3500);
+            } else {
+                setShouldLoadDanDeFilter(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadDanDeFilter(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('dan-de-filter-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadDanDeFilter(true), 3500);
+                } else {
+                    setShouldLoadDanDeFilter(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch DanDeFilter component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadDanDeFilter) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadDanDeFilter) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/DanDeFilter').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadDanDeFilter]);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
@@ -570,6 +666,40 @@ function HomePage() {
                             justifyContent: 'center'
                         }}>
                             Cuộn xuống để tải công cụ tạo dàn đề...
+                        </div>
+                    )}
+                </section>
+
+                {/* DanDeFilter Component - Render ngay dưới component 9X-0X */}
+                <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for DanDeFilter */ }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Lọc Dàn Đề Tổng Hợp Cho Ra Đề Bất Tử
+                    </h2>
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="dan-de-filter-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
+                    {shouldLoadDanDeFilter ? (
+                        <DanDeFilter />
+                    ) : (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#999',
+                            minHeight: '400px', /* ✅ CLS: Match placeholder height */
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            Cuộn xuống để tải công cụ lọc dàn số...
                         </div>
                     )}
                 </section>

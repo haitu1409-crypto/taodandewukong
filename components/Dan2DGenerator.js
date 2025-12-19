@@ -195,6 +195,10 @@ const TabButton = memo(({ label, isActive, onClick }) => (
     <button
         className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
         onClick={onClick}
+        role="tab"
+        aria-selected={isActive}
+        aria-controls="result-textarea"
+        tabIndex={isActive ? 0 : -1}
     >
         {label}
     </button>
@@ -464,6 +468,21 @@ function Dan2DGenerator() {
         
         // Use startTransition for non-urgent updates
         startTransition(() => {
+            setError('');
+        });
+    }, []);
+
+    // ✅ PERFORMANCE: Handle input focus - Reset tabs and clear results
+    const handleInputFocus = useCallback(() => {
+        startTransition(() => {
+            // Reset viewMode về null (không có tab nào được chọn)
+            setViewMode(null);
+            // Xóa tất cả kết quả levels
+            setLevels2D({});
+            setLevels1D({});
+            setLevels3D({});
+            setLevels4D({});
+            // Clear error nếu có
             setError('');
         });
     }, []);
@@ -890,27 +909,33 @@ function Dan2DGenerator() {
                 <div className={styles.leftColumn}>
                     <div className={styles.inputSection}>
                         {/* Action Buttons */}
-                        <div className={styles.buttonGroup}>
+                        <div className={styles.buttonGroup} role="toolbar" aria-label="Công cụ tạo dàn số">
                             <button
                                 onClick={handleGenerateDan}
                                 className={`${styles.button} ${styles.primaryButton}`}
                                 disabled={loading}
+                                aria-label={loading ? 'Đang tạo số ngẫu nhiên' : 'Tạo số ngẫu nhiên'}
+                                aria-busy={loading}
                             >
                                 {loading ? (
                                     <>
-                                        <IconClock size={16} />
+                                        <IconClock size={16} aria-hidden="true" />
                                         <span className={styles.buttonText}>Đang tạo...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <IconDice size={16} />
+                                        <IconDice size={16} aria-hidden="true" />
                                         <span className={styles.buttonText}>Tạo</span>
                                     </>
                                 )}
                             </button>
 
                             {/* Input and Select */}
+                            <label htmlFor="quantity-input" className={styles.srOnly}>
+                                Số lượng số cần tạo
+                            </label>
                             <input
+                                id="quantity-input"
                                 type="number"
                                 placeholder="Nhập số lượng"
                                 className={styles.numberInput}
@@ -919,12 +944,19 @@ function Dan2DGenerator() {
                                 min="1"
                                 max="1000"
                                 disabled={loading}
+                                aria-label="Số lượng số cần tạo"
+                                aria-describedby={error ? "error-message" : undefined}
                             />
+                            <label htmlFor="mode-select" className={styles.srOnly}>
+                                Chọn mức số
+                            </label>
                             <select
+                                id="mode-select"
                                 className={styles.modeSelect}
                                 value={generateMode || ''}
                                 onChange={handleGenerateModeChange}
                                 disabled={loading}
+                                aria-label="Chọn mức số (1D, 2D, 3D, 4D)"
                             >
                                 <option value="">Chọn mức</option>
                                 <option value="1D">1D</option>
@@ -937,6 +969,7 @@ function Dan2DGenerator() {
                                 onClick={handleClear}
                                 className={`${styles.button} ${styles.dangerButton} ${deleteStatus ? styles.successButton : ''}`}
                                 disabled={loading}
+                                aria-label={deleteStatus ? 'Đã xóa tất cả' : 'Xóa tất cả dàn số'}
                             >
                                 <span className={styles.buttonText}>
                                     {deleteStatus ? 'Đã Xóa!' : 'Xóa'}
@@ -945,21 +978,34 @@ function Dan2DGenerator() {
 
                         </div>
 
+                        <label htmlFor="input-textarea" className={styles.srOnly}>
+                            Nhập các dàn số 2D, 3D, 4D
+                        </label>
                         <textarea
+                            id="input-textarea"
                             value={displayInput}
                             onChange={handleInputChange}
+                            onFocus={handleInputFocus}
                             onBlur={handleInputBlur}
                             placeholder="Nhập các dàn 2D,3D,4D hoặc bấm nút tạo ngẫu nhiên theo mức"
                             className={styles.inputTextarea}
                             disabled={loading}
+                            aria-label="Nhập các dàn số 2D, 3D, 4D"
+                            aria-describedby={error ? "error-message" : undefined}
                         />
                         {error && (
-                            <div className={styles.errorMessage}>
+                            <div 
+                                id="error-message"
+                                className={styles.errorMessage}
+                                role="alert"
+                                aria-live="polite"
+                            >
                                 {error}
                                 {offlineMode && (
                                     <button
                                         onClick={handleRetryOnline}
                                         className={styles.retryButton}
+                                        aria-label="Thử lại kết nối online"
                                     >
                                         Thử lại Online
                                     </button>
@@ -973,7 +1019,11 @@ function Dan2DGenerator() {
                 <div className={styles.rightColumn}>
                     <div className={styles.resultsSection}>
                         <div className={styles.resultsHeader}>
-                            <div className={styles.tabGroup}>
+                            <div 
+                                className={styles.tabGroup}
+                                role="tablist"
+                                aria-label="Chọn loại dàn số để xem"
+                            >
                                 <TabButton
                                     label="Dàn 1D"
                                     isActive={viewMode === '1D'}
@@ -997,16 +1047,32 @@ function Dan2DGenerator() {
                             </div>
                         </div>
 
-                        {loading && <p className={styles.loadingText}><IconClock size={16} style={{ display: 'inline', marginRight: '4px' }} />Đang xử lý...</p>}
+                        {loading && (
+                            <p 
+                                className={styles.loadingText}
+                                role="status"
+                                aria-live="polite"
+                                aria-busy="true"
+                            >
+                                <IconClock size={16} style={{ display: 'inline', marginRight: '4px' }} aria-hidden="true" />
+                                Đang xử lý...
+                            </p>
+                        )}
 
                         <div className={styles.resultTextareaWrapper}>
+                            <label htmlFor="result-textarea" className={styles.srOnly}>
+                                Kết quả dàn số {viewMode || ''}
+                            </label>
                             <textarea
+                                id="result-textarea"
                                 value={generateResultText}
                                 readOnly
                                 className={styles.resultTextarea}
                                 placeholder={`- Tạo mức 1D: Tạo mức số cho các dàn càng
 - Tạo mức 2D: Tạo mức số cho các dàn 2D(các cặp số có thể gộp lại, ví dụ: 12,21=121)
 - Tạo mức 3D,4D: Tạo mức số cho các dàn 3-4D`}
+                                aria-label={`Kết quả dàn số ${viewMode || ''}`}
+                                aria-live="polite"
                             />
                             <div className={styles.copyButtonContainer}>
                                 {viewMode === '2D' && (
@@ -1014,9 +1080,10 @@ function Dan2DGenerator() {
                                         onClick={handleCopy2D}
                                         className={`${styles.copyButton} ${copy2DStatus ? styles.successButton : ''}`}
                                         disabled={totalSelected === 0 || loading}
-                                        title="Copy Dàn 2D"
+                                        aria-label={copy2DStatus ? 'Đã sao chép dàn 2D' : 'Sao chép dàn 2D'}
+                                        aria-pressed={copy2DStatus}
                                     >
-                                        {copy2DStatus ? <IconCheck size={16} /> : <IconCopy size={16} />}
+                                        {copy2DStatus ? <IconCheck size={16} aria-hidden="true" /> : <IconCopy size={16} aria-hidden="true" />}
                                         <span className={styles.copyButtonText}>Copy</span>
                                     </button>
                                 )}
@@ -1026,9 +1093,10 @@ function Dan2DGenerator() {
                                         onClick={handleCopy1D}
                                         className={`${styles.copyButton} ${copy1DStatus ? styles.successButton : ''}`}
                                         disabled={totalSelected === 0 || loading}
-                                        title="Copy Dàn 1D"
+                                        aria-label={copy1DStatus ? 'Đã sao chép dàn 1D' : 'Sao chép dàn 1D'}
+                                        aria-pressed={copy1DStatus}
                                     >
-                                        {copy1DStatus ? <IconCheck size={16} /> : <IconCopy size={16} />}
+                                        {copy1DStatus ? <IconCheck size={16} aria-hidden="true" /> : <IconCopy size={16} aria-hidden="true" />}
                                         <span className={styles.copyButtonText}>Copy</span>
                                     </button>
                                 )}
@@ -1038,9 +1106,10 @@ function Dan2DGenerator() {
                                         onClick={handleCopy3D}
                                         className={`${styles.copyButton} ${copy3DStatus ? styles.successButton : ''}`}
                                         disabled={totalSelected === 0 || loading}
-                                        title="Copy Dàn 3D"
+                                        aria-label={copy3DStatus ? 'Đã sao chép dàn 3D' : 'Sao chép dàn 3D'}
+                                        aria-pressed={copy3DStatus}
                                     >
-                                        {copy3DStatus ? <IconCheck size={16} /> : <IconCopy size={16} />}
+                                        {copy3DStatus ? <IconCheck size={16} aria-hidden="true" /> : <IconCopy size={16} aria-hidden="true" />}
                                         <span className={styles.copyButtonText}>Copy</span>
                                     </button>
                                 )}
@@ -1050,9 +1119,10 @@ function Dan2DGenerator() {
                                         onClick={handleCopy4D}
                                         className={`${styles.copyButton} ${copy4DStatus ? styles.successButton : ''}`}
                                         disabled={totalSelected === 0 || loading}
-                                        title="Copy Dàn 4D"
+                                        aria-label={copy4DStatus ? 'Đã sao chép dàn 4D' : 'Sao chép dàn 4D'}
+                                        aria-pressed={copy4DStatus}
                                     >
-                                        {copy4DStatus ? <IconCheck size={16} /> : <IconCopy size={16} />}
+                                        {copy4DStatus ? <IconCheck size={16} aria-hidden="true" /> : <IconCopy size={16} aria-hidden="true" />}
                                         <span className={styles.copyButtonText}>Copy</span>
                                     </button>
                                 )}
@@ -1065,10 +1135,20 @@ function Dan2DGenerator() {
 
             {/* Modal */}
             {showModal && (
-                <div className={styles.modalOverlay} onClick={closeModal}>
+                <div 
+                    className={styles.modalOverlay} 
+                    onClick={closeModal}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-message"
+                >
                     <div className={styles.modal} onClick={e => e.stopPropagation()}>
-                        <p className={styles.modalMessage}>{modalMessage}</p>
-                        <button onClick={closeModal} className={styles.modalButton}>
+                        <p id="modal-message" className={styles.modalMessage} role="alert">{modalMessage}</p>
+                        <button 
+                            onClick={closeModal} 
+                            className={styles.modalButton}
+                            aria-label="Đóng hộp thoại"
+                        >
                             Đóng
                         </button>
                     </div>

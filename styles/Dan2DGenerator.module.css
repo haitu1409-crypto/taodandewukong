@@ -5,6 +5,19 @@
  * Note: CSS Variables được định nghĩa trong _app.js để tránh lỗi CSS Module
  */
 
+/* ✅ ACCESSIBILITY: Screen reader only class */
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
 .container {
     width: 100%;
     max-width: var(--container-7xl, 1280px);

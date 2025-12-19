@@ -1072,7 +1072,7 @@ function Dan2DGenerator() {
                             placeholder="Nhập các dàn 2D,3D,4D hoặc bấm nút tạo ngẫu nhiên theo mức"
                             className={styles.inputTextarea}
                             disabled={loading}
-                            inputMode="tel"
+                            inputMode="numeric"
                             aria-label="Nhập các dàn số 2D, 3D, 4D"
                             aria-describedby={error ? "error-message" : undefined}
                         />

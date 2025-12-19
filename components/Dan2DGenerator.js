@@ -949,7 +949,6 @@ function Dan2DGenerator() {
                             <button
                                 onClick={handleGenerateDan}
                                 className={`${styles.button} ${styles.primaryButton}`}
-                                style={{ width: '110px' }} // ✅ FIXED: Fixed width to prevent layout shift
                                 disabled={loading || isInputFocused}
                                 aria-label={loading ? 'Đang tạo số ngẫu nhiên' : 'Tạo số ngẫu nhiên'}
                                 aria-busy={loading}

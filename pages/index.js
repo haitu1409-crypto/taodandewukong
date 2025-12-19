@@ -52,6 +52,12 @@ const DanDeGenerator = dynamic(() => import('../components/DanDeGenerator'), {
     loading: () => <DanDeLoadingPlaceholder />
 });
 
+// ✅ PERFORMANCE: Lazy load Dan2DGenerator component - disable SSR for better initial load
+const Dan2DGenerator = dynamic(() => import('../components/Dan2DGenerator'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => <DanDeLoadingPlaceholder />
+});
+
 // ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
 const ANIMATION_STYLES = `
     @keyframes colorPulse {
@@ -82,6 +88,7 @@ function HomePage() {
     });
     // ✅ PERFORMANCE: Only load component when user scrolls near it or interacts
     const [shouldLoadDanDeGenerator, setShouldLoadDanDeGenerator] = useState(false);
+    const [shouldLoadDan2DGenerator, setShouldLoadDan2DGenerator] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
@@ -231,6 +238,95 @@ function HomePage() {
             window.removeEventListener('load', handleLoad);
         };
     }, [shouldLoadDanDeGenerator]);
+
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load Dan2DGenerator khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadDan2DGenerator(true), 4000);
+            } else {
+                setShouldLoadDan2DGenerator(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadDan2DGenerator(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('dan-2d-generator-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadDan2DGenerator(true), 4000);
+                } else {
+                    setShouldLoadDan2DGenerator(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch Dan2DGenerator component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadDan2DGenerator) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadDan2DGenerator) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/Dan2DGenerator').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadDan2DGenerator]);
 
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
@@ -475,6 +571,41 @@ function HomePage() {
                             justifyContent: 'center'
                         }}>
                             Cuộn xuống để tải công cụ tạo dàn đề...
+                        </div>
+                    )}
+                </section>
+
+                {/* Dan2DGenerator Component - Render dưới component 9X-0X */}
+                <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for Dan2DGenerator */ }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        paddingBottom: '15px',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Tạo dàn đề mức số 1D,2D, 3D,4D ngẫu nhiên
+                    </h2>
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="dan-2d-generator-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
+                    {shouldLoadDan2DGenerator ? (
+                        <Dan2DGenerator />
+                    ) : (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#999',
+                            minHeight: '400px', /* ✅ CLS: Match placeholder height */
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            Cuộn xuống để tải công cụ tạo dàn đề 2D...
                         </div>
                     )}
                 </section>

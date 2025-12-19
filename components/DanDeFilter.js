@@ -1044,51 +1044,42 @@ const DanDeFilter = memo(() => {
         }
 
         try {
-            // Lấy chỉ phần kết quả lọc, bỏ qua thống kê và options
+            // Lấy chỉ phần kết quả lọc, bỏ qua phần "Đã áp dụng"
             const lines = filterResult.split('\n');
             const resultLines = [];
-            let inResultSection = false;
 
             for (const line of lines) {
-                // Bắt đầu từ phần "📋 KẾT QUẢ LỌC"
-                if (line.includes('📋 KẾT QUẢ LỌC')) {
-                    inResultSection = true;
-                    continue;
-                }
-
+                const trimmedLine = line.trim();
+                
                 // Dừng khi gặp phần "Đã áp dụng"
-                if (inResultSection && line.includes('Đã áp dụng')) {
+                if (trimmedLine.includes('Đã áp dụng')) {
                     break;
                 }
 
-                // Thu thập kết quả lọc
-                if (inResultSection && line.trim() !== '') {
-                    // Nếu dòng có format "9 5 s (stats):" và chứa số liệu
-                    if (line.includes(' s') && line.includes(':')) {
-                        const parts = line.split(':');
-                        const levelPart = parts[0].trim();
-                        const numbersPart = parts[1] ? parts[1].trim() : '';
+                // Bỏ qua dòng trống
+                if (!trimmedLine) {
+                    continue;
+                }
 
-                        // Loại bỏ thống kê trong ngoặc
-                        const cleanLevelPart = levelPart.replace(/\s*\([^)]*\)\s*$/, '');
+                // Bỏ qua các dòng thống kê (nếu có)
+                if (trimmedLine.includes('📊') || trimmedLine.includes('THỐNG KÊ')) {
+                    continue;
+                }
 
-                        resultLines.push(cleanLevelPart);
-                        if (numbersPart) {
-                            resultLines.push(numbersPart);
-                        }
-                    }
-                    // Nếu dòng chỉ chứa số liệu (không có level)
-                    else if (!line.includes('📊') && !line.includes('THỐNG KÊ')) {
-                        resultLines.push(line.trim());
-                    }
+                // Thu thập tất cả các dòng kết quả (có format "X X s:" hoặc chứa số)
+                if (trimmedLine.includes(' s') && trimmedLine.includes(':')) {
+                    // Dòng có format "9 5 s: 01,02,03..."
+                    resultLines.push(trimmedLine);
+                } else if (/^\d{2}(,\d{2})*$/.test(trimmedLine)) {
+                    // Dòng chỉ chứa số (format: 01,02,03...)
+                    resultLines.push(trimmedLine);
+                } else if (trimmedLine && !trimmedLine.includes('❌') && !trimmedLine.includes('💡')) {
+                    // Các dòng khác không phải error hoặc hint
+                    resultLines.push(trimmedLine);
                 }
             }
 
             const finalCopyText = resultLines.join('\n').trim();
-
-            // Debug log
-            console.log('Copy text:', finalCopyText);
-            console.log('Result lines:', resultLines);
 
             if (!finalCopyText) {
                 setError('Không có nội dung để sao chép');
@@ -1098,25 +1089,17 @@ const DanDeFilter = memo(() => {
             // Lưu text để hiển thị trong modal nếu cần
             setCopyText(finalCopyText);
 
-            // Kiểm tra hỗ trợ Clipboard API
-            console.log('Clipboard API supported:', !!navigator.clipboard);
-            console.log('HTTPS:', window.location.protocol === 'https:');
-
             // Sử dụng Clipboard API với fallback
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                console.log('Using Clipboard API...');
                 navigator.clipboard.writeText(finalCopyText).then(() => {
-                    console.log('Copy successful via Clipboard API');
                     setCopyStatus(true);
                     setTimeout(() => setCopyStatus(false), 2000);
                 }).catch((err) => {
                     console.error('Clipboard API error:', err);
-                    console.log('Falling back to textarea method...');
                     // Fallback: tạo textarea và copy
                     fallbackCopyTextToClipboard(finalCopyText);
                 });
             } else {
-                console.log('Clipboard API not supported, using fallback...');
                 // Fallback cho trình duyệt không hỗ trợ Clipboard API
                 fallbackCopyTextToClipboard(finalCopyText);
             }

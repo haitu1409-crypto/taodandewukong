@@ -221,6 +221,7 @@ function Dan2DGenerator() {
     const [levels3D, setLevels3D] = useState({});
     const [levels4D, setLevels4D] = useState({});
     const [viewMode, setViewMode] = useState(null); // Tab để xem kết quả (1D, 2D, 3D, 4D)
+    const [lastActiveViewMode, setLastActiveViewMode] = useState(null); // Lưu tab cuối cùng để hiển thị kết quả khi focus
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -234,12 +235,21 @@ function Dan2DGenerator() {
     const [lastApiCallTime, setLastApiCallTime] = useState(0);
     const [offlineMode, setOfflineMode] = useState(false);
     const [lastOfflineWarning, setLastOfflineWarning] = useState(0);
+    const [isInputFocused, setIsInputFocused] = useState(false); // Track khi textarea input được focus
 
     // Refs để cleanup setTimeout
     const timeoutRefs = useRef([]);
+    
+    // ✅ PERFORMANCE: Ref to track current viewMode without causing re-renders
+    const viewModeRef = useRef(null);
 
     // ✅ PERFORMANCE: Deferred values for better performance
     const deferredDisplayInput = useDeferredValue(displayInput);
+
+    // ✅ PERFORMANCE: Sync viewModeRef with viewMode state
+    useEffect(() => {
+        viewModeRef.current = viewMode;
+    }, [viewMode]);
 
     // Cleanup timeouts khi component unmount
     useEffect(() => {
@@ -253,23 +263,28 @@ function Dan2DGenerator() {
 
 
     // ✅ PERFORMANCE: Memoize totalSelected - calculate from input numbers based on viewMode
+    // ✅ FIXED: Use lastActiveViewMode when viewMode is null (when focusing input)
     const totalSelected = useMemo(() => {
-        if (!inputNumbers || inputNumbers.trim() === '' || !viewMode) return 0;
+        if (!inputNumbers || inputNumbers.trim() === '') return 0;
+        
+        // Dùng viewMode hoặc lastActiveViewMode để tính totalSelected
+        const activeMode = viewMode || lastActiveViewMode;
+        if (!activeMode) return 0;
 
-        if (viewMode === '1D') {
+        if (activeMode === '1D') {
             const { digits } = parseInput1D(inputNumbers);
             return digits.length;
-        } else if (viewMode === '3D') {
+        } else if (activeMode === '3D') {
             const { numbers } = parseInput3D(inputNumbers);
             return numbers.length;
-        } else if (viewMode === '4D') {
+        } else if (activeMode === '4D') {
             const { numbers } = parseInput4D(inputNumbers);
             return numbers.length;
         } else {
             const { pairs } = parseInput(inputNumbers);
             return pairs.length;
         }
-    }, [inputNumbers, viewMode]);
+    }, [inputNumbers, viewMode, lastActiveViewMode]);
 
     // ✅ PERFORMANCE: Tính toán local nếu API lỗi - Memoized - Hỗ trợ 2D, 1D, 3D, 4D
     const calculateLevelsLocal = useCallback((input) => {
@@ -472,23 +487,25 @@ function Dan2DGenerator() {
         });
     }, []);
 
-    // ✅ PERFORMANCE: Handle input focus - Reset tabs and clear results
+    // ✅ PERFORMANCE: Handle input focus - Reset tabs but keep results
+    // ✅ OPTIMIZED: Use ref to avoid dependency, React 18 auto-batches state updates
     const handleInputFocus = useCallback(() => {
+        setIsInputFocused(true); // Đánh dấu textarea đang được focus
         startTransition(() => {
-            // Reset viewMode về null (không có tab nào được chọn)
+            // Lấy viewMode hiện tại từ ref (không cần dependency)
+            const currentViewMode = viewModeRef.current;
+            // React 18 sẽ tự động batch cả 2 state updates này
+            if (currentViewMode) {
+                setLastActiveViewMode(currentViewMode);
+            }
+            // Reset viewMode về null để button không active
             setViewMode(null);
-            // Xóa tất cả kết quả levels
-            setLevels2D({});
-            setLevels1D({});
-            setLevels3D({});
-            setLevels4D({});
-            // Clear error nếu có
-            setError('');
         });
-    }, []);
+    }, []); // ✅ OPTIMIZED: No dependencies needed - uses ref instead
 
     // ✅ PERFORMANCE: Handle input blur - Optimized with startTransition - Hỗ trợ 1D, 2D, 3D, 4D
     const handleInputBlur = useCallback(() => {
+        setIsInputFocused(false); // Đánh dấu textarea không còn được focus
         startTransition(() => {
             let normalized, error;
 
@@ -584,6 +601,7 @@ function Dan2DGenerator() {
 
             // Tự động set viewMode theo mode được chọn
             setViewMode(mode);
+            setLastActiveViewMode(mode);
 
             // Tạo đủ số theo mức được chọn
             let defaultCount = 86; // Mặc định 2D
@@ -619,6 +637,7 @@ function Dan2DGenerator() {
 
         // Tự động set viewMode theo mode được chọn (set trước để đảm bảo hiển thị đúng tab)
         setViewMode(mode);
+        setLastActiveViewMode(mode);
 
         // Generate random numbers using mode
         const randomNumbers = generateRandomNumbers(quantityNum, mode);
@@ -812,6 +831,7 @@ function Dan2DGenerator() {
         setLevels3D({});
         setLevels4D({});
         setViewMode(null);
+        setLastActiveViewMode(null);
         setError('');
         setDeleteStatus(true);
         const timeoutId = setTimeout(() => setDeleteStatus(false), 2000);
@@ -849,22 +869,24 @@ function Dan2DGenerator() {
 
     // ✅ PERFORMANCE: Memoize sorted levels based on viewMode - Hỗ trợ 2D, 1D, 3D, 4D
     const currentLevels = useMemo(() => {
-        if (!viewMode) return {};
+        // Dùng lastActiveViewMode nếu viewMode là null (khi đang focus vào input)
+        const activeMode = viewMode || lastActiveViewMode;
+        if (!activeMode) return {};
 
         let levels;
-        if (viewMode === '2D') levels = levels2D;
-        else if (viewMode === '1D') levels = levels1D;
-        else if (viewMode === '3D') levels = levels3D;
-        else if (viewMode === '4D') levels = levels4D;
+        if (activeMode === '2D') levels = levels2D;
+        else if (activeMode === '1D') levels = levels1D;
+        else if (activeMode === '3D') levels = levels3D;
+        else if (activeMode === '4D') levels = levels4D;
         else return {};
 
         // Nếu không có input (levels rỗng), trả về levels với tất cả số ở mức 0
         if (Object.keys(levels).length === 0 && totalSelected === 0) {
-            return createEmptyLevels(viewMode);
+            return createEmptyLevels(activeMode);
         }
 
         return levels;
-    }, [viewMode, levels2D, levels1D, levels3D, levels4D, totalSelected, createEmptyLevels]);
+    }, [viewMode, lastActiveViewMode, levels2D, levels1D, levels3D, levels4D, totalSelected, createEmptyLevels]);
 
     const sortedCurrentLevels = useMemo(() => {
         return Object.entries(currentLevels)
@@ -873,20 +895,34 @@ function Dan2DGenerator() {
     }, [currentLevels]);
 
     // ✅ PERFORMANCE: Memoize tab change handlers
-    const handleViewMode2D = useCallback(() => setViewMode('2D'), []);
-    const handleViewMode1D = useCallback(() => setViewMode('1D'), []);
-    const handleViewMode3D = useCallback(() => setViewMode('3D'), []);
-    const handleViewMode4D = useCallback(() => setViewMode('4D'), []);
+    const handleViewMode2D = useCallback(() => {
+        setViewMode('2D');
+        setLastActiveViewMode('2D');
+    }, []);
+    const handleViewMode1D = useCallback(() => {
+        setViewMode('1D');
+        setLastActiveViewMode('1D');
+    }, []);
+    const handleViewMode3D = useCallback(() => {
+        setViewMode('3D');
+        setLastActiveViewMode('3D');
+    }, []);
+    const handleViewMode4D = useCallback(() => {
+        setViewMode('4D');
+        setLastActiveViewMode('4D');
+    }, []);
 
     // ✅ PERFORMANCE: Generate result text for textarea - Memoized - Hỗ trợ 2D, 1D, 3D, 4D
     const generateResultText = useMemo(() => {
-        if (!viewMode) {
+        // Dùng lastActiveViewMode nếu viewMode là null (khi đang focus vào input)
+        const activeMode = viewMode || lastActiveViewMode;
+        if (!activeMode) {
             return "";
         }
 
-        const currentTitle = viewMode === '2D' ? 'DÀN 2D' :
-            viewMode === '1D' ? 'DÀN 1D' :
-                viewMode === '3D' ? 'DÀN 3D' : 'DÀN 4D';
+        const currentTitle = activeMode === '2D' ? 'DÀN 2D' :
+            activeMode === '1D' ? 'DÀN 1D' :
+                activeMode === '3D' ? 'DÀN 3D' : 'DÀN 4D';
         let resultText = `${currentTitle}\n${'='.repeat(currentTitle.length)}\n`;
 
         if (sortedCurrentLevels.length > 0) {
@@ -898,7 +934,7 @@ function Dan2DGenerator() {
         }
 
         return resultText.trim();
-    }, [viewMode, sortedCurrentLevels]);
+    }, [viewMode, lastActiveViewMode, sortedCurrentLevels]);
 
 
     return (
@@ -913,7 +949,7 @@ function Dan2DGenerator() {
                             <button
                                 onClick={handleGenerateDan}
                                 className={`${styles.button} ${styles.primaryButton}`}
-                                disabled={loading}
+                                disabled={loading || isInputFocused}
                                 aria-label={loading ? 'Đang tạo số ngẫu nhiên' : 'Tạo số ngẫu nhiên'}
                                 aria-busy={loading}
                             >
@@ -1075,7 +1111,8 @@ function Dan2DGenerator() {
                                 aria-live="polite"
                             />
                             <div className={styles.copyButtonContainer}>
-                                {viewMode === '2D' && (
+                                {/* Dùng viewMode hoặc lastActiveViewMode để hiển thị nút copy đúng */}
+                                {(viewMode === '2D' || lastActiveViewMode === '2D') && (
                                     <button
                                         onClick={handleCopy2D}
                                         className={`${styles.copyButton} ${copy2DStatus ? styles.successButton : ''}`}
@@ -1088,7 +1125,7 @@ function Dan2DGenerator() {
                                     </button>
                                 )}
 
-                                {viewMode === '1D' && (
+                                {(viewMode === '1D' || lastActiveViewMode === '1D') && (
                                     <button
                                         onClick={handleCopy1D}
                                         className={`${styles.copyButton} ${copy1DStatus ? styles.successButton : ''}`}
@@ -1101,7 +1138,7 @@ function Dan2DGenerator() {
                                     </button>
                                 )}
 
-                                {viewMode === '3D' && (
+                                {(viewMode === '3D' || lastActiveViewMode === '3D') && (
                                     <button
                                         onClick={handleCopy3D}
                                         className={`${styles.copyButton} ${copy3DStatus ? styles.successButton : ''}`}
@@ -1114,7 +1151,7 @@ function Dan2DGenerator() {
                                     </button>
                                 )}
 
-                                {viewMode === '4D' && (
+                                {(viewMode === '4D' || lastActiveViewMode === '4D') && (
                                     <button
                                         onClick={handleCopy4D}
                                         className={`${styles.copyButton} ${copy4DStatus ? styles.successButton : ''}`}

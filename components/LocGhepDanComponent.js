@@ -410,7 +410,10 @@ const LocGhepDanComponent = memo(function LocGhepDanComponent() {
                         className={styles.featureTextarea}
                         value={featureResult}
                         readOnly
-                        placeholder="Kết quả sẽ hiển thị ở đây..."
+                        placeholder="- Lấy trùng: Lấy các số xuất hiện trong cả 2 dàn
+- Ghép dàn: Ghép dàn 1 và dàn 2 lại bỏ đi các số trùng.
+- 1 Loại 2: Lấy dàn 1 bỏ đi các số xuất hiện trong dàn 2
+- 2 Loại 1: Lấy dàn 2 bỏ đi các số xuất hiện trong dàn 1"
                     />
                 </div>
             </div>

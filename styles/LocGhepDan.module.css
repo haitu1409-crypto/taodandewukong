@@ -1,0 +1,441 @@
+/**
+ * LocGhepDan Component Styles
+ * Tối ưu theo Design System mới - Đồng điệu với Dan2DGenerator
+ * ✅ Performance: CSS Variables với fallback values
+ */
+
+/* ✅ ACCESSIBILITY: Screen reader only class */
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* New Feature Section - 3 Textareas */
+.newFeatureSection {
+    width: 100%;
+    max-width: var(--container-7xl, 1280px);
+    margin: 0 auto;
+    padding: 8px;
+    background: rgb(255, 232, 220);
+    border: 2px solid #55555570;
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+.threeTextareaSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.textareaContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.textareaLabel {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #E65A2E;
+    margin-top: 5px;
+    /* margin-bottom: 8px; */
+    padding-left: 4px;
+    text-transform: uppercase;
+}
+
+.featureTextarea {
+    width: 100%;
+    height: 360px;
+    padding: 12px;
+    border: 2px solid var(--color-gray-400, #9ca3af);
+    border-radius: 0;
+    font-size: 1.1rem;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all var(--transition-base, 0.2s);
+    background: var(--color-white, #ffffff);
+    color: var(--color-gray-900, #111827);
+    box-sizing: border-box;
+}
+
+.featureTextarea:focus {
+    outline: none;
+    border-color: var(--color-primary-500, #2563eb);
+    box-shadow: 0 0 0 3px var(--color-primary-100, rgba(37, 99, 235, 0.1));
+    background: var(--color-white, #ffffff);
+}
+
+.featureTextarea:disabled {
+    background: #F3F4F6;
+    cursor: not-allowed;
+}
+
+.featureTextarea::placeholder {
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+.featureButtonSection {
+    display: flex;
+    flex-direction: column;
+    /* gap: 15px; */
+}
+
+.featureButtonGroup {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+/* Mobile: 4 button đầu trên 1 hàng, 3 button Copy, Xóa và Hoàn tác trên 1 hàng riêng */
+@media (max-width: 768px) {
+    .featureButtonGroup {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    
+    /* Button Copy, Xóa và Hoàn tác nằm trên hàng thứ 2, mỗi button chiếm 1 cột (chia đều 3 button trên 4 cột) */
+    .featureButtonGroup button:nth-child(5),
+    .featureButtonGroup button:nth-child(6),
+    .featureButtonGroup button:nth-child(7) {
+        grid-column: span 1;
+    }
+}
+
+.featureButton {
+    padding: 6px 10px;
+    border: none;
+    border-radius: var(--border-radius-md, 0.375rem);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-base, 0.2s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-align: center;
+    min-height: 36px;
+    white-space: nowrap;
+}
+
+.featureButton:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.featureButton:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.featureButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.featureStatus {
+    font-size: 0.8rem;
+    color: #EF4444;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.featureStatus.success {
+    color: #059669;
+    background: #ECFDF5;
+    border-color: #A7F3D0;
+}
+
+.featureStatus.info {
+    color: #2563EB;
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+}
+
+/* Button Styles - Đồng bộ với Dan2DGenerator */
+.primaryButton {
+    background: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+}
+
+.primaryButton:hover:not(:disabled) {
+    background: #1d4ed8;
+    opacity: 0.9;
+}
+
+/* Orange Button - Màu cam cho 4 button đầu tiên */
+.orangeButton {
+    background: #E65A2E;
+    color: #ffffff;
+    border: 1px solid #E65A2E;
+}
+
+.orangeButton:hover:not(:disabled) {
+    background: #FF8C42;
+    opacity: 0.9;
+}
+
+.dangerButton {
+    background: #dc2626;
+    color: #ffffff;
+    border: 1px solid #dc2626;
+}
+
+.dangerButton:hover:not(:disabled) {
+    background: #b91c1c;
+    opacity: 0.9;
+}
+
+.undoButton {
+    background: #ffffff;
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+}
+
+.undoButton:hover:not(:disabled) {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.secondaryButton {
+    background: #059669;
+    color: #ffffff;
+    border: 1px solid #059669;
+}
+
+.secondaryButton:hover:not(:disabled) {
+    background: #047857;
+    opacity: 0.9;
+}
+
+.infoButton {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+}
+
+.infoButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+}
+
+.warningButton {
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: white;
+}
+
+.warningButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+}
+
+.successButton {
+    background: #10b981 !important;
+    color: #ffffff !important;
+    border: 1px solid #10b981 !important;
+}
+
+.successButton:hover:not(:disabled) {
+    background: #059669 !important;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .newFeatureSection {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .featureButtonSection {
+        order: 3; /* Button section nằm sau Dàn 1 và Dàn 2, trước Kết quả */
+        margin-top: 5px;
+    }
+
+    .threeTextareaSection {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        display: contents; /* Cho phép các child trực tiếp tham gia flex container của parent */
+    }
+    
+    .textareaContainer:nth-child(1) {
+        order: 1; /* Dàn 1 */
+    }
+    
+    .textareaContainer:nth-child(2) {
+        order: 2; /* Dàn 2 */
+    }
+    
+    .textareaContainer:nth-child(3) {
+        order: 4; /* Kết quả nằm sau button */
+    }
+
+    .textareaContainer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .featureTextarea {
+        height: 300px;
+        min-height: 300px;
+        max-height: 300px;
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        resize: none; /* Tắt resize trên mobile để đảm bảo chiều cao cố định */
+    }
+
+    .featureButton {
+        padding: 6px 6px;
+        font-size: 0.9rem;
+        min-height: 34px;
+        white-space: normal;
+        line-height: 1.2;
+    }
+}
+
+@media (max-width: 640px) {
+    .newFeatureSection {
+        padding: 12px;
+    }
+
+    .threeTextareaSection {
+        gap: 12px;
+    }
+
+    .textareaContainer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .featureTextarea {
+        height: 250px;
+        min-height: 250px;
+        max-height: 250px;
+        font-size: 1rem;
+        padding: 10px;
+        resize: none; /* Tắt resize trên mobile để đảm bảo chiều cao cố định */
+    }
+
+    .featureButtonGroup {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+    
+    /* Button Copy, Xóa và Hoàn tác nằm trên hàng thứ 2, mỗi button chiếm 1 cột (chia đều 3 button trên 4 cột) */
+    .featureButtonGroup button:nth-child(5),
+    .featureButtonGroup button:nth-child(6),
+    .featureButtonGroup button:nth-child(7) {
+        grid-column: span 1;
+    }
+
+    .featureButton {
+        padding: 5px 4px;
+        font-size: 0.85rem;
+        min-height: 32px;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    .featureStatus {
+        font-size: 0.75rem;
+        padding: 6px 8px;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .newFeatureSection {
+        padding: 8px;
+    }
+
+    .threeTextareaSection {
+        gap: 1px;
+    }
+
+    .textareaContainer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .featureTextarea {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+        font-size: 0.9rem;
+        padding: 8px;
+        resize: none; /* Tắt resize trên mobile để đảm bảo chiều cao cố định */
+    }
+
+    .featureButtonGroup {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 3px;
+    }
+    
+    /* Button Copy, Xóa và Hoàn tác nằm trên hàng thứ 2, mỗi button chiếm 1 cột (chia đều 3 button trên 4 cột) */
+    .featureButtonGroup button:nth-child(5),
+    .featureButtonGroup button:nth-child(6),
+    .featureButtonGroup button:nth-child(7) {
+        grid-column: span 1;
+    }
+
+    .featureButton {
+        padding: 4px 4px;
+        font-size: 0.75rem;
+        min-height: 28px;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    .textareaLabel {
+        font-size: 0.8rem;
+    }
+}
+
+/* Màn hình rất nhỏ (≤ 360px) */
+@media (max-width: 360px) {
+    .featureButtonGroup {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
+    }
+    
+    .featureButton {
+        padding: 3px 2px;
+        font-size: 0.7rem;
+        min-height: 26px;
+        line-height: 1.1;
+    }
+    
+    .newFeatureSection {
+        padding: 6px;
+    }
+}

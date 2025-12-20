@@ -76,6 +76,12 @@ const TaoDanDauDuoi = dynamic(() => import('../components/TaoDanDauDuoi'), {
     loading: () => <DanDeLoadingPlaceholder />
 });
 
+// ✅ PERFORMANCE: Lazy load TaoDanCham component - disable SSR for better initial load
+const TaoDanCham = dynamic(() => import('../components/TaoDanCham'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => <DanDeLoadingPlaceholder />
+});
+
 // ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
 const ANIMATION_STYLES = `
     @keyframes colorPulse {
@@ -110,6 +116,7 @@ function HomePage() {
     const [shouldLoadDanDeFilter, setShouldLoadDanDeFilter] = useState(false);
     const [shouldLoadLocGhepDan, setShouldLoadLocGhepDan] = useState(false);
     const [shouldLoadTaoDanDauDuoi, setShouldLoadTaoDanDauDuoi] = useState(false);
+    const [shouldLoadTaoDanCham, setShouldLoadTaoDanCham] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
@@ -616,6 +623,95 @@ function HomePage() {
         };
     }, [shouldLoadTaoDanDauDuoi]);
 
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load TaoDanCham khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadTaoDanCham(true), 5500);
+            } else {
+                setShouldLoadTaoDanCham(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadTaoDanCham(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('tao-dan-cham-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadTaoDanCham(true), 5500);
+                } else {
+                    setShouldLoadTaoDanCham(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch TaoDanCham component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadTaoDanCham) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadTaoDanCham) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/TaoDanCham').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadTaoDanCham]);
+
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
         if (!url) return false;
@@ -965,7 +1061,7 @@ function HomePage() {
                 </section>
 
                 {/* TaoDanDauDuoi Component - Render ngay dưới LocGhepDanComponent */}
-                <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for TaoDanDauDuoi */ }}>
+                <section style={{ ...styles.mainContent, minHeight: '320px' /* ✅ CLS: Reserve space for TaoDanDauDuoi */ }}>
                     <h2 style={{
                         fontSize: '24px',
                         fontWeight: 'bold',
@@ -985,7 +1081,7 @@ function HomePage() {
                             padding: '20px',
                             textAlign: 'center',
                             color: '#999',
-                            minHeight: '400px', /* ✅ CLS: Match placeholder height */
+                            minHeight: '320px', /* ✅ CLS: Match placeholder height */
                             width: '100%',
                             boxSizing: 'border-box',
                             fontSize: '14px',
@@ -994,6 +1090,40 @@ function HomePage() {
                             justifyContent: 'center'
                         }}>
                             Cuộn xuống để tải công cụ tạo dàn đầu đuôi...
+                        </div>
+                    )}
+                </section>
+
+                {/* TaoDanCham Component - Render ngay dưới TaoDanDauDuoi */}
+                <section style={{ ...styles.mainContent, minHeight: '320px' /* ✅ CLS: Reserve space for TaoDanCham */ }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Tạo Dàn Chạm
+                    </h2>
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="tao-dan-cham-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
+                    {shouldLoadTaoDanCham ? (
+                        <TaoDanCham />
+                    ) : (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#999',
+                            minHeight: '320px', /* ✅ CLS: Match placeholder height */
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            Cuộn xuống để tải công cụ tạo dàn chạm...
                         </div>
                     )}
                 </section>

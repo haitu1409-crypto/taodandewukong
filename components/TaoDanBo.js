@@ -202,6 +202,14 @@ const TaoDanBo = memo(function TaoDanBo() {
         return getCombinedSpecialSetNumbers(selectedSpecialSets);
     }, [selectedSpecialSets]);
 
+    // ✅ PERFORMANCE: Memoize special sets with titles to avoid recalculation
+    const specialSetsWithTitles = useMemo(() => {
+        return specialSetsData.map(set => ({
+            ...set,
+            title: `Bộ ${set.id}: ${set.numbers.join(', ')}`
+        }));
+    }, [specialSetsData]);
+
     // Tạo nội dung textarea từ kết quả
     const generateTextareaContent = useMemo(() => {
         if (result.length === 0) {
@@ -219,7 +227,7 @@ const TaoDanBo = memo(function TaoDanBo() {
     }, [result]);
 
     return (
-        <div className={styles.toolContainer}>
+        <div className={`${styles.toolContainer} ${styles.toolContainerDanBo}`}>
             <div className={styles.twoColumnLayout}>
                 {/* Left Column: Inputs and Controls */}
                 <div className={styles.leftColumn}>
@@ -229,9 +237,9 @@ const TaoDanBo = memo(function TaoDanBo() {
                             <label className={styles.inputLabel}>
                                 Chọn Bộ Số Đặc Biệt * (tối đa 5 bộ)
                             </label>
-                            <div className={styles.specialSetsContainer}>
-                                <div className={styles.specialSetsList}>
-                                    {specialSetsData.map(set => {
+                            <div className={`${styles.specialSetsContainer} ${styles.danBoSpecialSetsContainer}`}>
+                                <div className={`${styles.specialSetsList} ${styles.danBoSpecialSetsList}`}>
+                                    {specialSetsWithTitles.map(set => {
                                         const isSelected = selectedSpecialSets.includes(set.id);
                                         const isDisabled = selectedSpecialSets.length >= 5 && !isSelected;
                                         return (
@@ -239,7 +247,7 @@ const TaoDanBo = memo(function TaoDanBo() {
                                                 key={set.id}
                                                 className={`${styles.specialSetItem} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
                                                 onClick={() => !loading && !isPending && handleSpecialSetToggle(set.id)}
-                                                title={`Bộ ${set.id}: ${set.numbers.join(', ')}`}
+                                                title={set.title}
                                             >
                                                 <div className={styles.specialSetHeader}>
                                                     <span className={styles.specialSetId}>Bộ {set.id}</span>
@@ -258,7 +266,7 @@ const TaoDanBo = memo(function TaoDanBo() {
                         </div>
 
                         {/* Additional Options */}
-                        <div className={styles.inputRow}>
+                        <div className={`${styles.inputRow} ${styles.danBoInputRow}`}>
                             <div className={styles.inputGroup}>
                                 <label className={styles.inputLabel}>Tổng</label>
                                 <input

@@ -117,6 +117,12 @@
         grid-template-columns: repeat(5, 1fr);
         gap: 4px;
     }
+
+    /* TaoDanBo specific - 3 columns on mobile */
+    .danBoSpecialSetsList {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 3px !important;
+    }
 }
 
 .specialSetItem {
@@ -1651,6 +1657,155 @@
     border: 2px solid #55555570;
     border-radius: 0;
     box-sizing: border-box;
+}
+
+/* ===== TẠO DÀN BỘ SPECIFIC STYLES ===== */
+/* Container riêng cho TaoDanBo để tối ưu mobile */
+.toolContainerDanBo {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Special Sets Container cho TaoDanBo - Mobile optimized */
+.danBoSpecialSetsContainer {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.danBoSpecialSetsList {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Input Row cho TaoDanBo - Mobile responsive */
+.danBoInputRow {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    align-items: center !important;
+    display: flex;
+}
+
+/* Mobile optimizations cho TaoDanBo */
+@media (max-width: 768px) {
+    .toolContainerDanBo {
+        padding: 4px;
+        overflow-x: hidden;
+    }
+
+    .danBoSpecialSetsContainer {
+        padding: 4px !important;
+        max-height: 150px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .danBoSpecialSetsList {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 3px !important;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .danBoInputRow {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+        width: 100%;
+        max-width: 100%;
+        flex-wrap: nowrap;
+    }
+
+    .danBoInputRow .inputGroup {
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+        max-width: 100%;
+    }
+
+    .danBoInputRow .input {
+        width: 100%;
+        min-width: 0;
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+        min-height: 38px;
+    }
+
+    .danBoTextarea {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        min-height: 200px;
+        font-size: 0.9rem;
+    }
+
+    /* Đảm bảo twoColumnLayout không overflow */
+    .toolContainerDanBo .twoColumnLayout {
+        width: 100%;
+        max-width: 100%;
+        gap: 4px;
+    }
+
+    .toolContainerDanBo .leftColumn,
+    .toolContainerDanBo .rightColumn {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .toolContainerDanBo .inputsSection {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .toolContainerDanBo .inputGroup {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .toolContainerDanBo .input {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .toolContainerDanBo {
+        padding: 2px;
+    }
+
+    .danBoSpecialSetsContainer {
+        padding: 3px !important;
+        max-height: 120px;
+    }
+
+    .danBoSpecialSetsList {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 2px !important;
+    }
+
+    .danBoInputRow {
+        gap: 0.25rem !important;
+    }
+
+    .danBoInputRow .input {
+        font-size: 0.85rem;
+        padding: 0.45rem 0.6rem;
+        min-height: 36px;
+    }
+
+    .danBoTextarea {
+        min-height: 180px;
+        font-size: 0.85rem;
+        padding: 8px;
+    }
 }
 
 .toolTitle {

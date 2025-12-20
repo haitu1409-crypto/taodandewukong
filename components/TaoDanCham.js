@@ -4,7 +4,7 @@
  * ✅ PERFORMANCE: Optimized with memo, useCallback, useMemo for best render performance
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo, useTransition, startTransition } from 'react';
 import styles from '../styles/DanDacBiet.module.css';
 
 const TaoDanCham = memo(function TaoDanCham() {
@@ -18,6 +18,9 @@ const TaoDanCham = memo(function TaoDanCham() {
     const [modalMessage, setModalMessage] = useState('');
     const [copyStatus, setCopyStatus] = useState(false);
     const [clearStatus, setClearStatus] = useState(false);
+
+    // ✅ PERFORMANCE: Use transition for non-urgent updates to prevent blocking UI
+    const [isPending, startTransitionFn] = useTransition();
 
     // Refs để cleanup setTimeout
     const timeoutRefs = useRef([]);
@@ -38,7 +41,7 @@ const TaoDanCham = memo(function TaoDanCham() {
         return number.split('').reduce((s, d) => s + parseInt(d), 0);
     }, []);
 
-    // ✅ PERFORMANCE: Memoize generateDanCham function
+    // ✅ PERFORMANCE: Memoize generateDanCham function - optimized for mobile
     // Hàm tạo dàn chạm với logic client-side
     const generateDanCham = useCallback(() => {
         // Client-side logic to generate numbers with cham
@@ -47,31 +50,30 @@ const TaoDanCham = memo(function TaoDanCham() {
             return [];
         }
 
-        let resultNumbers = [];
+        // ✅ PERFORMANCE: Use Set for O(1) lookup instead of array
+        const resultSet = new Set();
 
-        // Generate numbers containing cham digits
-        chamNumbers.forEach(cham => {
-            for (let i = 0; i <= 99; i++) {
-                const numStr = i.toString().padStart(2, '0');
-                if (numStr.includes(cham)) {
-                    resultNumbers.push(numStr);
-                }
+        // Generate numbers containing cham digits - optimized loop
+        for (const cham of chamNumbers) {
+            // Generate numbers with cham digit
+            for (let i = 0; i <= 9; i++) {
+                resultSet.add(cham + i.toString().padStart(1, '0'));
             }
-        });
+            for (let i = 0; i <= 9; i++) {
+                resultSet.add(i.toString() + cham);
+            }
+        }
 
-        // Remove duplicates
-        resultNumbers = [...new Set(resultNumbers)];
+        let resultNumbers = Array.from(resultSet);
 
         // Filter by tong if provided
         if (tongInput.trim()) {
             const tongValues = tongInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d+$/.test(t));
             if (tongValues.length > 0) {
+                const tongSet = new Set(tongValues.map(t => parseInt(t)));
                 resultNumbers = resultNumbers.filter(num => {
                     const sum = calculateSum(num);
-                    return tongValues.some(t => {
-                        const targetTong = parseInt(t);
-                        return sum === targetTong || sum === (targetTong + 10);
-                    });
+                    return tongSet.has(sum) || tongSet.has(sum - 10);
                 });
             }
         }
@@ -79,23 +81,23 @@ const TaoDanCham = memo(function TaoDanCham() {
         // Add them numbers if provided
         if (themInput.trim()) {
             const themNumbers = themInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d{2}$/.test(t));
-            resultNumbers = [...resultNumbers, ...themNumbers];
-            resultNumbers = [...new Set(resultNumbers)];
+            themNumbers.forEach(num => resultSet.add(num));
+            resultNumbers = Array.from(resultSet);
         }
 
         // Remove bo numbers if provided
         if (boInput.trim()) {
-            const boNumbers = boInput.split(',').map(b => b.trim()).filter(b => b !== '' && /^\d{2}$/.test(b));
-            resultNumbers = resultNumbers.filter(num => !boNumbers.includes(num));
+            const boSet = new Set(boInput.split(',').map(b => b.trim()).filter(b => b !== '' && /^\d{2}$/.test(b)));
+            resultNumbers = resultNumbers.filter(num => !boSet.has(num));
         }
 
-        // Sort result
+        // Sort result - use numeric sort for better performance
         resultNumbers.sort((a, b) => parseInt(a) - parseInt(b));
 
         return resultNumbers;
     }, [chamInput, tongInput, themInput, boInput, calculateSum]);
 
-    // ✅ PERFORMANCE: Memoize event handlers to prevent recreation on every render
+    // ✅ PERFORMANCE: Memoize event handlers - use transition for non-blocking UI
     const handleTaoDan = useCallback(() => {
         if (!chamInput) {
             setModalMessage('Vui lòng nhập số chạm');
@@ -105,29 +107,35 @@ const TaoDanCham = memo(function TaoDanCham() {
 
         setLoading(true);
 
-        try {
-            const resultNumbers = generateDanCham();
+        // ✅ PERFORMANCE: Use startTransition to prevent blocking UI on mobile
+        startTransitionFn(() => {
+            try {
+                const resultNumbers = generateDanCham();
 
-            if (resultNumbers.length === 0) {
-                setModalMessage('Vui lòng nhập số chạm hợp lệ');
+                if (resultNumbers.length === 0) {
+                    setModalMessage('Vui lòng nhập số chạm hợp lệ');
+                    setShowModal(true);
+                    setLoading(false);
+                    return;
+                }
+
+                // Use setTimeout to yield to browser for better mobile performance
+                setTimeout(() => {
+                    setResult(resultNumbers);
+                    setLoading(false);
+
+                    if (resultNumbers.length === 0) {
+                        setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
+                        setShowModal(true);
+                    }
+                }, 0);
+            } catch (error) {
+                console.error('Error generating dan cham:', error);
+                setModalMessage('Lỗi khi tạo dàn số');
                 setShowModal(true);
                 setLoading(false);
-                return;
             }
-
-            setResult(resultNumbers);
-
-            if (resultNumbers.length === 0) {
-                setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
-                setShowModal(true);
-            }
-        } catch (error) {
-            console.error('Error generating dan cham:', error);
-            setModalMessage('Lỗi khi tạo dàn số');
-            setShowModal(true);
-        } finally {
-            setLoading(false);
-        }
+        });
     }, [chamInput, generateDanCham]);
 
     const handleClearAll = useCallback(() => {
@@ -165,9 +173,15 @@ const TaoDanCham = memo(function TaoDanCham() {
         setModalMessage('');
     }, []);
 
-    // ✅ PERFORMANCE: Memoize textarea content to prevent recalculation
+    // ✅ PERFORMANCE: Memoize textarea content - optimize join for large arrays
     const textareaContent = useMemo(() => {
-        return result.length > 0 ? result.join(', ') : '';
+        if (result.length === 0) return '';
+        // ✅ PERFORMANCE: For large arrays, use more efficient join
+        // Limit display to prevent UI blocking on mobile
+        if (result.length > 500) {
+            return result.slice(0, 500).join(', ') + `\n... (còn ${result.length - 500} số, tổng: ${result.length} số)`;
+        }
+        return result.join(', ');
     }, [result]);
 
     // ✅ PERFORMANCE: Memoize disabled states to prevent recalculation
@@ -262,9 +276,9 @@ const TaoDanCham = memo(function TaoDanCham() {
                                 <button
                                     onClick={handleTaoDan}
                                     className={`${styles.button} ${styles.orangeButton}`}
-                                    disabled={loading}
+                                    disabled={loading || isPending}
                                 >
-                                    Tạo Dàn
+                                    {loading || isPending ? 'Đang tạo...' : 'Tạo Dàn'}
                                 </button>
                                 <button
                                     onClick={handleCopy}

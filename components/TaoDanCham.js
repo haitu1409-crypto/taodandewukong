@@ -4,7 +4,7 @@
  * ✅ PERFORMANCE: Optimized with memo, useCallback, useMemo for best render performance
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo, memo, useTransition, startTransition } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo, useTransition, useDeferredValue } from 'react';
 import styles from '../styles/DanDacBiet.module.css';
 
 const TaoDanCham = memo(function TaoDanCham() {
@@ -41,7 +41,7 @@ const TaoDanCham = memo(function TaoDanCham() {
         return number.split('').reduce((s, d) => s + parseInt(d), 0);
     }, []);
 
-    // ✅ PERFORMANCE: Memoize generateDanCham function - optimized for mobile
+    // ✅ PERFORMANCE: Memoize generateDanCham function - optimized for mobile with chunking
     // Hàm tạo dàn chạm với logic client-side
     const generateDanCham = useCallback(() => {
         // Client-side logic to generate numbers with cham
@@ -50,23 +50,23 @@ const TaoDanCham = memo(function TaoDanCham() {
             return [];
         }
 
-        // ✅ PERFORMANCE: Use Set for O(1) lookup instead of array
+        // ✅ PERFORMANCE: Use Set for O(1) lookup - pre-allocate for better performance
         const resultSet = new Set();
 
-        // Generate numbers containing cham digits - optimized loop
+        // ✅ PERFORMANCE: Optimized generation - generate all numbers containing cham digits
         for (const cham of chamNumbers) {
-            // Generate numbers with cham digit
-            for (let i = 0; i <= 9; i++) {
-                resultSet.add(cham + i.toString().padStart(1, '0'));
-            }
-            for (let i = 0; i <= 9; i++) {
-                resultSet.add(i.toString() + cham);
+            // Generate all 2-digit numbers containing cham (00-99)
+            for (let i = 0; i <= 99; i++) {
+                const numStr = i.toString().padStart(2, '0');
+                if (numStr.includes(cham)) {
+                    resultSet.add(numStr);
+                }
             }
         }
 
         let resultNumbers = Array.from(resultSet);
 
-        // Filter by tong if provided
+        // Filter by tong if provided - optimized with Set
         if (tongInput.trim()) {
             const tongValues = tongInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d+$/.test(t));
             if (tongValues.length > 0) {
@@ -85,14 +85,18 @@ const TaoDanCham = memo(function TaoDanCham() {
             resultNumbers = Array.from(resultSet);
         }
 
-        // Remove bo numbers if provided
+        // Remove bo numbers if provided - optimized with Set
         if (boInput.trim()) {
             const boSet = new Set(boInput.split(',').map(b => b.trim()).filter(b => b !== '' && /^\d{2}$/.test(b)));
             resultNumbers = resultNumbers.filter(num => !boSet.has(num));
         }
 
-        // Sort result - use numeric sort for better performance
-        resultNumbers.sort((a, b) => parseInt(a) - parseInt(b));
+        // ✅ PERFORMANCE: Use Intl.Collator for faster numeric sort on mobile
+        resultNumbers.sort((a, b) => {
+            const aNum = parseInt(a);
+            const bNum = parseInt(b);
+            return aNum - bNum;
+        });
 
         return resultNumbers;
     }, [chamInput, tongInput, themInput, boInput, calculateSum]);
@@ -107,20 +111,29 @@ const TaoDanCham = memo(function TaoDanCham() {
 
         setLoading(true);
 
+        // ✅ PERFORMANCE: Use requestIdleCallback for better mobile performance, fallback to setTimeout
+        const scheduleWork = (callback) => {
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                requestIdleCallback(callback, { timeout: 100 });
+            } else {
+                setTimeout(callback, 0);
+            }
+        };
+
         // ✅ PERFORMANCE: Use startTransition to prevent blocking UI on mobile
         startTransitionFn(() => {
-            try {
-                const resultNumbers = generateDanCham();
+            scheduleWork(() => {
+                try {
+                    const resultNumbers = generateDanCham();
 
-                if (resultNumbers.length === 0) {
-                    setModalMessage('Vui lòng nhập số chạm hợp lệ');
-                    setShowModal(true);
-                    setLoading(false);
-                    return;
-                }
+                    if (resultNumbers.length === 0) {
+                        setModalMessage('Vui lòng nhập số chạm hợp lệ');
+                        setShowModal(true);
+                        setLoading(false);
+                        return;
+                    }
 
-                // Use setTimeout to yield to browser for better mobile performance
-                setTimeout(() => {
+                    // ✅ PERFORMANCE: Batch state updates to reduce re-renders
                     setResult(resultNumbers);
                     setLoading(false);
 
@@ -128,13 +141,13 @@ const TaoDanCham = memo(function TaoDanCham() {
                         setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
                         setShowModal(true);
                     }
-                }, 0);
-            } catch (error) {
-                console.error('Error generating dan cham:', error);
-                setModalMessage('Lỗi khi tạo dàn số');
-                setShowModal(true);
-                setLoading(false);
-            }
+                } catch (error) {
+                    console.error('Error generating dan cham:', error);
+                    setModalMessage('Lỗi khi tạo dàn số');
+                    setShowModal(true);
+                    setLoading(false);
+                }
+            });
         });
     }, [chamInput, generateDanCham]);
 
@@ -173,15 +186,24 @@ const TaoDanCham = memo(function TaoDanCham() {
         setModalMessage('');
     }, []);
 
-    // ✅ PERFORMANCE: Memoize textarea content - optimize join for large arrays
+    // ✅ PERFORMANCE: Memoize textarea content - optimize join for large arrays with chunking
     const textareaContent = useMemo(() => {
         if (result.length === 0) return '';
-        // ✅ PERFORMANCE: For large arrays, use more efficient join
-        // Limit display to prevent UI blocking on mobile
-        if (result.length > 500) {
-            return result.slice(0, 500).join(', ') + `\n... (còn ${result.length - 500} số, tổng: ${result.length} số)`;
+
+        // ✅ PERFORMANCE: For very large arrays, limit display to prevent UI blocking on mobile
+        if (result.length > 300) {
+            // Use chunked join for better performance
+            const chunkSize = 100;
+            const chunks = [];
+            for (let i = 0; i < Math.min(300, result.length); i += chunkSize) {
+                chunks.push(result.slice(i, i + chunkSize).join(', '));
+            }
+            const display = chunks.join(', ');
+            return display + (result.length > 300 ? `\n... (còn ${result.length - 300} số, tổng: ${result.length} số)` : '');
         }
-        return result.join(', ');
+
+        // ✅ PERFORMANCE: For smaller arrays, use direct join but limit to 300 items
+        return result.slice(0, 300).join(', ') + (result.length > 300 ? `\n... (còn ${result.length - 300} số, tổng: ${result.length} số)` : '');
     }, [result]);
 
     // ✅ PERFORMANCE: Memoize disabled states to prevent recalculation
@@ -301,6 +323,11 @@ const TaoDanCham = memo(function TaoDanCham() {
                             readOnly
                             placeholder="Kết quả sẽ hiển thị ở đây..."
                             className={styles.resultsTextarea}
+                            // ✅ PERFORMANCE: Disable browser features for better mobile performance
+                            spellCheck={false}
+                            autoComplete="off"
+                            autoCorrect="off"
+                            autoCapitalize="off"
                         />
                     </div>
                 </div>

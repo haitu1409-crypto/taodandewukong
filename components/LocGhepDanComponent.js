@@ -323,12 +323,19 @@ const LocGhepDanComponent = memo(function LocGhepDanComponent() {
     }, [featureUndoData]);
 
     // ✅ PERFORMANCE: Memoize onChange handlers để tránh re-render không cần thiết
+    // Chỉ cho phép nhập số và các ký tự phân tách (dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng)
     const handleDan1Change = useCallback((e) => {
-        setDan1(e.target.value);
+        const value = e.target.value;
+        // Chỉ cho phép số, dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng
+        const filteredValue = value.replace(/[^0-9\s,;\r\n]/g, '');
+        setDan1(filteredValue);
     }, []);
 
     const handleDan2Change = useCallback((e) => {
-        setDan2(e.target.value);
+        const value = e.target.value;
+        // Chỉ cho phép số, dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng
+        const filteredValue = value.replace(/[^0-9\s,;\r\n]/g, '');
+        setDan2(filteredValue);
     }, []);
 
     return (
@@ -393,6 +400,7 @@ const LocGhepDanComponent = memo(function LocGhepDanComponent() {
                         placeholder="Nhập dàn số thứ nhất..."
                         value={dan1}
                         onChange={handleDan1Change}
+                        inputMode="numeric"
                     />
                 </div>
                 <div className={styles.textareaContainer}>
@@ -402,6 +410,7 @@ const LocGhepDanComponent = memo(function LocGhepDanComponent() {
                         placeholder="Nhập dàn số thứ hai..."
                         value={dan2}
                         onChange={handleDan2Change}
+                        inputMode="numeric"
                     />
                 </div>
                 <div className={styles.textareaContainer}>

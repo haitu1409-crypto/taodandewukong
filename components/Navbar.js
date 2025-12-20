@@ -262,7 +262,7 @@ const styles = {
     container: {
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '10px 16px',
+        /* padding: '10px 16px', */
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

@@ -88,6 +88,12 @@ const TaoDanBo = dynamic(() => import('../components/TaoDanBo'), {
     loading: () => <DanDeLoadingPlaceholder />
 });
 
+// ✅ PERFORMANCE: Lazy load LayNhanhDacBiet component - disable SSR for better initial load
+const LayNhanhDacBiet = dynamic(() => import('../components/LayNhanhDacBiet'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => <DanDeLoadingPlaceholder />
+});
+
 // ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
 const ANIMATION_STYLES = `
     @keyframes colorPulse {
@@ -124,6 +130,7 @@ function HomePage() {
     const [shouldLoadTaoDanDauDuoi, setShouldLoadTaoDanDauDuoi] = useState(false);
     const [shouldLoadTaoDanCham, setShouldLoadTaoDanCham] = useState(false);
     const [shouldLoadTaoDanBo, setShouldLoadTaoDanBo] = useState(false);
+    const [shouldLoadLayNhanhDacBiet, setShouldLoadLayNhanhDacBiet] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
     useEffect(() => {
@@ -808,6 +815,95 @@ function HomePage() {
         };
     }, [shouldLoadTaoDanBo]);
 
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load LayNhanhDacBiet khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadLayNhanhDacBiet(true), 6000);
+            } else {
+                setShouldLoadLayNhanhDacBiet(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadLayNhanhDacBiet(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('lay-nhanh-dac-biet-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadLayNhanhDacBiet(true), 6000);
+                } else {
+                    setShouldLoadLayNhanhDacBiet(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch LayNhanhDacBiet component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadLayNhanhDacBiet) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadLayNhanhDacBiet) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/LayNhanhDacBiet').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadLayNhanhDacBiet]);
+
     // ✅ PERFORMANCE: Memoize helper function với useCallback
     const shouldAnimateLink = useCallback((url) => {
         if (!url) return false;
@@ -1254,6 +1350,40 @@ function HomePage() {
                             justifyContent: 'center'
                         }}>
                             Cuộn xuống để tải công cụ tạo dàn bộ...
+                        </div>
+                    )}
+                </section>
+
+                {/* LayNhanhDacBiet Component - Render ngay dưới component Tạo Dàn Bộ */}
+                <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for LayNhanhDacBiet */ }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Lấy Nhanh Dàn Đặc Biệt
+                    </h2>
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="lay-nhanh-dac-biet-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
+                    {shouldLoadLayNhanhDacBiet ? (
+                        <LayNhanhDacBiet />
+                    ) : (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#999',
+                            minHeight: '380px', /* ✅ CLS: Match placeholder height */
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            Cuộn xuống để tải công cụ lấy nhanh dàn đặc biệt...
                         </div>
                     )}
                 </section>

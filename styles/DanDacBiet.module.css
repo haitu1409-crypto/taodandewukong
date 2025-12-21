@@ -34,11 +34,11 @@
 }
 
 .filterButton {
-    padding: 0.2rem 0.75rem;
+    padding: 0.1rem 0.4rem;
     border: 2px solid #e5e7eb;
     background: white;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #6b7280;
     cursor: pointer;
@@ -78,8 +78,13 @@
 /* ===== LẤY NHANH DÀN ĐẶC BIỆT LAYOUT ===== */
 .layNhanhResults {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     margin-top: 0.8rem;
+}
+
+.textareaWrapper {
+    position: relative;
+    width: 100%;
 }
 
 /* ===== SPECIAL SETS STYLES ===== */
@@ -631,6 +636,7 @@
     width: 100%;
     height: 150px;
     padding: 1rem;
+    padding-bottom: 3.5rem; /* Tạo khoảng trống cho nút Copy */
     border: 1px solid #808083;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
     font-size: 1.2rem;
@@ -639,6 +645,7 @@
     color: #1F2937;
     background: #FAFAFA;
     resize: vertical;
+    box-sizing: border-box;
 }
 
 /* Textarea cho Tạo Dàn Chạm - kích thước vừa phải */
@@ -1594,7 +1601,7 @@
     }
 
     .filterButton {
-        padding: 0.5rem 0.6rem;
+        padding: 0.1rem 0.1rem;
         font-size: 0.7rem;
         min-height: 32px;
     }
@@ -1885,6 +1892,34 @@
     gap: 1rem;
 }
 
+/* Grid 8 cột cho tất cả filter buttons */
+.allFiltersGrid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.1rem;
+    width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .allFiltersGrid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .allFiltersGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .allFiltersGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.1rem;
+    }
+}
+
 
 
 @media (min-width: 768px) {
@@ -1993,6 +2028,47 @@
     background: #f8fafc;
 }
 
+/* Màu nền cho từng loại filter - sáng hơn, vừa phải */
+.filterTypeDau {
+    background: #bfdbfe;
+    color: #1e40af;
+}
+
+.filterTypeDuoi {
+    background: #a7f3d0;
+    color: #065f46;
+}
+
+.filterTypeTong {
+    background: #fde68a;
+    color: #92400e;
+}
+
+.filterTypeDauDuoi {
+    background: #ddd6fe;
+    color: #5b21b6;
+}
+
+.filterTypeBeLon {
+    background: #fbcfe8;
+    color: #9f1239;
+}
+
+.filterTypeKep {
+    background: #99f6e4;
+    color: #134e4a;
+}
+
+.filterTypeHieu {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.filterTypeConGiap {
+    background: #c7d2fe;
+    color: #3730a3;
+}
+
 .filterButton.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-color: #667eea;
@@ -2041,13 +2117,18 @@
 }
 
 .copyButton {
-    padding: 0.75rem 1.5rem;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 0.5rem 1rem;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .copyButton {}
@@ -2078,6 +2159,7 @@
 
 .buttonText {
     display: inline;
+    text-transform: uppercase;
 }
 
 .numbersGrid {

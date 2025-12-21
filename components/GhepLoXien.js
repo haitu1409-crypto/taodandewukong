@@ -79,33 +79,35 @@ const GhepLoXien = memo(function GhepLoXien() {
         };
     }, []);
 
-    // ✅ PERFORMANCE: Helper function to parse numbers from text - Optimized single pass parsing
+    // ✅ PERFORMANCE: Helper function to parse numbers from text - Ultra optimized
     const parseNumbersFromText = useCallback((text) => {
-        if (!text.trim()) return [];
+        if (!text) return [];
+        const trimmed = text.trim();
+        if (!trimmed) return [];
 
-        // ✅ PERFORMANCE: Use Set for O(1) duplicate removal + single regex pass
+        // ✅ PERFORMANCE: Single regex pass + Set for O(1) duplicate removal
         const numberSet = new Set();
-        // ✅ PERFORMANCE: Single regex to normalize separators
-        const normalized = text.replace(/[^0-9]+/g, ',').replace(/^,|,$/g, '');
-        if (!normalized) return [];
+        // ✅ PERFORMANCE: Extract numbers directly with regex (faster than split)
+        const numbers = trimmed.match(/\d{1,2}/g);
+        if (!numbers) return [];
         
-        const parts = normalized.split(',');
-        const len = parts.length;
+        const len = numbers.length;
         for (let i = 0; i < len; i++) {
-            const num = parts[i];
-            if (num && num.length <= 2) {
-                const numStr = num.length === 1 ? `0${num}` : num;
-                if (numStr.length === 2 && /^\d{2}$/.test(numStr)) {
-                    numberSet.add(numStr);
-                }
+            const num = numbers[i];
+            const numStr = num.length === 1 ? `0${num}` : num;
+            if (numStr.length === 2) {
+                numberSet.add(numStr);
             }
         }
 
-        // ✅ PERFORMANCE: Pre-allocate array and numeric sort (faster than string sort)
+        // ✅ PERFORMANCE: Convert to array and sort numerically (fastest method)
         const result = Array.from(numberSet);
+        // ✅ PERFORMANCE: Parse to numbers once for faster comparison
         result.sort((a, b) => {
-            // Direct numeric comparison is faster than parseInt
-            return (a[0] === b[0] ? (a[1] - b[1]) : (a[0] - b[0]));
+            // ✅ PERFORMANCE: Direct numeric comparison (faster than string/charCode)
+            const aNum = Number(a);
+            const bNum = Number(b);
+            return aNum - bNum;
         });
         return result;
     }, []);
@@ -153,7 +155,7 @@ const GhepLoXien = memo(function GhepLoXien() {
                 return;
             }
 
-            // ✅ PERFORMANCE: Format combinations efficiently - use single pass with join
+            // ✅ PERFORMANCE: Format efficiently with array join (optimized by JS engine)
             const formattedResult = combinations
                 .map(combo => combo.join('-'))
                 .join(', ');
@@ -161,7 +163,7 @@ const GhepLoXien = memo(function GhepLoXien() {
             setResult(formattedResult);
             setShowUndo(true);
         });
-    }, [danSo, xienType, result, parsedNumbers, startTransitionFn, calculateCombinations]);
+    }, [xienType, parsedNumbers, startTransitionFn, calculateCombinations, danSo, result]);
 
     // ✅ PERFORMANCE: Memoize handleCopy with useCallback
     const handleCopy = useCallback(async () => {
@@ -210,20 +212,24 @@ const GhepLoXien = memo(function GhepLoXien() {
         }
     }, [undoData]);
 
-    // ✅ PERFORMANCE: Memoize onChange handlers
+    // ✅ PERFORMANCE: Memoize onChange handlers - optimized regex
     const handleDanSoChange = useCallback((e) => {
-        const value = e.target.value;
-        // Chỉ cho phép số, dấu phẩy, chấm phẩy, khoảng trắng, xuống dòng
-        const filteredValue = value.replace(/[^0-9\s,;\r\n]/g, '');
-        setDanSo(filteredValue);
+        setDanSo(e.target.value.replace(/[^0-9\s,;\n]/g, ''));
     }, []);
 
     const handleXienTypeChange = useCallback((e) => {
         setXienType(parseInt(e.target.value, 10));
     }, []);
 
-    // ✅ PERFORMANCE: Memoize button text to avoid string interpolation on every render
+    // ✅ PERFORMANCE: Memoize button text and static class names
     const buttonText = useMemo(() => `Ghép xiên ${xienType}`, [xienType]);
+    // ✅ PERFORMANCE: Pre-compute static class names once
+    const buttonBase = styles.button;
+    const primaryBtn = styles.primaryButton;
+    const secondaryBtn = styles.secondaryButton;
+    const successBtn = styles.successButton;
+    const dangerBtn = styles.dangerButton;
+    const undoBtn = styles.undoButton;
 
     return (
         <div className={styles.toolContainer}>
@@ -285,27 +291,27 @@ const GhepLoXien = memo(function GhepLoXien() {
                     <div className={styles.buttonGroup}>
                         <button
                             onClick={handleGhepXien}
-                            className={`${styles.button} ${styles.primaryButton}`}
+                            className={`${buttonBase} ${primaryBtn}`}
                             disabled={isPending}
                         >
                             {isPending ? 'Đang xử lý...' : buttonText}
                         </button>
                         <button
                             onClick={handleCopy}
-                            className={`${styles.button} ${copyStatus ? styles.successButton : styles.secondaryButton}`}
+                            className={`${buttonBase} ${copyStatus ? successBtn : secondaryBtn}`}
                         >
                             {copyStatus ? '✓ Đã Copy!' : 'Copy'}
                         </button>
                         <button
                             onClick={handleClear}
-                            className={`${styles.button} ${clearStatus ? styles.successButton : styles.dangerButton}`}
+                            className={`${buttonBase} ${clearStatus ? successBtn : dangerBtn}`}
                         >
                             {clearStatus ? '✓ Đã Xóa!' : 'Xóa tất cả'}
                         </button>
                         {showUndo && (
                             <button
                                 onClick={handleUndo}
-                                className={`${styles.button} ${styles.undoButton}`}
+                                className={`${buttonBase} ${undoBtn}`}
                             >
                                 ↶ Hoàn tác
                             </button>

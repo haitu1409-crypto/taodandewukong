@@ -17,6 +17,7 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [hasSearched, setHasSearched] = useState(false); // Track nếu đã tìm kiếm
 
     // ✅ PERFORMANCE: Memoize helper functions to prevent recreation on every render
     // Hàm parse input thành mảng số
@@ -36,24 +37,40 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
     const generateNumbersFromDauDuoi = useCallback((dauNumbers, duoiNumbers) => {
         const result = [];
 
-        // Nếu có đầu
-        if (dauNumbers.length > 0) {
+        // Nếu có CẢ đầu VÀ đuôi: tạo tổ hợp (AND logic) - chỉ số có đầu X VÀ đuôi Y
+        if (dauNumbers.length > 0 && duoiNumbers.length > 0) {
             dauNumbers.forEach(dau => {
-                for (let i = 0; i <= 9; i++) {
-                    const number = dau + i.toString();
+                duoiNumbers.forEach(duoi => {
+                    // Chỉ lấy chữ số cuối cùng để đảm bảo đúng format
+                    const dauDigit = parseInt(dau) % 10;
+                    const duoiDigit = parseInt(duoi) % 10;
+                    const number = (dauDigit * 10 + duoiDigit).toString().padStart(2, '0');
                     result.push(number);
-                }
+                });
             });
-        }
+        } else {
+            // Nếu chỉ có đầu HOẶC chỉ có đuôi: tạo số có đầu/đuôi đó (OR logic)
+            // Nếu có đầu
+            if (dauNumbers.length > 0) {
+                dauNumbers.forEach(dau => {
+                    const dauDigit = parseInt(dau) % 10;
+                    for (let i = 0; i <= 9; i++) {
+                        const number = (dauDigit * 10 + i).toString().padStart(2, '0');
+                        result.push(number);
+                    }
+                });
+            }
 
-        // Nếu có đuôi
-        if (duoiNumbers.length > 0) {
-            duoiNumbers.forEach(duoi => {
-                for (let i = 0; i <= 9; i++) {
-                    const number = i.toString() + duoi;
-                    result.push(number);
-                }
-            });
+            // Nếu có đuôi
+            if (duoiNumbers.length > 0) {
+                duoiNumbers.forEach(duoi => {
+                    const duoiDigit = parseInt(duoi) % 10;
+                    for (let i = 0; i <= 9; i++) {
+                        const number = (i * 10 + duoiDigit).toString().padStart(2, '0');
+                        result.push(number);
+                    }
+                });
+            }
         }
 
         return [...new Set(result)]; // Loại bỏ trùng lặp
@@ -127,19 +144,16 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
         }
 
         setLoading(true);
+        setHasSearched(true); // Đánh dấu đã tìm kiếm
 
         try {
             const result = generateDanDauDuoi();
             setResult(result);
-
-            if (result.length === 0) {
-                setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
-                setShowModal(true);
-            }
         } catch (error) {
             console.error('Error generating dan dau duoi:', error);
             setModalMessage('Lỗi khi tạo dàn số');
             setShowModal(true);
+            setHasSearched(false); // Reset nếu có lỗi
         } finally {
             setLoading(false);
         }
@@ -152,7 +166,138 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
         setThemInput('');
         setBoInput('');
         setResult([]);
+        setHasSearched(false); // Reset trạng thái tìm kiếm
     }, []);
+
+    // Hàm lấy số từ đầu
+    const getNumbersByDau = useCallback((dauNumbers) => {
+        const result = [];
+        dauNumbers.forEach(dau => {
+            // Chỉ lấy chữ số cuối cùng (0-9) để đảm bảo đúng format
+            const dauDigit = parseInt(dau) % 10;
+            for (let i = 0; i <= 9; i++) {
+                const number = (dauDigit * 10 + i).toString().padStart(2, '0');
+                result.push(number);
+            }
+        });
+        return result;
+    }, []);
+
+    // Hàm lấy số từ đuôi
+    const getNumbersByDuoi = useCallback((duoiNumbers) => {
+        const result = [];
+        duoiNumbers.forEach(duoi => {
+            // Chỉ lấy chữ số cuối cùng (0-9) để đảm bảo đúng format
+            const duoiDigit = parseInt(duoi) % 10;
+            for (let i = 0; i <= 9; i++) {
+                const number = (i * 10 + duoiDigit).toString().padStart(2, '0');
+                result.push(number);
+            }
+        });
+        return result;
+    }, []);
+
+    // Hàm parse tổng (chỉ chấp nhận 0-18)
+    const parseTongInput = useCallback((input) => {
+        if (!input || input.trim() === '') return [];
+        return input
+            .replace(/[;,\s]+/g, ',')
+            .replace(/,+/g, ',')
+            .replace(/^,|,$/g, '')
+            .split(',')
+            .map(n => n.trim())
+            .filter(n => {
+                const num = parseInt(n);
+                return n !== '' && /^\d{1,2}$/.test(n) && num >= 0 && num <= 18;
+            })
+            .map(n => parseInt(n).toString());
+    }, []);
+
+    // Hàm lấy số từ tổng
+    const getNumbersByTong = useCallback((tongNumbers) => {
+        const result = [];
+        const allNumbers = Array.from({ length: 100 }, (_, i) => {
+            return i.toString().padStart(2, '0');
+        });
+
+        tongNumbers.forEach(targetTong => {
+            const target = parseInt(targetTong);
+            allNumbers.forEach(number => {
+                const sum = calculateSum(number);
+                // Tổng có thể là chính xác hoặc tổng + 10
+                if (sum === target || sum === (target + 10)) {
+                    result.push(number);
+                }
+            });
+        });
+        return result;
+    }, [calculateSum]);
+
+    const handleLayHet = useCallback(() => {
+        setLoading(true);
+
+        try {
+            let allNumbers = [];
+
+            // Bước 1: Lấy số từ đầu (nếu có)
+            const dauNumbers = parseInputNumbers(dauInput);
+            if (dauNumbers.length > 0) {
+                const dauResult = getNumbersByDau(dauNumbers);
+                allNumbers = [...allNumbers, ...dauResult];
+            }
+
+            // Bước 2: Lấy số từ đuôi (nếu có)
+            const duoiNumbers = parseInputNumbers(duoiInput);
+            if (duoiNumbers.length > 0) {
+                const duoiResult = getNumbersByDuoi(duoiNumbers);
+                allNumbers = [...allNumbers, ...duoiResult];
+            }
+
+            // Bước 3: Lấy số từ tổng (nếu có)
+            const tongNumbers = parseTongInput(tongInput);
+            if (tongNumbers.length > 0) {
+                const tongResult = getNumbersByTong(tongNumbers);
+                allNumbers = [...allNumbers, ...tongResult];
+            }
+
+            // Kiểm tra nếu không có đầu, đuôi, tổng nào
+            if (allNumbers.length === 0) {
+                setResult([]);
+                setHasSearched(true); // Đánh dấu đã tìm kiếm để hiển thị thông báo
+                setLoading(false);
+                return;
+            }
+
+            // Bước 4: Loại bỏ trùng lặp
+            allNumbers = [...new Set(allNumbers)];
+
+            // Bước 5: Thêm số (nếu có)
+            if (themInput.trim()) {
+                const themNumbers = parseInputNumbers(themInput).map(n => n.padStart(2, '0'));
+                allNumbers = [...allNumbers, ...themNumbers];
+                allNumbers = [...new Set(allNumbers)];
+            }
+
+            // Bước 6: Bỏ số (nếu có)
+            if (boInput.trim()) {
+                const boNumbers = parseInputNumbers(boInput).map(n => n.padStart(2, '0'));
+                allNumbers = allNumbers.filter(num => !boNumbers.includes(num));
+            }
+
+            // Sắp xếp kết quả
+            allNumbers.sort((a, b) => parseInt(a) - parseInt(b));
+
+            setResult(allNumbers);
+            setHasSearched(true); // Đánh dấu đã tìm kiếm
+        } catch (error) {
+            console.error('Error generating all numbers:', error);
+            setModalMessage('Lỗi khi tạo dàn số');
+            setShowModal(true);
+            setHasSearched(false); // Reset nếu có lỗi
+        } finally {
+            setLoading(false);
+        }
+    }, [dauInput, duoiInput, tongInput, themInput, boInput, parseInputNumbers, parseTongInput, getNumbersByDau, getNumbersByDuoi, getNumbersByTong]);
 
     const handleCopy = useCallback(() => {
         if (result.length === 0) {
@@ -180,8 +325,18 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
     // ✅ PERFORMANCE: Memoize textarea content to prevent recalculation
     // Tạo nội dung textarea từ kết quả
     const generateTextareaContent = useMemo(() => {
-        if (result.length === 0) {
-            return "Chưa có dàn số nào. Nhấn \"Tạo Dàn\" để bắt đầu.";
+        // Nếu đã tìm kiếm nhưng không có kết quả
+        if (hasSearched && result.length === 0) {
+            // Kiểm tra xem có phải là trường hợp không có đầu/đuôi/tổng khi "Lấy Hết" không
+            if (!dauInput.trim() && !duoiInput.trim() && !tongInput.trim()) {
+                return "Vui lòng nhập đầu, đuôi hoặc tổng để lấy hết.";
+            }
+            return "Không có số nào phù hợp với các tiêu chí đã chọn.";
+        }
+
+        // Nếu chưa tìm kiếm
+        if (!hasSearched && result.length === 0) {
+            return "Chưa có dàn số nào. Nhấn \"Tạo Dàn\" hoặc \"Lấy Hết\" để bắt đầu.";
         }
 
         const content = [];
@@ -192,7 +347,7 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
         content.push(result.join(','));
 
         return content.join('\n');
-    }, [result]);
+    }, [result, hasSearched, dauInput, duoiInput, tongInput]);
 
     // ✅ PERFORMANCE: Memoize disabled states to prevent recalculation
     const isTaoDanDisabled = useMemo(() => {
@@ -310,6 +465,13 @@ const TaoDanDauDuoi = memo(function TaoDanDauDuoi() {
                                     disabled={isTaoDanDisabled}
                                 >
                                     {loading ? 'Đang tạo...' : 'Tạo Dàn'}
+                                </button>
+                                <button
+                                    onClick={handleLayHet}
+                                    className={`${styles.button} ${styles.orangeButton}`}
+                                    disabled={loading}
+                                >
+                                    Lấy Hết
                                 </button>
                                 <button
                                     onClick={handleCopy}

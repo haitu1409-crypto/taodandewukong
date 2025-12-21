@@ -94,6 +94,12 @@ const LayNhanhDacBiet = dynamic(() => import('../components/LayNhanhDacBiet'), {
     loading: () => <DanDeLoadingPlaceholder />
 });
 
+// ✅ PERFORMANCE: Lazy load GhepLoXien component - disable SSR for better initial load
+const GhepLoXien = dynamic(() => import('../components/GhepLoXien'), {
+    ssr: false, // Disable SSR for better initial load performance
+    loading: () => <DanDeLoadingPlaceholder />
+});
+
 // ✅ PERFORMANCE: Memoize styles object outside component to prevent recreation
 const ANIMATION_STYLES = `
     @keyframes colorPulse {
@@ -130,6 +136,7 @@ function HomePage() {
     const [shouldLoadTaoDanDauDuoi, setShouldLoadTaoDanDauDuoi] = useState(false);
     const [shouldLoadTaoDanCham, setShouldLoadTaoDanCham] = useState(false);
     const [shouldLoadTaoDanBo, setShouldLoadTaoDanBo] = useState(false);
+    const [shouldLoadGhepLoXien, setShouldLoadGhepLoXien] = useState(false);
     const [shouldLoadLayNhanhDacBiet, setShouldLoadLayNhanhDacBiet] = useState(false);
 
     // ✅ PERFORMANCE: Scroll to top only on client side, use requestAnimationFrame for better performance
@@ -815,6 +822,95 @@ function HomePage() {
         };
     }, [shouldLoadTaoDanBo]);
 
+    // ✅ PERFORMANCE: Intersection Observer để chỉ load GhepLoXien khi scroll đến (cải thiện mobile PageSpeed)
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+            // Fallback: Load after delay on mobile if IntersectionObserver not supported
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            if (isMobile) {
+                // Delay loading on mobile to improve initial PageSpeed
+                setTimeout(() => setShouldLoadGhepLoXien(true), 6000);
+            } else {
+                setShouldLoadGhepLoXien(true);
+            }
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setShouldLoadGhepLoXien(true);
+                        observer.disconnect();
+                    }
+                });
+            },
+            {
+                rootMargin: '300px', // Start loading 300px before component is visible
+                threshold: 0.01
+            }
+        );
+
+        // Use setTimeout to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            const placeholder = document.getElementById('ghep-lo-xien-placeholder');
+            if (placeholder) {
+                observer.observe(placeholder);
+            } else {
+                // Fallback: Load after delay if placeholder not found
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    setTimeout(() => setShouldLoadGhepLoXien(true), 6000);
+                } else {
+                    setShouldLoadGhepLoXien(true);
+                }
+            }
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            observer.disconnect();
+        };
+    }, []);
+
+    // ✅ PERFORMANCE: Prefetch GhepLoXien component only after initial page load and user interaction
+    useEffect(() => {
+        if (typeof window === 'undefined' || shouldLoadGhepLoXien) return;
+
+        let prefetchTimeout;
+        const handleInteraction = () => {
+            // Prefetch when user interacts (scroll, touch, mouse move)
+            if (!shouldLoadGhepLoXien) {
+                clearTimeout(prefetchTimeout);
+                prefetchTimeout = setTimeout(() => {
+                    import('../components/GhepLoXien').catch(() => {});
+                }, 2000);
+            }
+        };
+
+        // Only prefetch after page is fully loaded and user has interacted
+        const handleLoad = () => {
+            // Wait for user interaction before prefetching
+            window.addEventListener('scroll', handleInteraction, { passive: true, once: true });
+            window.addEventListener('touchstart', handleInteraction, { passive: true, once: true });
+            window.addEventListener('mousemove', handleInteraction, { passive: true, once: true });
+        };
+
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad, { once: true });
+        }
+
+        return () => {
+            clearTimeout(prefetchTimeout);
+            window.removeEventListener('scroll', handleInteraction);
+            window.removeEventListener('touchstart', handleInteraction);
+            window.removeEventListener('mousemove', handleInteraction);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [shouldLoadGhepLoXien]);
+
     // ✅ PERFORMANCE: Intersection Observer để chỉ load LayNhanhDacBiet khi scroll đến (cải thiện mobile PageSpeed)
     useEffect(() => {
         if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
@@ -1354,7 +1450,41 @@ function HomePage() {
                     )}
                 </section>
 
-                {/* LayNhanhDacBiet Component - Render ngay dưới component Tạo Dàn Bộ */}
+                {/* GhepLoXien Component - Render ngay dưới component Tạo Dàn Bộ */}
+                <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for GhepLoXien */ }}>
+                    <h2 style={{
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                        color: '#ea580c',
+                        marginTop: '0',
+                        marginBottom: '0',
+                        borderBottom: '2px solid #555'
+                    }}>
+                        Ghép Lô Xiên
+                    </h2>
+                    {/* ✅ CLS: Placeholder with fixed height to prevent layout shift */}
+                    <div id="ghep-lo-xien-placeholder" style={{ minHeight: '10px', width: '100%', boxSizing: 'border-box' }} />
+                    {shouldLoadGhepLoXien ? (
+                        <GhepLoXien />
+                    ) : (
+                        <div style={{
+                            padding: '20px',
+                            textAlign: 'center',
+                            color: '#999',
+                            minHeight: '400px', /* ✅ CLS: Match placeholder height */
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            fontSize: '14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            Cuộn xuống để tải công cụ ghép lô xiên...
+                        </div>
+                    )}
+                </section>
+
+                {/* LayNhanhDacBiet Component - Render ngay dưới component Ghép Lô Xiên */}
                 <section style={{ ...styles.mainContent, minHeight: '400px' /* ✅ CLS: Reserve space for LayNhanhDacBiet */ }}>
                     <h2 style={{
                         fontSize: '24px',

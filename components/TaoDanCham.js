@@ -18,6 +18,7 @@ const TaoDanCham = memo(function TaoDanCham() {
     const [modalMessage, setModalMessage] = useState('');
     const [copyStatus, setCopyStatus] = useState(false);
     const [clearStatus, setClearStatus] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false); // Track nếu đã tìm kiếm
 
     // ✅ PERFORMANCE: Use transition for non-urgent updates to prevent blocking UI
     const [isPending, startTransitionFn] = useTransition();
@@ -110,6 +111,7 @@ const TaoDanCham = memo(function TaoDanCham() {
         }
 
         setLoading(true);
+        setHasSearched(true); // Đánh dấu đã tìm kiếm
 
         // ✅ PERFORMANCE: Use requestIdleCallback for better mobile performance, fallback to setTimeout
         const scheduleWork = (callback) => {
@@ -126,30 +128,126 @@ const TaoDanCham = memo(function TaoDanCham() {
                 try {
                     const resultNumbers = generateDanCham();
 
-                    if (resultNumbers.length === 0) {
-                        setModalMessage('Vui lòng nhập số chạm hợp lệ');
-                        setShowModal(true);
-                        setLoading(false);
-                        return;
-                    }
-
                     // ✅ PERFORMANCE: Batch state updates to reduce re-renders
                     setResult(resultNumbers);
                     setLoading(false);
-
-                    if (resultNumbers.length === 0) {
-                        setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
-                        setShowModal(true);
-                    }
                 } catch (error) {
                     console.error('Error generating dan cham:', error);
                     setModalMessage('Lỗi khi tạo dàn số');
                     setShowModal(true);
                     setLoading(false);
+                    setHasSearched(false); // Reset nếu có lỗi
                 }
             });
         });
     }, [chamInput, generateDanCham]);
+
+    // Hàm lấy số từ chạm
+    const getNumbersByCham = useCallback((chamNumbers) => {
+        const resultSet = new Set();
+        chamNumbers.forEach(cham => {
+            // Generate all 2-digit numbers containing cham (00-99)
+            for (let i = 0; i <= 99; i++) {
+                const numStr = i.toString().padStart(2, '0');
+                if (numStr.includes(cham)) {
+                    resultSet.add(numStr);
+                }
+            }
+        });
+        return Array.from(resultSet);
+    }, []);
+
+    // Hàm lấy số từ tổng
+    const getNumbersByTong = useCallback((tongNumbers) => {
+        const result = [];
+        const allNumbers = Array.from({ length: 100 }, (_, i) => {
+            return i.toString().padStart(2, '0');
+        });
+
+        tongNumbers.forEach(targetTong => {
+            const target = parseInt(targetTong);
+            allNumbers.forEach(number => {
+                const sum = calculateSum(number);
+                // Tổng có thể là chính xác hoặc tổng + 10
+                if (sum === target || sum === (target + 10)) {
+                    result.push(number);
+                }
+            });
+        });
+        return result;
+    }, [calculateSum]);
+
+    const handleLayHet = useCallback(() => {
+        setLoading(true);
+        setHasSearched(true); // Đánh dấu đã tìm kiếm
+
+        const scheduleWork = (callback) => {
+            if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+                requestIdleCallback(callback, { timeout: 100 });
+            } else {
+                setTimeout(callback, 0);
+            }
+        };
+
+        startTransitionFn(() => {
+            scheduleWork(() => {
+                try {
+                    let allNumbers = [];
+
+                    // Bước 1: Lấy số từ chạm (nếu có)
+                    const chamNumbers = chamInput.split(',').map(c => c.trim()).filter(c => c !== '' && /^\d$/.test(c));
+                    if (chamNumbers.length > 0) {
+                        const chamResult = getNumbersByCham(chamNumbers);
+                        allNumbers = [...allNumbers, ...chamResult];
+                    }
+
+                    // Bước 2: Lấy số từ tổng (nếu có)
+                    if (tongInput.trim()) {
+                        const tongValues = tongInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d+$/.test(t));
+                        if (tongValues.length > 0) {
+                            const tongResult = getNumbersByTong(tongValues);
+                            allNumbers = [...allNumbers, ...tongResult];
+                        }
+                    }
+
+                    // Kiểm tra nếu không có chạm và tổng nào
+                    if (allNumbers.length === 0) {
+                        setResult([]);
+                        setLoading(false);
+                        return;
+                    }
+
+                    // Bước 3: Loại bỏ trùng lặp
+                    allNumbers = [...new Set(allNumbers)];
+
+                    // Bước 4: Thêm số (nếu có)
+                    if (themInput.trim()) {
+                        const themNumbers = themInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d{2}$/.test(t));
+                        allNumbers = [...allNumbers, ...themNumbers];
+                        allNumbers = [...new Set(allNumbers)];
+                    }
+
+                    // Bước 5: Bỏ số (nếu có)
+                    if (boInput.trim()) {
+                        const boSet = new Set(boInput.split(',').map(b => b.trim()).filter(b => b !== '' && /^\d{2}$/.test(b)));
+                        allNumbers = allNumbers.filter(num => !boSet.has(num));
+                    }
+
+                    // Sắp xếp kết quả
+                    allNumbers.sort((a, b) => parseInt(a) - parseInt(b));
+
+                    setResult(allNumbers);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error generating all numbers:', error);
+                    setModalMessage('Lỗi khi tạo dàn số');
+                    setShowModal(true);
+                    setLoading(false);
+                    setHasSearched(false); // Reset nếu có lỗi
+                }
+            });
+        });
+    }, [chamInput, tongInput, themInput, boInput, getNumbersByCham, getNumbersByTong]);
 
     const handleClearAll = useCallback(() => {
         setChamInput('');
@@ -157,6 +255,7 @@ const TaoDanCham = memo(function TaoDanCham() {
         setThemInput('');
         setBoInput('');
         setResult([]);
+        setHasSearched(false); // Reset trạng thái tìm kiếm
         setClearStatus(true);
         const timeoutId = setTimeout(() => setClearStatus(false), 2000);
         timeoutRefs.current.push(timeoutId);
@@ -188,7 +287,19 @@ const TaoDanCham = memo(function TaoDanCham() {
 
     // ✅ PERFORMANCE: Memoize textarea content - optimize join for large arrays with chunking
     const textareaContent = useMemo(() => {
-        if (result.length === 0) return '';
+        // Nếu đã tìm kiếm nhưng không có kết quả
+        if (hasSearched && result.length === 0) {
+            // Kiểm tra xem có phải là trường hợp không có chạm/tổng khi "Lấy Hết" không
+            if (!chamInput.trim() && !tongInput.trim()) {
+                return "Vui lòng nhập chạm hoặc tổng để lấy hết.";
+            }
+            return "Không có số nào phù hợp với các tiêu chí đã chọn.";
+        }
+
+        // Nếu chưa tìm kiếm
+        if (!hasSearched && result.length === 0) {
+            return "Chưa có dàn số nào. Nhấn \"Tạo Dàn\" hoặc \"Lấy Hết\" để bắt đầu.";
+        }
 
         // ✅ PERFORMANCE: For very large arrays, limit display to prevent UI blocking on mobile
         if (result.length > 300) {
@@ -204,7 +315,7 @@ const TaoDanCham = memo(function TaoDanCham() {
 
         // ✅ PERFORMANCE: For smaller arrays, use direct join but limit to 300 items
         return result.slice(0, 300).join(', ') + (result.length > 300 ? `\n... (còn ${result.length - 300} số, tổng: ${result.length} số)` : '');
-    }, [result]);
+    }, [result, hasSearched, chamInput, tongInput]);
 
     // ✅ PERFORMANCE: Memoize disabled states to prevent recalculation
     const isCopyDisabled = useMemo(() => {
@@ -301,6 +412,13 @@ const TaoDanCham = memo(function TaoDanCham() {
                                     disabled={loading || isPending}
                                 >
                                     {loading || isPending ? 'Đang tạo...' : 'Tạo Dàn'}
+                                </button>
+                                <button
+                                    onClick={handleLayHet}
+                                    className={`${styles.button} ${styles.orangeButton}`}
+                                    disabled={loading || isPending}
+                                >
+                                    Lấy Hết
                                 </button>
                                 <button
                                     onClick={handleCopy}

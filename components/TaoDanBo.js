@@ -17,6 +17,7 @@ const TaoDanBo = memo(function TaoDanBo() {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [hasSearched, setHasSearched] = useState(false); // Track nếu đã tìm kiếm
 
     // ✅ PERFORMANCE: Use transition for non-urgent updates to prevent blocking UI
     const [isPending, startTransitionFn] = useTransition();
@@ -43,6 +44,26 @@ const TaoDanBo = memo(function TaoDanBo() {
                 return sum === target || sum === (target + 10);
             });
         });
+    }, [calculateSum]);
+
+    // Hàm lấy số từ tổng
+    const getNumbersByTong = useCallback((tongNumbers) => {
+        const result = [];
+        const allNumbers = Array.from({ length: 100 }, (_, i) => {
+            return i.toString().padStart(2, '0');
+        });
+
+        tongNumbers.forEach(targetTong => {
+            const target = parseInt(targetTong);
+            allNumbers.forEach(number => {
+                const sum = calculateSum(number);
+                // Tổng có thể là chính xác hoặc tổng + 10
+                if (sum === target || sum === (target + 10)) {
+                    result.push(number);
+                }
+            });
+        });
+        return result;
     }, [calculateSum]);
 
     // ✅ PERFORMANCE: Memoize parse function
@@ -124,6 +145,7 @@ const TaoDanBo = memo(function TaoDanBo() {
         }
 
         setLoading(true);
+        setHasSearched(true); // Đánh dấu đã tìm kiếm
 
         // Use startTransition for non-urgent computation
         startTransitionFn(() => {
@@ -131,20 +153,77 @@ const TaoDanBo = memo(function TaoDanBo() {
                 // Sử dụng logic client-side thay vì gọi API
                 const result = generateDanBo();
                 setResult(result);
-
-                if (result.length === 0) {
-                    setModalMessage('Không có số nào phù hợp với các tiêu chí đã chọn');
-                    setShowModal(true);
-                }
             } catch (error) {
                 console.error('Error generating dan bo:', error);
                 setModalMessage('Lỗi khi tạo dàn số');
                 setShowModal(true);
+                setHasSearched(false); // Reset nếu có lỗi
             } finally {
                 setLoading(false);
             }
         });
     }, [selectedSpecialSets, generateDanBo, startTransitionFn]);
+
+    const handleLayHet = useCallback(() => {
+        setLoading(true);
+        setHasSearched(true); // Đánh dấu đã tìm kiếm
+
+        startTransitionFn(() => {
+            try {
+                let allNumbers = [];
+
+                // Bước 1: Lấy số từ các bộ đã chọn (nếu có)
+                if (selectedSpecialSets.length > 0) {
+                    const boResult = getCombinedSpecialSetNumbers(selectedSpecialSets);
+                    allNumbers = [...allNumbers, ...boResult];
+                }
+
+                // Bước 2: Lấy số từ tổng (nếu có)
+                if (tongInput.trim()) {
+                    const tongValues = tongInput.split(',').map(t => t.trim()).filter(t => t !== '' && /^\d+$/.test(t));
+                    if (tongValues.length > 0) {
+                        const tongResult = getNumbersByTong(tongValues);
+                        allNumbers = [...allNumbers, ...tongResult];
+                    }
+                }
+
+                // Kiểm tra nếu không có bộ và tổng nào
+                if (allNumbers.length === 0) {
+                    setResult([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // Bước 3: Loại bỏ trùng lặp
+                allNumbers = [...new Set(allNumbers)];
+
+                // Bước 4: Thêm số (nếu có)
+                if (themInput.trim()) {
+                    const themNumbers = parseInputNumbers(themInput);
+                    allNumbers = [...allNumbers, ...themNumbers];
+                    allNumbers = [...new Set(allNumbers)];
+                }
+
+                // Bước 5: Bỏ số (nếu có)
+                if (boInput.trim()) {
+                    const boNumbers = parseInputNumbers(boInput);
+                    allNumbers = allNumbers.filter(num => !boNumbers.includes(num));
+                }
+
+                // Sắp xếp kết quả
+                allNumbers.sort((a, b) => parseInt(a) - parseInt(b));
+
+                setResult(allNumbers);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error generating all numbers:', error);
+                setModalMessage('Lỗi khi tạo dàn số');
+                setShowModal(true);
+                setLoading(false);
+                setHasSearched(false); // Reset nếu có lỗi
+            }
+        });
+    }, [selectedSpecialSets, tongInput, themInput, boInput, getNumbersByTong, parseInputNumbers, startTransitionFn]);
 
     const handleLamLai = useCallback(() => {
         setSelectedSpecialSets([]);
@@ -152,6 +231,7 @@ const TaoDanBo = memo(function TaoDanBo() {
         setThemInput('');
         setBoInput('');
         setResult([]);
+        setHasSearched(false); // Reset trạng thái tìm kiếm
     }, []);
 
     const handleCopy = useCallback(() => {
@@ -212,8 +292,18 @@ const TaoDanBo = memo(function TaoDanBo() {
 
     // Tạo nội dung textarea từ kết quả
     const generateTextareaContent = useMemo(() => {
-        if (result.length === 0) {
-            return "Chưa có dàn số nào. Nhấn \"Tạo Dàn\" để bắt đầu.";
+        // Nếu đã tìm kiếm nhưng không có kết quả
+        if (hasSearched && result.length === 0) {
+            // Kiểm tra xem có phải là trường hợp không có bộ/tổng khi "Lấy Hết" không
+            if (selectedSpecialSets.length === 0 && !tongInput.trim()) {
+                return "Vui lòng chọn bộ hoặc nhập tổng để lấy hết.";
+            }
+            return "Không có số nào phù hợp với các tiêu chí đã chọn.";
+        }
+
+        // Nếu chưa tìm kiếm
+        if (!hasSearched && result.length === 0) {
+            return "Chưa có dàn số nào. Nhấn \"Tạo Dàn\" hoặc \"Lấy Hết\" để bắt đầu.";
         }
 
         const content = [];
@@ -224,7 +314,7 @@ const TaoDanBo = memo(function TaoDanBo() {
         content.push(result.join(','));
 
         return content.join('\n');
-    }, [result]);
+    }, [result, hasSearched, selectedSpecialSets.length, tongInput]);
 
     return (
         <div className={`${styles.toolContainer} ${styles.toolContainerDanBo}`}>
@@ -318,6 +408,13 @@ const TaoDanBo = memo(function TaoDanBo() {
                                     disabled={loading || isPending || selectedSpecialSets.length === 0}
                                 >
                                     {loading || isPending ? 'Đang tạo...' : 'Tạo Dàn'}
+                                </button>
+                                <button
+                                    onClick={handleLayHet}
+                                    className={`${styles.button} ${styles.orangeButton}`}
+                                    disabled={loading || isPending}
+                                >
+                                    Lấy Hết
                                 </button>
                                 <button
                                     onClick={handleCopy}

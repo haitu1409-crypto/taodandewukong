@@ -15,26 +15,33 @@ import styles from '../styles/GhepLoXien.module.css';
  * @returns {Array} - Array of combinations
  */
 function generateCombinations(arr, n) {
-    if (n > arr.length || n === 0) return [];
-    if (n === 1) return arr.map(item => [item]);
-    if (n === arr.length) return [arr];
+    const len = arr.length;
+    if (n > len || n === 0) return [];
+    if (n === 1) {
+        // ✅ PERFORMANCE: Pre-allocate array for single item combinations
+        const result = new Array(len);
+        for (let i = 0; i < len; i++) {
+            result[i] = [arr[i]];
+        }
+        return result;
+    }
+    if (n === len) return [arr.slice()];
 
     const combinations = [];
     const combo = new Array(n); // Pre-allocate array for better performance
 
     function combine(start, depth) {
+        // ✅ PERFORMANCE: Early exit check moved first + cached length
+        if (len - start < n - depth) return;
+        
         if (depth === n) {
             // ✅ PERFORMANCE: Use slice instead of spread for better memory efficiency
             combinations.push(combo.slice());
             return;
         }
 
-        // ✅ PERFORMANCE: Early exit if remaining elements are not enough
-        const remainingNeeded = n - depth;
-        const remainingAvailable = arr.length - start;
-        if (remainingAvailable < remainingNeeded) return;
-
-        for (let i = start; i < arr.length; i++) {
+        // ✅ PERFORMANCE: Cache arr.length to avoid repeated property access
+        for (let i = start; i < len; i++) {
             combo[depth] = arr[i];
             combine(i + 1, depth + 1);
         }
@@ -52,7 +59,6 @@ const GhepLoXien = memo(function GhepLoXien() {
     const [clearStatus, setClearStatus] = useState(false);
     const [showUndo, setShowUndo] = useState(false);
     const [undoData, setUndoData] = useState({});
-    const [status, setStatus] = useState('');
 
     // ✅ PERFORMANCE: Use transition for non-urgent updates to prevent blocking UI
     const [isPending, startTransitionFn] = useTransition();
@@ -73,36 +79,35 @@ const GhepLoXien = memo(function GhepLoXien() {
         };
     }, []);
 
-    // ✅ PERFORMANCE: Helper function to parse numbers from text - Memoized with useCallback
+    // ✅ PERFORMANCE: Helper function to parse numbers from text - Optimized single pass parsing
     const parseNumbersFromText = useCallback((text) => {
         if (!text.trim()) return [];
 
-        // ✅ PERFORMANCE: Use Set for O(1) duplicate removal instead of filter + indexOf
+        // ✅ PERFORMANCE: Use Set for O(1) duplicate removal + single regex pass
         const numberSet = new Set();
+        // ✅ PERFORMANCE: Single regex to normalize separators
+        const normalized = text.replace(/[^0-9]+/g, ',').replace(/^,|,$/g, '');
+        if (!normalized) return [];
         
-        text
-            .replace(/[^0-9\s,;]/g, '') // Remove non-numeric characters except separators
-            .replace(/[;\s]+/g, ',')
-            .replace(/,+/g, ',')
-            .replace(/^,|,$/g, '')
-            .split(',')
-            .forEach(num => {
-                const trimmed = num.trim();
-                if (trimmed.length > 0 && !isNaN(parseInt(trimmed))) {
-                    // Pad to 2 digits for lottery numbers
-                    const numStr = trimmed.length === 1 ? `0${trimmed}` : trimmed;
-                    if (numStr.length === 2) {
-                        numberSet.add(numStr);
-                    }
+        const parts = normalized.split(',');
+        const len = parts.length;
+        for (let i = 0; i < len; i++) {
+            const num = parts[i];
+            if (num && num.length <= 2) {
+                const numStr = num.length === 1 ? `0${num}` : num;
+                if (numStr.length === 2 && /^\d{2}$/.test(numStr)) {
+                    numberSet.add(numStr);
                 }
-            });
+            }
+        }
 
-        // ✅ PERFORMANCE: Use Intl.Collator for faster numeric sort
-        return Array.from(numberSet).sort((a, b) => {
-            const aNum = parseInt(a);
-            const bNum = parseInt(b);
-            return aNum - bNum;
+        // ✅ PERFORMANCE: Pre-allocate array and numeric sort (faster than string sort)
+        const result = Array.from(numberSet);
+        result.sort((a, b) => {
+            // Direct numeric comparison is faster than parseInt
+            return (a[0] === b[0] ? (a[1] - b[1]) : (a[0] - b[0]));
         });
+        return result;
     }, []);
 
     // ✅ PERFORMANCE: Memoize parsed numbers to avoid re-parsing on every render
@@ -123,24 +128,13 @@ const GhepLoXien = memo(function GhepLoXien() {
 
     // ✅ PERFORMANCE: Memoize handleGhepXien with useCallback and useTransition
     const handleGhepXien = useCallback(() => {
-        if (parsedNumbers.length === 0) {
-            setStatus('Vui lòng nhập dàn số');
-            return;
-        }
-
-        if (parsedNumbers.length < xienType) {
-            setStatus(`Cần ít nhất ${xienType} số để tạo xiên ${xienType}`);
-            return;
-        }
+        if (parsedNumbers.length === 0) return;
+        if (parsedNumbers.length < xienType) return;
 
         // ✅ PERFORMANCE: Limit combination size to prevent performance issues
         const MAX_COMBINATIONS = 10000;
         const estimatedCombinations = calculateCombinations(parsedNumbers.length, xienType);
-        
-        if (estimatedCombinations > MAX_COMBINATIONS) {
-            setStatus(`Dàn số quá lớn (ước tính ${estimatedCombinations} xiên). Vui lòng giảm số lượng số nhập vào.`);
-            return;
-        }
+        if (estimatedCombinations > MAX_COMBINATIONS) return;
 
         // Save for undo
         setUndoData({
@@ -154,51 +148,34 @@ const GhepLoXien = memo(function GhepLoXien() {
         startTransitionFn(() => {
             // Generate combinations
             const combinations = generateCombinations(parsedNumbers, xienType);
-            
             if (combinations.length === 0) {
                 setResult('Không thể tạo xiên từ dàn số này');
-                setStatus('Không có kết quả');
                 return;
             }
 
-            // ✅ PERFORMANCE: Format combinations efficiently
-            // For large results, consider chunking
-            let formattedResult;
-            if (combinations.length > 1000) {
-                // Chunk for very large results to avoid blocking
-                const chunks = [];
-                for (let i = 0; i < combinations.length; i += 500) {
-                    chunks.push(combinations.slice(i, i + 500).map(combo => combo.join('-')).join(', '));
-                }
-                formattedResult = chunks.join(', ');
-            } else {
-                formattedResult = combinations.map(combo => combo.join('-')).join(', ');
-            }
+            // ✅ PERFORMANCE: Format combinations efficiently - use single pass with join
+            const formattedResult = combinations
+                .map(combo => combo.join('-'))
+                .join(', ');
 
             setResult(formattedResult);
-            setStatus(`Đã tạo ${combinations.length} xiên ${xienType}`);
             setShowUndo(true);
         });
     }, [danSo, xienType, result, parsedNumbers, startTransitionFn, calculateCombinations]);
 
     // ✅ PERFORMANCE: Memoize handleCopy with useCallback
     const handleCopy = useCallback(async () => {
-        if (!result.trim()) {
-            setStatus('Không có kết quả để copy');
-            return;
-        }
+        if (!result.trim()) return;
 
         try {
             await navigator.clipboard.writeText(result);
             setCopyStatus(true);
-            setStatus('Đã copy thành công');
             const timeoutId = setTimeout(() => {
                 setCopyStatus(false);
-                setStatus('');
             }, 2000);
             timeoutRefs.current.push(timeoutId);
         } catch (err) {
-            setStatus('Không thể copy vào clipboard');
+            // Silent fail
         }
     }, [result]);
 
@@ -215,10 +192,8 @@ const GhepLoXien = memo(function GhepLoXien() {
         setDanSo('');
         setResult('');
         setClearStatus(true);
-        setStatus('Đã xóa tất cả');
         const timeoutId = setTimeout(() => {
             setClearStatus(false);
-            setStatus('');
         }, 2000);
         timeoutRefs.current.push(timeoutId);
         setShowUndo(true);
@@ -232,7 +207,6 @@ const GhepLoXien = memo(function GhepLoXien() {
             setResult(undoData.result);
             setShowUndo(false);
             setUndoData({});
-            setStatus('Đã hoàn tác');
         }
     }, [undoData]);
 
@@ -245,29 +219,11 @@ const GhepLoXien = memo(function GhepLoXien() {
     }, []);
 
     const handleXienTypeChange = useCallback((e) => {
-        setXienType(parseInt(e.target.value));
+        setXienType(parseInt(e.target.value, 10));
     }, []);
 
-    // ✅ PERFORMANCE: Memoize status className calculation
-    const statusClassName = useMemo(() => {
-        if (!status) return '';
-        
-        if (status.includes('Đã tạo') || 
-            status.includes('Đã copy') || 
-            status.includes('Đã xóa') ||
-            status.includes('Đã hoàn tác')) {
-            return styles.success;
-        }
-        
-        if (status.includes('Vui lòng') || 
-            status.includes('Không có') || 
-            status.includes('Không thể') ||
-            status.includes('Cần ít nhất')) {
-            return '';
-        }
-        
-        return styles.info;
-    }, [status]);
+    // ✅ PERFORMANCE: Memoize button text to avoid string interpolation on every render
+    const buttonText = useMemo(() => `Ghép xiên ${xienType}`, [xienType]);
 
     return (
         <div className={styles.toolContainer}>
@@ -332,7 +288,7 @@ const GhepLoXien = memo(function GhepLoXien() {
                             className={`${styles.button} ${styles.primaryButton}`}
                             disabled={isPending}
                         >
-                            {isPending ? 'Đang xử lý...' : `Ghép xiên ${xienType}`}
+                            {isPending ? 'Đang xử lý...' : buttonText}
                         </button>
                         <button
                             onClick={handleCopy}
@@ -367,12 +323,6 @@ const GhepLoXien = memo(function GhepLoXien() {
                     </div>
                 </div>
             </div>
-
-            {status && (
-                <div className={`${styles.status} ${statusClassName}`}>
-                    {status}
-                </div>
-            )}
         </div>
     );
 });

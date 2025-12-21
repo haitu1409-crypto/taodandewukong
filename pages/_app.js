@@ -63,7 +63,7 @@ function App({ Component, pageProps }) {
                 }
                 
                 body {
-                    background-color: #e0e0e0;
+                    background-color: #e0e0e073;
                     margin: 0;
                     padding: 0;
                     min-height: 100vh;

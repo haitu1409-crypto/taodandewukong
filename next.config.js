@@ -13,6 +13,34 @@ const nextConfig = {
 
     // Images configuration - Optimized for performance
     images: {
+        remotePatterns: [
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '5000',
+                pathname: '/uploads/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'api1.ketquamn.com',
+                pathname: '/uploads/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'api.taodandewukong.pro',
+                pathname: '/uploads/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'cloudinary.com',
+                pathname: '/**',
+            },
+        ],
         formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
         imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -20,7 +48,6 @@ const nextConfig = {
         unoptimized: false,
         dangerouslyAllowSVG: false,
         contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-        remotePatterns: [],
     },
 
     // Headers for SEO and security

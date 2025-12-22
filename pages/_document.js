@@ -46,15 +46,16 @@ export default function Document() {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 
                 {/* ✅ PERFORMANCE: Optimize font loading - defer non-critical CSS */}
+                {/* Inter font - Modern, clean, easy to read, supports Vietnamese */}
                 <link 
                     rel="preload"
-                    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap"
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
                     as="style"
                     onLoad="this.onload=null;this.rel='stylesheet'"
                 />
                 <noscript>
                     <link 
-                        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" 
+                        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" 
                         rel="stylesheet"
                     />
                 </noscript>

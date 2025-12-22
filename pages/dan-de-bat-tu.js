@@ -773,10 +773,11 @@ OptimizedImage.displayName = 'OptimizedImage';
 
 // Category Label Component - Small badge for image corners
 const CategoryLabel = memo(({ category }) => {
-    if (!category) return null;
-
     const color = useMemo(() => getCategoryColor(category), [category]);
     const label = useMemo(() => getCategoryLabel(category), [category]);
+
+    // Early return sau khi tất cả hooks đã được gọi
+    if (!category) return null;
 
     return (
         <span
@@ -901,11 +902,12 @@ ErrorMessage.displayName = 'ErrorMessage';
 
 // Optimized Hero Article Component - Horizontal Layout
 const HeroArticle = memo(({ article }) => {
-    if (!article) return null;
+    const categoryColor = useMemo(() => getCategoryColor(article?.category), [article?.category]);
+    const categoryLabel = useMemo(() => getCategoryLabel(article?.category), [article?.category]);
+    const formattedDate = useMemo(() => formatDate(article?.publishedAt), [article?.publishedAt]);
 
-    const categoryColor = useMemo(() => getCategoryColor(article.category), [article.category]);
-    const categoryLabel = useMemo(() => getCategoryLabel(article.category), [article.category]);
-    const formattedDate = useMemo(() => formatDate(article.publishedAt), [article.publishedAt]);
+    // Early return sau khi tất cả hooks đã được gọi
+    if (!article) return null;
 
     return (
         <Link href={`/tin-tuc/${article.slug}`} className={styles.heroPost}>

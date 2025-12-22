@@ -970,8 +970,6 @@ FeaturedCard.displayName = 'FeaturedCard';
 
 // Featured Articles Slider Component - Carousel/Belt Effect
 const FeaturedSlider = memo(({ articles, currentIndex, onNext, onPrev, onGoToSlide }) => {
-    if (!articles || articles.length === 0) return null;
-
     const [slidesPerView, setSlidesPerView] = useState(
         typeof window !== 'undefined' && window.innerWidth <= 768 ? 2 : 3
     );
@@ -1049,6 +1047,9 @@ const FeaturedSlider = memo(({ articles, currentIndex, onNext, onPrev, onGoToSli
             onGoToSlide(index);
         }
     }, [onGoToSlide]);
+
+    // Early return sau khi tất cả hooks đã được gọi
+    if (!articles || articles.length === 0) return null;
 
     return (
         <div className={styles.featuredSlider}>
@@ -1671,9 +1672,14 @@ export default function NewsPage() {
     // Error state
     if (state.error) {
         return (
-            <Layout>
+            <>
+                <SEOOptimized
+                    pageType="news"
+                    title="Lỗi - Tin Tức"
+                    description="Đã xảy ra lỗi khi tải dữ liệu"
+                />
                 <ErrorMessage message={state.error} onRetry={loadData} />
-            </Layout>
+            </>
         );
     }
 

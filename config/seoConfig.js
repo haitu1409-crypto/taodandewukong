@@ -254,6 +254,12 @@ const TOP_KEYWORDS = {
         'xoso.me', 'xoso me',
         'minhchinh.com', 'minhchinh',
         
+        // Brand keywords - Công cụ tạo dàn đề
+        'kangdh', 'kangdh.com', 'kangdh tạo dàn đề', 'kangdh công cụ',
+        'taodande.online', 'taodande online', 'taodande', 'taodande tạo dàn đề',
+        'công cụ xổ số kangdh', 'công cụ xổ số taodande',
+        'tạo dàn đề kangdh', 'tạo dàn đề taodande',
+        
         // Competitor + Keywords combinations
         'xosodaiphat kết quả xổ số', 'xosodaiphat ket qua xo so',
         'xoso.com.vn xsmn', 'xoso.com.vn xsmb',
@@ -389,10 +395,22 @@ const FAQ_DATA = [
         answer: `KETQUAMN.COM (viết tắt của Kết Quả Miền Nam) là trang web xem kết quả xổ số 3 miền (miền Nam, miền Bắc, miền Trung) nhanh nhất và chính xác nhất. Trang web tốt hơn xosodaiphat, xoso.com.vn về nhiều mặt và hoàn toàn miễn phí.`
     },
     
-    // Tool-related FAQs
+    // Tool-related FAQs - Công cụ tạo dàn đề
     {
         question: 'Ketquamn.com có công cụ tạo dàn đề không?',
         answer: `Có, ${TARGET_URL} cung cấp đầy đủ các công cụ tạo dàn đề: tạo dàn đề 9x-0x, tạo dàn đề 2D, tạo dàn đề 3D-4D, dàn đề đặc biệt, và lọc dàn đề. Tất cả đều miễn phí 100% tại ketquamn.com.`
+    },
+    {
+        question: 'Kangdh là gì? Có công cụ nào tốt hơn kangdh không?',
+        answer: `Kangdh là một công cụ tạo dàn đề phổ biến. Tại taodandewukong.pro, chúng tôi cung cấp các công cụ tạo dàn đề 2D, 3D, 4D, 9X-0X với nhiều tính năng hơn, tốc độ nhanh hơn và hoàn toàn miễn phí. Công cụ của chúng tôi hỗ trợ tạo ghép dàn 3D-4D, lọc dàn đề tổng hợp, và nhiều tính năng nâng cao khác.`
+    },
+    {
+        question: 'Taodande.online có tốt không? So sánh với taodandewukong.pro',
+        answer: `Taodande.online là một công cụ tạo dàn đề khác. Taodandewukong.pro cung cấp nhiều công cụ hơn như tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn đầu đuôi, tạo dàn chạm, và nhiều tính năng nâng cao khác. Tất cả đều miễn phí và không giới hạn.`
+    },
+    {
+        question: 'Công cụ tạo dàn đề nào tốt nhất? Kangdh, taodande.online hay taodandewukong.pro?',
+        answer: `Taodandewukong.pro là công cụ tạo dàn đề tốt nhất với nhiều tính năng: tạo dàn đề 9X-0X, 2D, 3D-4D, ghép dàn, lọc dàn tổng hợp. So với kangdh và taodande.online, taodandewukong.pro có nhiều công cụ hơn, tốc độ nhanh hơn, và hoàn toàn miễn phí không giới hạn.`
     },
     {
         question: 'Soi cầu miền Bắc ở đâu chính xác nhất?',

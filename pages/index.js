@@ -1136,16 +1136,18 @@ function HomePage() {
             name: 'Công Cụ Xổ Số KETQUAMN.COM',
             applicationCategory: 'GameApplication',
             operatingSystem: 'Web Browser',
-            offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'VND'
-            },
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '2500'
-            },
+            // REMOVED: offers và aggregateRating - Gây lỗi Product/Seller/Review schema không hợp lệ
+            // SoftwareApplication miễn phí không cần offers và aggregateRating khi chưa có reviews thực tế
+            // offers: {
+            //     '@type': 'Offer',
+            //     price: '0',
+            //     priceCurrency: 'VND'
+            // },
+            // aggregateRating: {
+            //     '@type': 'AggregateRating',
+            //     ratingValue: '4.9',
+            //     reviewCount: '2500'
+            // },
             featureList: LOTTERY_TOOLS.map(tool => tool.name).join(', ')
         },
         // ItemList Schema for Tools
@@ -1162,12 +1164,13 @@ function HomePage() {
                     name: tool.name,
                     url: tool.url,
                     description: tool.description,
-                    applicationCategory: 'GameApplication',
-                    offers: {
-                        '@type': 'Offer',
-                        price: '0',
-                        priceCurrency: 'VND'
-                    }
+                    applicationCategory: 'GameApplication'
+                    // REMOVED: offers - Gây lỗi Product/Seller schema không hợp lệ
+                    // offers: {
+                    //     '@type': 'Offer',
+                    //     price: '0',
+                    //     priceCurrency: 'VND'
+                    // }
                 }
             }))
         }

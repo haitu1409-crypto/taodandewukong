@@ -140,13 +140,15 @@ export default function UltraSEOHead({
                 'https://www.facebook.com/ketquamn',
                 'https://www.youtube.com/@ketquamn'
             ],
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '2500',
-                bestRating: '5',
-                worstRating: '1'
-            },
+            // REMOVED: aggregateRating - Gây lỗi Review schema không hợp lệ
+            // Chỉ thêm khi có reviews thực tế từ users
+            // aggregateRating: {
+            //     '@type': 'AggregateRating',
+            //     ratingValue: '4.9',
+            //     reviewCount: '2500',
+            //     bestRating: '5',
+            //     worstRating: '1'
+            // },
             // ✅ 2025 SEO: E-E-A-T - Trust signals
             foundingDate: '2020',
             knowsAbout: ['Xổ Số', 'Kết Quả Xổ Số', 'Thống Kê Xổ Số', 'Soi Cầu Xổ Số', 'Tạo Dàn Đề'],
@@ -274,11 +276,12 @@ export default function UltraSEOHead({
             },
             priceRange: 'Miễn phí',
             openingHours: 'Mo-Su 00:00-23:59',
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '2500'
-            }
+            // REMOVED: aggregateRating - Gây lỗi Review schema không hợp lệ
+            // aggregateRating: {
+            //     '@type': 'AggregateRating',
+            //     ratingValue: '4.9',
+            //     reviewCount: '2500'
+            // }
         });
 
         // 7. FAQPage (nếu có) - Tối ưu cho Featured Snippets
@@ -337,76 +340,17 @@ export default function UltraSEOHead({
             ]
         });
 
-        // 10. Product Schema - Tạo Dàn Đề Product
-        schemas.push({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: 'Tạo Dàn Đề - Công Cụ Tạo Dàn Đề 2D, 3D, 4D, 9X-0X',
-            description: 'Công cụ tạo dàn đề nhanh, tạo dàn đề xổ số, tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên miễn phí',
-            brand: {
-                '@type': 'Brand',
-                name: 'Taodandewukong.pro'
-            },
-            category: 'Công Cụ Xổ Số',
-            offers: {
-                '@type': 'Offer',
-                price: '0',
-                priceCurrency: 'VND',
-                availability: 'https://schema.org/InStock',
-                url: siteUrl
-            },
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.9',
-                reviewCount: '2500'
-            },
-            additionalProperty: [
-                {
-                    '@type': 'PropertyValue',
-                    name: 'Tính năng',
-                    value: 'Tạo dàn đề 2D, 3D, 4D, 9X-0X, tạo ghép dàn 3D-4D, tạo dàn số, tạo dàn xiên'
-                },
-                {
-                    '@type': 'PropertyValue',
-                    name: 'Miễn phí',
-                    value: 'Có'
-                }
-            ]
-        });
+        // 10. Product Schema - REMOVED: Gây lỗi Seller schema không hợp lệ
+        // Product schema yêu cầu seller information đầy đủ, không phù hợp với công cụ miễn phí
+        // Thay vào đó sử dụng SoftwareApplication schema đã có ở trên
 
-        // 11. Review Schema - Chi tiết reviews
-        schemas.push({
-            '@context': 'https://schema.org',
-            '@type': 'Review',
-            itemReviewed: {
-                '@type': 'WebSite',
-                name: 'KETQUAMN.COM',
-                url: targetUrl
-            },
-            author: {
-                '@type': 'Person',
-                name: 'Người dùng KETQUAMN.COM'
-            },
-            reviewRating: {
-                '@type': 'Rating',
-                ratingValue: '5',
-                bestRating: '5',
-                worstRating: '1'
-            },
-            reviewBody: `${targetUrl} là trang web xem kết quả xổ số tốt nhất, nhanh nhất và chính xác nhất. Tốt hơn xosodaiphat, xoso.com.vn về mọi mặt.`
-        });
+        // 11. Review Schema - REMOVED: Gây lỗi Review schema không hợp lệ
+        // Review schema yêu cầu author information đầy đủ và xác thực
+        // Không nên tạo review giả, chỉ nên dùng khi có reviews thực tế từ users
 
-        // 12. VideoObject Schema - Cho video hướng dẫn (nếu có)
-        schemas.push({
-            '@context': 'https://schema.org',
-            '@type': 'VideoObject',
-            name: 'Hướng dẫn sử dụng KETQUAMN.COM',
-            description: 'Hướng dẫn xem kết quả xổ số tại KETQUAMN.COM',
-            thumbnailUrl: `${siteUrl}/backgroundseo.png`,
-            uploadDate: currentDate,
-            contentUrl: targetUrl,
-            embedUrl: targetUrl
-        });
+        // 12. VideoObject Schema - REMOVED: Gây lỗi Video schema không hợp lệ
+        // VideoObject schema yêu cầu video thực sự với contentUrl hợp lệ
+        // Chỉ thêm khi có video thực tế trên trang
 
         // 13. Article Schema - Tối ưu cho featured snippets
         schemas.push({
@@ -490,18 +434,20 @@ export default function UltraSEOHead({
             speakable: {
                 '@type': 'SpeakableSpecification',
                 cssSelector: ['h1', '.heroDescription', '.faq-question']
-            },
-            mainEntity: {
-                '@type': 'FAQPage',
-                mainEntity: faq && faq.length > 0 ? faq.map(item => ({
-                    '@type': 'Question',
-                    name: item.question,
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: item.answer
-                    }
-                })) : []
             }
+            // REMOVED: FAQPage trong mainEntity - Trùng lặp với FAQPage schema ở trên (dòng 285-297)
+            // Chỉ cần một FAQPage schema duy nhất
+            // mainEntity: {
+            //     '@type': 'FAQPage',
+            //     mainEntity: faq && faq.length > 0 ? faq.map(item => ({
+            //         '@type': 'Question',
+            //         name: item.question,
+            //         acceptedAnswer: {
+            //             '@type': 'Answer',
+            //             text: item.answer
+            //         }
+            //     })) : []
+            // }
         });
 
         // Merge với structured data từ props

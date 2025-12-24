@@ -381,63 +381,66 @@ export default function SEOOptimized({
             <link rel="shortcut icon" href="/favicon.ico" />
 
             {/* ===== STRUCTURED DATA - WEB APPLICATION ===== */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify({
-                        '@context': 'https://schema.org',
-                        '@type': 'WebApplication',
-                        name: siteName,
-                        alternateName: 'Tạo Dàn Đề Online',
-                        description: description,
-                        url: fullUrl,
-                        applicationCategory: 'UtilityApplication',
-                        operatingSystem: 'Any',
-                        browserRequirements: 'Requires JavaScript. Requires HTML5.',
-                        softwareVersion: '1.0.0',
-                        offers: {
-                            '@type': 'Offer',
-                            price: '0',
-                            priceCurrency: 'VND',
-                            availability: 'https://schema.org/InStock',
-                        },
-                        aggregateRating: {
-                            '@type': 'AggregateRating',
-                            ratingValue: '4.8',
-                            ratingCount: '1547',
-                            bestRating: '5',
-                            worstRating: '1',
-                        },
-                        author: {
-                            '@type': 'Organization',
+            {/* Chỉ thêm WebApplication schema cho các trang công cụ, không thêm cho trang content/tin-tuc */}
+            {pageType !== 'content' && pageType !== 'tin-tuc' && pageType !== 'article' && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'WebApplication',
                             name: siteName,
-                            url: siteUrl,
-                        },
-                        publisher: {
-                            '@type': 'Organization',
-                            name: siteName,
-                            logo: {
+                            alternateName: 'Tạo Dàn Đề Online',
+                            description: description,
+                            url: fullUrl,
+                            applicationCategory: 'UtilityApplication',
+                            operatingSystem: 'Any',
+                            browserRequirements: 'Requires JavaScript. Requires HTML5.',
+                            softwareVersion: '1.0.0',
+                            offers: {
+                                '@type': 'Offer',
+                                price: '0',
+                                priceCurrency: 'VND',
+                                availability: 'https://schema.org/InStock',
+                            },
+                            aggregateRating: {
+                                '@type': 'AggregateRating',
+                                ratingValue: '4.8',
+                                ratingCount: '1547',
+                                bestRating: '5',
+                                worstRating: '1',
+                            },
+                            author: {
+                                '@type': 'Organization',
+                                name: siteName,
+                                url: siteUrl,
+                            },
+                            publisher: {
+                                '@type': 'Organization',
+                                name: siteName,
+                                logo: {
+                                    '@type': 'ImageObject',
+                                    url: ogImageUrl,
+                                },
+                            },
+                            image: {
                                 '@type': 'ImageObject',
                                 url: ogImageUrl,
+                                width: 1200,
+                                height: 630,
                             },
-                        },
-                        image: {
-                            '@type': 'ImageObject',
-                            url: ogImageUrl,
-                            width: 1200,
-                            height: 630,
-                        },
-                        inLanguage: 'vi-VN',
-                        potentialAction: {
-                            '@type': 'UseAction',
-                            target: {
-                                '@type': 'EntryPoint',
-                                urlTemplate: fullUrl,
+                            inLanguage: 'vi-VN',
+                            potentialAction: {
+                                '@type': 'UseAction',
+                                target: {
+                                    '@type': 'EntryPoint',
+                                    urlTemplate: fullUrl,
+                                },
                             },
-                        },
-                    }),
-                }}
-            />
+                        }),
+                    }}
+                />
+            )}
 
             {/* ===== BREADCRUMB SCHEMA ===== */}
             {breadcrumbs && (

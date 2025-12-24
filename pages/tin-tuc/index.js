@@ -163,7 +163,7 @@ function NewsListingPage({
         ...(category ? [{ name: currentCategoryLabel, url: `/tin-tuc?category=${category}` }] : [])
     ];
 
-    // Structured data
+    // Structured data - CollectionPage với ItemList
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
@@ -173,17 +173,38 @@ function NewsListingPage({
         mainEntity: {
             '@type': 'ItemList',
             numberOfItems: totalArticles,
-            itemListElement: articles.slice(0, 10).map((article, index) => ({
-                '@type': 'ListItem',
-                position: index + 1,
-                item: {
-                    '@type': 'Article',
-                    headline: article.title,
-                    url: `${siteUrl}/tin-tuc/${article.slug}`,
-                    datePublished: article.publishedAt,
-                    image: article.featuredImage?.url || `${siteUrl}/logo1.png`
-                }
-            }))
+            itemListElement: articles.slice(0, 10).map((article, index) => {
+                const articleImage = article.featuredImage?.url
+                    ? (article.featuredImage.url.startsWith('http')
+                        ? article.featuredImage.url
+                        : `${siteUrl}${article.featuredImage.url.startsWith('/') ? article.featuredImage.url : '/' + article.featuredImage.url}`)
+                    : `${siteUrl}/logo1.png`;
+
+                return {
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    item: {
+                        '@type': 'Article',
+                        headline: article.title,
+                        url: `${siteUrl}/tin-tuc/${article.slug}`,
+                        datePublished: article.publishedAt,
+                        image: {
+                            '@type': 'ImageObject',
+                            url: articleImage,
+                            width: 1200,
+                            height: 630
+                        },
+                        publisher: {
+                            '@type': 'Organization',
+                            name: 'Kết Quả MN',
+                            logo: {
+                                '@type': 'ImageObject',
+                                url: `${siteUrl}/logo1.png`
+                            }
+                        }
+                    }
+                };
+            })
         }
     };
 

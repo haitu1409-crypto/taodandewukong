@@ -1753,7 +1753,7 @@ const DanDeFilter = memo(() => {
                                 ))}
                             </div>
                             {filterSelectedLevels.length > 0 && (
-                                <div className={styles.selectedLevels} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative' }}>
+                                <div className={styles.selectedLevels} style={{ display: 'none' }}>
                                     <strong>Đã chọn:</strong> {selectedLevelsString}
                                     {frequencyStatsData && (
                                         <>
@@ -1847,7 +1847,7 @@ const DanDeFilter = memo(() => {
                                 ))}
                             </div>
                             {filterSelectedLevels.length > 0 && (
-                                <div className={styles.selectedLevels} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', position: 'relative' }}>
+                                <div className={styles.selectedLevels} style={{ display: 'none' }}>
                                     <strong>Đã chọn:</strong> {selectedLevelsString}
                                     {frequencyStatsData && (
                                         <>

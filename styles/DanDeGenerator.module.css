@@ -265,7 +265,7 @@
   display: flex;
   flex-direction: column;
   /* ✅ FIX: Reserve space to prevent CLS when results load */
-  min-height: 600px;
+  min-height: 455px;
   contain: layout style paint;
 }
 
@@ -1660,7 +1660,7 @@
   display: flex;
   flex-direction: column;
   /* ✅ FIX: Reserve space to prevent CLS when results render */
-  min-height: 200px;
+  min-height: 180px;
   contain: layout style paint;
 }
 
@@ -1715,7 +1715,7 @@
   border: 2px solid var(--color-gray-400, #9ca3af);
   background: var(--color-white, #ffffff);
   color: var(--color-gray-900, #111827);
-  min-height: 200px;
+  min-height: 160px;
   resize: none;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -1825,9 +1825,9 @@
 
 /* ===== SPECIAL SETS STYLES ===== */
 .specialSetsContainer {
-  max-height: 280px;
+  max-height: 160px;
   overflow-y: auto;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   background: var(--color-white, #ffffff);
   padding: var(--spacing-3, 0.75rem);
   border-radius: var(--border-radius-md, 0.375rem);
@@ -1835,7 +1835,7 @@
 
 @media (min-width: 1024px) {
   .specialSetsContainer {
-    max-height: 280px;
+    max-height: 160px;
     padding: var(--spacing-1);
   }
 }
@@ -1862,7 +1862,7 @@
 
 .specialSetItem {
   padding: 2px;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   background: var(--color-white, #ffffff);
   cursor: pointer;
@@ -1883,16 +1883,18 @@
 .specialSetItem.selected {
   border-color: #059669;
   background: #d1fae5;
-  border-width: 3px;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+  border-width: 1px;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
 }
 
 @media (min-width: 1024px) {
   .specialSetItem.selected {
     border-color: #059669;
     background: #a7f3d0;
-    border-width: 3px;
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+    /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+    border-width: 1px;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
   }
 }
 
@@ -1975,7 +1977,7 @@
   margin-top: var(--spacing-2, 0.5rem);
   padding: var(--spacing-2, 0.5rem);
   background: var(--color-gray-50, #f9fafb);
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   font-size: var(--text-sm, 0.875rem);
   color: var(--color-gray-700, #374151);
@@ -2028,7 +2030,7 @@
 .touchSelectionContainer {
   max-height: 220px;
   overflow-y: auto;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   background: var(--color-white, #ffffff);
   padding: var(--spacing-3, 0.75rem);
   border-radius: var(--border-radius-md, 0.375rem);
@@ -2063,7 +2065,7 @@
 
 .touchSelectionItem {
   padding: 2px;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   background: var(--color-white, #ffffff);
   cursor: pointer;
@@ -2084,16 +2086,18 @@
 .touchSelectionItem.selected {
   border-color: #059669;
   background: #d1fae5;
-  border-width: 3px;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+  border-width: 1px;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
 }
 
 @media (min-width: 1024px) {
   .touchSelectionItem.selected {
     border-color: #059669;
     background: #a7f3d0;
-    border-width: 3px;
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+    /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+    border-width: 1px;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
   }
 }
 
@@ -2178,7 +2182,7 @@
   margin-top: var(--spacing-2, 0.5rem);
   padding: var(--spacing-2, 0.5rem);
   background: var(--color-gray-50, #f9fafb);
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   font-size: var(--text-sm, 0.875rem);
   color: var(--color-gray-700, #374151);
@@ -2196,7 +2200,7 @@
 .sumSelectionContainer {
   max-height: 220px;
   overflow-y: auto;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   background: var(--color-white, #ffffff);
   padding: var(--spacing-3, 0.75rem);
   border-radius: var(--border-radius-md, 0.375rem);
@@ -2231,7 +2235,7 @@
 
 .sumSelectionItem {
   padding: 2px;
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   background: var(--color-white, #ffffff);
   cursor: pointer;
@@ -2252,16 +2256,18 @@
 .sumSelectionItem.selected {
   border-color: #059669;
   background: #d1fae5;
-  border-width: 3px;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+  border-width: 1px;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
 }
 
 @media (min-width: 1024px) {
   .sumSelectionItem.selected {
     border-color: #059669;
     background: #a7f3d0;
-    border-width: 3px;
-    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+    /* ✅ FIX CLS: Giữ nguyên border-width 1px để tránh layout shift */
+    border-width: 1px;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), inset 0 0 0 1px rgba(5, 150, 105, 0.1);
   }
 }
 
@@ -2346,7 +2352,7 @@
   margin-top: var(--spacing-2, 0.5rem);
   padding: var(--spacing-2, 0.5rem);
   background: var(--color-gray-50, #f9fafb);
-  border: 2px solid var(--color-gray-400, #9ca3af);
+  border: 1px solid var(--color-gray-400, #9ca3af);
   border-radius: var(--border-radius-md, 0.375rem);
   font-size: var(--text-sm, 0.875rem);
   color: var(--color-gray-700, #374151);
@@ -3319,8 +3325,7 @@
 /* ===== LEVEL SELECTION STYLES ===== */
 .levelSelectionContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap: var(--spacing-2);
+  grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
   margin-top: var(--spacing-2);
 }
 
@@ -3351,6 +3356,9 @@
 }
 
 .selectedLevels {
+  display: none !important; /* ✅ Ẩn text selectedLevels */
+  visibility: hidden !important;
+  opacity: 0 !important;
   margin-top: var(--spacing-3);
   padding: var(--spacing-2);
   background: var(--color-primary-50);

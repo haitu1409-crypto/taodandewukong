@@ -9,9 +9,25 @@ import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { Calendar, Eye, Clock, ArrowRight } from 'lucide-react';
 import Layout from '../../components/Layout';
 import SEOOptimized from '../../components/SEOOptimized';
+
+// Simple SVG Icons - Lightweight alternative to lucide-react
+const CalendarIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+);
+
+const EyeIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+);
 
 const ITEMS_PER_PAGE = 12;
 
@@ -386,12 +402,12 @@ function NewsListingPage({
                                                     alignItems: 'center'
                                                 }}>
                                                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        <Calendar size={12} />
+                                                        <CalendarIcon size={12} />
                                                         {formatDate(article.publishedAt)}
                                                     </span>
                                                     {article.views > 0 && (
                                                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                            <Eye size={12} />
+                                                            <EyeIcon size={12} />
                                                             {article.views.toLocaleString('vi-VN')}
                                                         </span>
                                                     )}

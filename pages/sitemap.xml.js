@@ -21,6 +21,12 @@ function generateSiteMap(articles = []) {
             lastmod: currentDate,
         },
         {
+            url: '/dan-de-bat-tu',
+            changefreq: 'weekly',
+            priority: '0.9',
+            lastmod: currentDate,
+        },
+        {
             url: '/chinh-sach-bao-mat',
             changefreq: 'monthly',
             priority: '0.8',

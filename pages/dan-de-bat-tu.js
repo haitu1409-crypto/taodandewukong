@@ -1583,10 +1583,10 @@ export default function NewsPage() {
     const seoData = useMemo(() => {
         const ogImageUrl = `${siteUrl}/logo1.png`;
         return {
-            title: 'Tin Tức Xổ Số - Kinh Nghiệm, Soi Cầu, Dàn Đề | Cập Nhật 24/7',
-            description: 'Tin tức xổ số mới nhất về kinh nghiệm chơi lô đề, soi cầu lôtô, soi cầu đặc biệt, dàn đề bất tử. Hướng dẫn, phương pháp, thống kê chuyên sâu. Cập nhật 24/7.',
-            keywords: 'tin tức xổ số, kinh nghiệm lô đề, soi cầu lôtô, soi cầu đặc biệt, dàn đề bất tử, thống kê xổ số, dự đoán kết quả xổ số',
-            canonical: `${siteUrl}/tin-tuc`,
+            title: 'Dàn Đề Bất Tử - Bộ Số Vàng Không Bao Giờ Lỗi | KETQUAMN.COM',
+            description: 'Dàn đề bất tử được các chuyên gia đánh giá cao. Bộ số vàng với tỷ lệ trúng cao nhất hiện tại. Tổng hợp các bài viết về dàn đề bất tử, phương pháp tạo dàn đề hiệu quả.',
+            keywords: 'dàn đề bất tử, dàn đề bất tử 36 số, dàn đề bất tử miền bắc, dàn đề bất tử miền nam, tạo dàn đề bất tử, bộ số vàng, dàn đề chuyên nghiệp',
+            canonical: `${siteUrl}/dan-de-bat-tu`,
             ogImage: ogImageUrl,
             ogType: 'website'
         };
@@ -1631,7 +1631,7 @@ export default function NewsPage() {
 
     const breadcrumbs = [
         { name: 'Trang chủ', url: siteUrl },
-        { name: 'Tin Tức', url: `${siteUrl}/tin-tuc` }
+        { name: 'Dàn Đề Bất Tử', url: `${siteUrl}/dan-de-bat-tu` }
     ];
 
     // Enhanced handlers with debounce
